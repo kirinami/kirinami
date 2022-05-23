@@ -24,7 +24,7 @@ const frameworks = [
     ],
   },
   {
-    name: 'nest-next',
+    name: 'nest+next',
     color: yellow,
     variants: [
       {
@@ -61,159 +61,123 @@ const frameworks = [
   },
 ];
 
-const templates = frameworks.reduce((templates, framework) => [
-  ...templates, ...framework.variants.map((variant) => `${framework.name}${variant.name === 'base' ? '' : `-${variant.name}`}`),
-], []);
-
-function isValidPackageName(projectName) {
-  return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
-    projectName,
-  );
-}
-
-function toValidPackageName(projectName) {
-  return projectName
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/^[._]/, '')
-    .replace(/[^a-z0-9-~]+/g, '-');
-}
-
-function isEmpty(path) {
-  if (!fs.existsSync(path)) {
+const isEmptyDir = (dir) => {
+  if (!fs.existsSync(dir)) {
     return true;
   }
 
-  const files = fs.readdirSync(path);
+  const files = fs.readdirSync(dir);
   return files.length === 0 || (files.length === 1 && files[0] === '.git');
-}
+};
 
-function pkgFromUserAgent(userAgent) {
-  if (!userAgent) return undefined;
-  const pkgSpec = userAgent.split(' ')[0];
-  const pkgSpecArr = pkgSpec.split('/');
-  return {
-    name: pkgSpecArr[0],
-    version: pkgSpecArr[1],
-  };
-}
+const formatProjectName = (projectName) => projectName
+  .trim()
+  .replace(/\W+/g, '-')
+  .replace(/^-+/g, '')
+  .replace(/-+$/g, '');
 
 async function main() {
-  let targetDir = argv._[0];
-  let template = argv.template || argv.t;
+  const targetDir = argv._[0] ? path.resolve(argv._[0]) : null;
 
-  const defaultProjectName = !targetDir ? 'app' : targetDir.trim().replace(/\/+$/g, '');
+  const template = argv.template || argv.t || null;
+  const templateFramework = template?.split('-')[0];
+  const templateVariant = template?.split('-')[1];
 
-  let result = {};
+  const defaultProjectName = targetDir ? path.basename(targetDir) : 'app';
+  const defaultFramework = frameworks.find(framework => framework.name === templateFramework) || null;
+  const defaultVariant = defaultFramework?.variants.find(variant => {
+    variant.name === (templateVariant == null ? 'base' : templateVariant);
 
-  try {
-    result = await prompts(
-      [
-        {
-          type: targetDir ? null : 'text',
-          name: 'projectName',
-          message: reset('Project name:'),
-          initial: defaultProjectName,
-          onState: (state) => (targetDir = state.value.trim().replace(/\/+$/g, '') || defaultProjectName),
-        },
-        {
-          type: () => isEmpty(targetDir) ? null : 'confirm',
-          name: 'overwrite',
-          message: () => (targetDir === '.' ? 'Current directory' : `Target directory "${targetDir}"`) + ` is not empty. Remove existing files and continue?`,
-        },
-        {
-          type: (_, { overwrite } = {}) => {
-            if (overwrite === false) {
-              throw new Error(red('✖') + ' Operation cancelled');
-            }
-            return null;
-          },
-          name: 'overwriteChecker',
-        },
-        {
-          type: () => (isValidPackageName(targetDir) ? null : 'text'),
-          name: 'packageName',
-          message: reset('Package name:'),
-          initial: () => toValidPackageName(targetDir),
-          validate: (dir) => isValidPackageName(dir) || 'Invalid package.json name',
-        },
-        {
-          type: template && templates.includes(template) ? null : 'select',
-          name: 'framework',
-          message: typeof template === 'string' && !templates.includes(template)
-            ? reset(`"${template}" isn't a valid template. Please choose from below: `)
-            : reset('Select a framework:'),
-          initial: 0,
-          choices: frameworks.map((framework) => ({
-            title: framework.color(framework.name),
-            value: framework,
-          })),
-        },
-        {
-          type: (framework) => framework && framework.variants ? 'select' : null,
-          name: 'variant',
-          message: reset('Select a variant:'),
-          choices: (framework) => framework.variants.map((variant) => ({
-            title: variant.color(variant.name),
-            value: variant.name,
-          })),
-        },
-      ],
+    if (templateVariant === undefined) {
+      return variant.name === 'base';
+    }
+
+    if (templateVariant === '') {
+      return false;
+    }
+
+    return variant.name === templateVariant;
+  }) || null;
+
+  const {
+    projectName = defaultProjectName,
+    overwrite = false,
+    framework = defaultFramework,
+    variant = defaultVariant,
+  } = await prompts(
+    [
       {
-        onCancel: () => {
-          throw new Error(red('✖') + ' Operation cancelled');
-        },
+        type: targetDir ? null : 'text',
+        name: 'projectName',
+        message: reset('Project name:'),
+        initial: defaultProjectName,
+        format: (value) => formatProjectName(value),
       },
-    );
-  } catch (err) {
-    console.log(err.message);
-    return;
-  }
+      {
+        type: () => isEmptyDir(targetDir) ? null : 'confirm',
+        name: 'overwrite',
+        message: () => (targetDir === '.' ? 'Current directory' : `Target directory "${targetDir}"`) + ' is not empty. Remove existing files and continue?',
+      },
+      {
+        type: (_, { overwrite }) => {
+          if (overwrite === false) {
+            throw new Error(red('✖') + ' Operation cancelled');
+          }
 
-  const { framework, overwrite, packageName, variant } = result;
+          return null;
+        },
+        name: 'overwriteChecker',
+      },
+      {
+        type: !defaultFramework ? 'select' : null,
+        name: 'framework',
+        message: typeof template === 'string' && !defaultFramework
+          ? reset(`"${template}" isn't a valid framework. Please choose from below: `)
+          : reset('Select a framework:'),
+        choices: frameworks.map((framework) => ({
+          title: framework.color(framework.name),
+          value: framework,
+        })),
+      },
+      {
+        type: !defaultVariant ? 'select' : null,
+        name: 'variant',
+        message: reset('Select a variant:'),
+        choices: (framework = defaultFramework) => framework.variants.map((variant) => ({
+          title: variant.color(variant.name),
+          value: variant,
+        })),
+      },
+    ],
+    {
+      onCancel: () => {
+        throw new Error(red('✖') + ' Operation cancelled');
+      },
+    },
+  );
 
-  const root = path.join(cwd, targetDir);
+  const projectDir = path.resolve(cwd, targetDir || projectName);
 
   if (overwrite) {
-    fs.emptyDirSync(root);
-  } else if (!fs.existsSync(root)) {
-    fs.mkdirSync(root, { recursive: true });
+    fs.emptyDirSync(projectDir);
+  } else if (!fs.existsSync(projectDir)) {
+    fs.mkdirSync(projectDir, { recursive: true });
   }
 
-  template = variant ? `${framework.name}${variant === 'base' ? '' : `-${variant}`}` : template;
+  console.log(`${yellow('➔')} Scaffolding project in ${projectDir}`);
 
-  console.log(`\nScaffolding project in ${root}...`);
+  fs.copySync(path.join(__dirname, 'frameworks', framework.name), projectDir);
 
-  const templateDir = path.join(__dirname, 'templates', template);
-
-  fs.copySync(path.join(templateDir), root);
-
-  const pkg = fs.readJsonSync(path.join(root, `package.json`));
-  pkg.name = packageName || targetDir;
-  fs.writeJsonSync(path.join(root, 'package.json'), pkg, { spaces: 2 });
-
-  const pkgInfo = pkgFromUserAgent(process.env.npm_config_user_agent);
-  const pkgManager = pkgInfo ? pkgInfo.name : 'npm';
-
-  console.log(`\nDone. Now run:\n`);
-
-  if (root !== cwd) {
-    console.log(`  cd ${path.relative(cwd, root)}`);
+  if (variant && variant.name !== 'base') {
+    fs.copySync(path.join(__dirname, 'variants', `${framework.name}-${variant.name}`), projectDir);
   }
 
-  switch (pkgManager) {
-    case 'yarn':
-      console.log('  yarn');
-      console.log('  yarn dev');
-      break;
-    default:
-      console.log(`  ${pkgManager} install`);
-      console.log(`  ${pkgManager} run dev`);
-      break;
-  }
-  console.log();
+  const pkg = fs.readJsonSync(path.join(projectDir, `package.json`));
+  pkg.name = projectName;
+  fs.writeJsonSync(path.join(projectDir, 'package.json'), pkg, { spaces: 2 });
+
+  console.log(`${green('✔')} Done`);
 }
 
 main()
-  .catch(console.error);
+  .catch((err) => console.error(err.message));
