@@ -11,6 +11,7 @@ module.exports = {
   rules: {
     'no-console': 'off',
     'no-param-reassign': 'off',
+    'consistent-return': 'off',
     'prefer-destructuring': 'off',
     'prefer-arrow-callback': ['error', {
       'allowNamedFunctions': true,

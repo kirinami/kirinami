@@ -7,7 +7,7 @@ RUN yarn install --frozen-lockfile
 COPY . .
 ENV NODE_ENV production
 RUN yarn build
-RUN yarn install --production --ignore-scripts --prefer-offline
+RUN yarn install --frozen-lockfile --prefer-offline --production
 
 FROM node:16.13-alpine AS runner
 WORKDIR /app

@@ -1,23 +1,27 @@
-import { ArgumentsHost, Catch, HttpServer } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
+import { Catch, ExecutionContext, HttpServer } from '@nestjs/common';
 import { RequestHandler } from 'next/dist/server/next';
+
+import { getRequestFromContext } from './utils/get-request-from-context';
 
 @Catch()
 export class AppExceptionFilter extends BaseExceptionFilter {
-  constructor(protected requestHandler: RequestHandler, protected applicationRef?: HttpServer) {
+  constructor(private readonly requestHandler: RequestHandler, applicationRef?: HttpServer) {
     super(applicationRef);
   }
 
-  catch(exception: unknown, host: ArgumentsHost) {
-    const http = host.switchToHttp();
-    const req = http.getRequest();
-    const res = http.getResponse();
-    const url = this.applicationRef?.getRequestUrl?.(req) || '';
+  catch(exception: unknown, context: ExecutionContext) {
+    const type = context.getType<string>();
+    const req = getRequestFromContext(context);
+    const res = context.switchToHttp().getResponse();
+    const url = req.originalUrl || req.url;
 
-    if (!res.headersSent && !/^\/api(?:\/.*|$)/.test(url)) {
+    if (!res?.headersSent && !/^\/api(?:\/.*|$)/.test(url)) {
       return this.requestHandler(req, res);
     }
 
-    return super.catch(exception, host);
+    if (type === 'http') {
+      return super.catch(exception, context);
+    }
   }
 }

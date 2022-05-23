@@ -8,7 +8,7 @@ COPY . .
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN yarn build
-RUN yarn install --production --ignore-scripts --prefer-offline
+RUN yarn install --frozen-lockfile --prefer-offline --production
 
 FROM node:16.13-alpine AS runner
 WORKDIR /app
