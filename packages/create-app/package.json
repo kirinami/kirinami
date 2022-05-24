@@ -11,6 +11,7 @@
     "src/*"
   ],
   "main": "src/main.js",
+  "type": "module",
   "engines": {
     "node": ">=14.6.0"
   },
@@ -24,13 +25,8 @@
   },
   "homepage": "https://github.com/kirinami/kirinami/tree/main/packages/create-app#readme",
   "dependencies": {
-    "fs-extra": "^10.1.0",
     "kolorist": "^1.5.1",
     "minimist": "^1.2.6",
-    "prompts": "^2.4.2",
-    "react-modal": "^3.15.1"
-  },
-  "devDependencies": {
-    "@types/fs-extra": "^9.0.13"
+    "prompts": "^2.4.2"
   }
 }

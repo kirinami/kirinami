@@ -1,0 +1,24 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src/api",
+  "entryFile": "main",
+  "compilerOptions": {
+    "tsConfigPath": "tsconfig.nest.json",
+    "plugins": [
+      {
+        "name": "@nestjs/swagger",
+        "options": {
+          "dtoFileNameSuffix": [
+            ".dto.ts",
+            ".entity.ts"
+          ],
+          "controllerFileNameSuffix": ".controller.ts",
+          "introspectComments": true
+        }
+      }
+    ]
+  },
+  "generateOptions": {
+    "spec": false
+  }
+}

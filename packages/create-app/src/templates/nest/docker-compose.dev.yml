@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  postgres:
+    env_file:
+      - .env.local
+    image: postgres:13.2-alpine
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    restart: unless-stopped
+
+volumes:
+  postgres:
