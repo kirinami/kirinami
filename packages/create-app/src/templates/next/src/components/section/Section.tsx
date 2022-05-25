@@ -17,9 +17,9 @@ export default function Section({ className, title, page, children }: ContainerP
       <p css={styles.description}>Get started by editing <code css={styles.code}>{page}</code></p>
       <hr css={styles.delimiter} />
       <div css={styles.menu}>
-        <Link href="/"><a css={styles.link}>Home</a></Link>
-        <Link href="/todos"><a css={styles.link}>Todos</a></Link>
-        <Link href="/404"><a css={styles.link}>404</a></Link>
+        <Link href="/" passHref><a css={styles.link}>Home</a></Link>
+        <Link href="/todos" passHref><a css={styles.link}>Todos</a></Link>
+        <Link href="/404" passHref><a css={styles.link}>404</a></Link>
       </div>
       <hr css={styles.delimiter} />
       <div css={styles.content}>{children}</div>

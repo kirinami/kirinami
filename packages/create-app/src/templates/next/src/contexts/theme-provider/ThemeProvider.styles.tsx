@@ -322,7 +322,7 @@ export const styles = {
       outline: 1px solid ButtonText;
       outline: 1px auto -webkit-focus-ring-color;
     }
-    
+
     #__next {
       display: flex;
       flex-direction: column;
