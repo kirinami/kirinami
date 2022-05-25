@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
-import Container from '@/components/container/Container';
+import Section from '@/components/section/Section';
 import AddTodoModal from '@/containers/todos/AddTodoModal';
 import TodosList from '@/containers/todos/TodosList';
-import Todo from '@/types/Todo';
+import { Todo } from '@/types/todos';
 import delay from '@/utils/delay';
 
 export type TodosPageProps = Awaited<ReturnType<typeof getServerSideProps>>['props'];
@@ -61,7 +61,7 @@ export default function TodosPage(props: TodosPageProps) {
   };
 
   return (
-    <Container title="Todos" page="pages/todos.tsx">
+    <Section title="Todos" page="pages/todos.tsx">
       <AddTodoModal
         visible={addModalVisible}
         loading={addModalLoading}
@@ -76,6 +76,6 @@ export default function TodosPage(props: TodosPageProps) {
         onRemove={handleRemoveTodo}
         onAdd={handleAddModalOpen}
       />
-    </Container>
+    </Section>
   );
 }

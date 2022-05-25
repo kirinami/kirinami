@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { css, Theme } from '@emotion/react';
 
 import Button from '@/components/button/Button';
@@ -17,7 +18,12 @@ export default function IndexPage() {
 
   return (
     <Section title="Index" page="pages/index.tsx">
-      <div css={styles.container}>12312</div>
+      <div css={styles.container}>
+        12312
+        <Link href="/">
+          <a>Test</a>
+        </Link>
+      </div>
       <Spinner variant={theme === 'light' ? 'primary' : 'secondary'} />
       <Button onClick={toggleTheme}>
         <Icon name="add" />

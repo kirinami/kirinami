@@ -55,7 +55,7 @@ export default function AddTodoModal({ visible, loading, onSubmit, onClose }: Ad
           onChange={(event) => setTitle(event.target.value)}
         />
       </label>
-      <Button loading={loading} disabled={title.length === 0} onClick={handleSubmit}>Submit</Button>
+      <Button disabled={title.length === 0} onClick={handleSubmit}>Submit</Button>
     </Modal>
   );
 }

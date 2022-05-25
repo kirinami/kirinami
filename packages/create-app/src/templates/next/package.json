@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "tsc --noEmit && eslint src",
     "test": "exit 0"
   },
   "dependencies": {

@@ -3,7 +3,7 @@ import { Global, ThemeProvider } from '@emotion/react';
 
 import light from './themes/light';
 import dark from './themes/dark';
-import { styles } from './Theme.styles';
+import styles from './Theme.styles';
 
 const themes = {
   light,

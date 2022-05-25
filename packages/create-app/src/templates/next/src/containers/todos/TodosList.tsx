@@ -2,7 +2,7 @@ import { MouseEvent } from 'react';
 
 import Spinner from '@/components/spinner/Spinner';
 import Button from '@/components/button/Button';
-import Todo from '@/types/Todo';
+import { Todo } from '@/types/todos';
 
 export type TodosListProps = {
   todos: Todo[],
@@ -50,7 +50,7 @@ export default function TodosList({ todos, completeLoading, onComplete, onRemove
         ))}
       </ul>
 
-      <Button icon="add" onClick={onAdd}>Add todo</Button>
+      <Button onClick={onAdd}>Add todo</Button>
     </div>
   );
 }
