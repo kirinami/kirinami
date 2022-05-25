@@ -57,6 +57,7 @@ module.exports = {
 
     'react/react-in-jsx-scope': 'off',
     'react/require-default-props': 'off',
+    'react/jsx-no-constructed-context-values': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/jsx-one-expression-per-line': 'off',
     'react/destructuring-assignment': 'off',

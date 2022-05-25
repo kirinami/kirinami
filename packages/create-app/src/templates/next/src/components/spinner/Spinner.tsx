@@ -1,24 +1,17 @@
 import React from 'react';
-import classNames from 'classnames';
 
-import styles from './Spinner.module.scss';
+import styles from './Spinner.styles';
 
 export type SpinnerProps = {
   className?: string,
-  variant?: 'primary' | 'secondary',
+  variant?: 'primary' | 'secondary' | 'light',
   size?: number,
 };
 
 export default function Spinner({ className, variant = 'primary', size = 24 }: SpinnerProps) {
   return (
-    <div className={classNames(styles.container, className)}>
-      <div
-        className={classNames(styles.spinner, {
-          [styles.primary]: variant === 'primary',
-          [styles.secondary]: variant === 'secondary',
-        })}
-        style={{ width: size }}
-      />
+    <div css={styles.container} className={className}>
+      <div css={styles.spinner(variant, size)} />
     </div>
   );
 }
