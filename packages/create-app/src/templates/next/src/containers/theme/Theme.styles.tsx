@@ -9,10 +9,6 @@ export const styles = {
       border-color: #e5e7eb;
     }
 
-    ::before, ::after {
-      content: "";
-    }
-    
     html, body {
       height: 100%;
       min-height: 100%;
