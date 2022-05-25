@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css, Theme } from '@emotion/react';
 
 const styles = {
   container: css`
@@ -13,7 +13,7 @@ const styles = {
     text-align: center;
   `,
   description: css`
-    margin: 4rem 0;
+    margin: 4rem 0 2rem 0;
     line-height: 1.5;
     font-size: 1.5rem;
     text-align: center;
@@ -23,6 +23,29 @@ const styles = {
     border-radius: 5px;
     padding: 0.75rem;
     font-size: 1.1rem;
+  `,
+  delimiter: css`
+    margin: 32px 0;
+  `,
+  menu: css`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    > :not([hidden]) ~ :not([hidden]) {
+      margin-left: 16px;
+    }
+  `,
+  link: (theme: Theme) => css`
+    color: ${theme.colors.primary};
+
+    &:hover {
+      opacity: 0.8;
+    }
+  `,
+  content: css`
+    display: flex;
+    justify-content: center;
   `,
 };
 

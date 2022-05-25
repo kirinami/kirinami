@@ -9,11 +9,11 @@ import Theme from '@/containers/theme/Theme';
 
 Modal.setAppElement('#__next');
 
-const cache = createCache({
-  key: 'next',
-});
-
 export default function MyApp({ Component, pageProps }: AppProps) {
+  const cache = createCache({
+    key: 'app',
+  });
+
   return (
     <CacheProvider value={cache}>
       <Theme>

@@ -23,7 +23,7 @@ const styles = {
     }
 
     > :not([hidden]) ~ :not([hidden]) {
-      margin: 0 12px;
+      margin: 0 0 0 12px;
     }
   `,
 };

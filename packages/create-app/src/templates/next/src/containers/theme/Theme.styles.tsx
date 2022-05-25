@@ -12,6 +12,11 @@ export const styles = {
     ::before, ::after {
       content: "";
     }
+    
+    html, body {
+      height: 100%;
+      min-height: 100%;
+    }
 
     html {
       line-height: 1.5;
@@ -47,6 +52,7 @@ export const styles = {
     a {
       color: inherit;
       text-decoration: inherit;
+      cursor: pointer;
     }
 
     b, strong {
@@ -319,6 +325,12 @@ export const styles = {
     [type="file"]:focus {
       outline: 1px solid ButtonText;
       outline: 1px auto -webkit-focus-ring-color;
+    }
+    
+    #__next {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
   `,
 };

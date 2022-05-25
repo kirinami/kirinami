@@ -4,18 +4,10 @@ import Section from '@/components/section/Section';
 import AddTodoModal from '@/containers/todos/AddTodoModal';
 import TodosList from '@/containers/todos/TodosList';
 import { Todo } from '@/types/todos';
-import delay from '@/utils/delay';
-
-export type TodosPageProps = Awaited<ReturnType<typeof getServerSideProps>>['props'];
+import http from '@/utils/http';
 
 export const getServerSideProps = async () => {
-  await delay(500);
-
-  const todos: Todo[] = [
-    { id: 1, title: 'Todo 1', completed: false },
-    { id: 2, title: 'Todo 2', completed: true },
-    { id: 3, title: 'Todo 3', completed: false },
-  ];
+  const { data: todos } = await http.get<Todo[]>('/todos');
 
   return {
     props: {
@@ -23,6 +15,8 @@ export const getServerSideProps = async () => {
     },
   };
 };
+
+export type TodosPageProps = Awaited<ReturnType<typeof getServerSideProps>>['props'];
 
 export default function TodosPage(props: TodosPageProps) {
   const [addModalVisible, setAddModalVisible] = useState(false);
@@ -37,26 +31,27 @@ export default function TodosPage(props: TodosPageProps) {
 
   const handleTodoComplete = async (id: number, completed: boolean) => {
     setTodosLoading((prevTodosLoading) => [...prevTodosLoading, id]);
-    await delay();
+    await http.patch(`/todos/${id}`, {
+      completed,
+    });
     setTodos((prevTodos) => prevTodos.map((todo) => (todo.id === id ? { ...todo, completed } : todo)));
     setTodosLoading((prevTodosLoading) => prevTodosLoading.filter((prevTodoLoading) => prevTodoLoading !== id));
   };
 
   const handleRemoveTodo = async (id: number) => {
     setTodosLoading((prevTodosLoading) => [...prevTodosLoading, id]);
-    await delay();
+    await http.delete(`/todos/${id}`);
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
     setTodosLoading((prevTodosLoading) => prevTodosLoading.filter((prevTodoLoading) => prevTodoLoading !== id));
   };
 
   const handleSubmitTodo = async (title: string, completed: boolean) => {
     setAddModalLoading(true);
-    await delay();
-    setTodos((prevTodos) => [...prevTodos, {
-      id: Math.round(Math.random() * 1000000),
+    const { data: todo } = await http.post<Todo>('/todos', {
       title,
       completed,
-    }]);
+    });
+    setTodos((prevTodos) => [...prevTodos, todo]);
     setAddModalLoading(false);
   };
 

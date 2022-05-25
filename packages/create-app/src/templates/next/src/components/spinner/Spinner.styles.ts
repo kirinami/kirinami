@@ -27,8 +27,8 @@ const styles = {
     `}
 
     ${variant === 'secondary' && css`
-      border-color: rgba(0, 243, 105, 0.2);
-      border-left-color: #00f369;
+      border-color: rgba(68, 68, 68, 0.2);
+      border-left-color: #444444;
     `}
 
     ${variant === 'light' && css`
