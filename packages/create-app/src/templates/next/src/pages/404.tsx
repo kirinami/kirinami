@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router';
 
-import Section from '@/components/section/Section';
+import Layout from '@/containers/layout/Layout';
 
 export default function NotFoundPage() {
   const router = useRouter();
 
   return (
-    <Section title="Not Found" page="pages/404.tsx">
+    <Layout title="Not Found" page="pages/404.tsx">
       URL: {router.pathname}
-    </Section>
+    </Layout>
   );
 }

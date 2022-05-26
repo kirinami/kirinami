@@ -1,9 +1,9 @@
 import { css } from '@emotion/react';
 
 export const styles = {
-  container: css`
-    width: 16px;
-    height: 16px;
+  container: (size: number) => css`
+    width: ${size}px;
+    height: ${size}px;
   `,
 };
 

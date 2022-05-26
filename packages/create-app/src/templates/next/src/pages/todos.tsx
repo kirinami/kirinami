@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import Section from '@/components/section/Section';
+import Layout from '@/containers/layout/Layout';
 import AddTodoModal from '@/containers/todos/AddTodoModal';
 import TodosList from '@/containers/todos/TodosList';
 import { Todo } from '@/types/todos';
@@ -56,7 +56,7 @@ export default function TodosPage(props: TodosPageProps) {
   };
 
   return (
-    <Section title="Todos" page="pages/todos.tsx">
+    <Layout title="Todos" page="pages/todos.tsx">
       <AddTodoModal
         visible={addModalVisible}
         loading={addModalLoading}
@@ -71,6 +71,6 @@ export default function TodosPage(props: TodosPageProps) {
         onRemove={handleRemoveTodo}
         onAdd={handleAddModalOpen}
       />
-    </Section>
+    </Layout>
   );
 }

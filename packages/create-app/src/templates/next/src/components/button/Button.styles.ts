@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 const styles = {
   container: css`
     display: flex;
-    align-self: flex-start;
+    align-self: inherit;
     justify-content: center;
     align-items: center;
     padding: 12px 18px;

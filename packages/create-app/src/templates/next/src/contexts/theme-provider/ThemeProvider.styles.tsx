@@ -214,11 +214,12 @@ export const styles = {
 
     [type="text"], [type="email"], [type="url"], [type="password"], [type="number"], [type="date"], [type="datetime-local"],
     [type="month"], [type="search"], [type="tel"], [type="time"], [type="week"], [multiple], textarea, select {
+      width: 100%;
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
       background-color: #ffffff;
-      border-color: #6b7280;
+      border-color: #cdd1d9;
       border-width: 1px;
       border-radius: 0;
       padding: 0.5rem 0.75rem;
@@ -231,7 +232,7 @@ export const styles = {
     [type="time"]:focus, [type="week"]:focus, [multiple]:focus, textarea:focus, select:focus {
       outline: 2px solid transparent;
       outline-offset: 2px;
-      box-shadow: 1px 1px 1px #000000; // TODO
+      //box-shadow: 1px 1px 1px #000000; // TODO
       border-color: #2563eb;
     }
 
@@ -270,7 +271,7 @@ export const styles = {
     [type="checkbox"]:focus, [type="radio"]:focus {
       outline: 2px solid transparent;
       outline-offset: 2px;
-      box-shadow: 1px 1px 1px #000000; // TODO
+      //box-shadow: 1px 1px 1px #000000; // TODO
     }
 
     [type="checkbox"]:checked, [type="radio"]:checked {

@@ -1,9 +1,9 @@
-import Section from '@/components/section/Section';
+import Layout from '@/containers/layout/Layout';
 
 export default function IndexPage() {
   return (
-    <Section title="Index" page="pages/index.tsx">
+    <Layout title="Index" page="pages/index.tsx">
       Index Page
-    </Section>
+    </Layout>
   );
 }
