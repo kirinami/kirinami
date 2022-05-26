@@ -1,8 +1,8 @@
 import { MouseEvent } from 'react';
 
-import Spinner from '@/components/spinner/Spinner';
-import Button from '@/components/button/Button';
-import { Todo } from '@/types/todos';
+import Spinner from '../Base/Spinner/Spinner';
+import Button from '../Base/Button/Button';
+import { Todo } from '../../types/todos';
 
 export type TodosListProps = {
   todos: Todo[],

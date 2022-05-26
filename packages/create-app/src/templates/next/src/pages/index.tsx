@@ -1,9 +1,5 @@
-import Layout from '@/containers/layout/Layout';
+import HomePage from '@/components/Page/HomePage/HomePage';
 
-export default function IndexPage() {
-  return (
-    <Layout title="Index" page="pages/index.tsx">
-      Index Page
-    </Layout>
-  );
+export default function Page() {
+  return <HomePage />;
 }

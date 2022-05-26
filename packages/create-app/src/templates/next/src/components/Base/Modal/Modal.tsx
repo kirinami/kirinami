@@ -1,7 +1,7 @@
 import BaseModal from 'react-modal';
 import { ClassNames } from '@emotion/react';
 
-import Icon from '../icon/Icon';
+import Icon from '../Icon/Icon';
 
 import styles from './Modal.styles';
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Modal from 'react-modal';
 
-import Button from '@/components/button/Button';
+import Button from '../Base/Button/Button';
 
 export type AddTodoModalProps = {
   visible: boolean,

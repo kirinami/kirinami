@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
 
-import LoginFormModal from '../modals/login-form-modal/LoginFormModal';
+import LoginModal from '@/components/Modal/LoginModal/LoginModal';
 
-import styles from './Layout.styles';
+import styles from './PageLayout.styles';
 
 export type LayoutProps = {
   title: string,
@@ -11,10 +11,10 @@ export type LayoutProps = {
   children: ReactNode,
 };
 
-export default function Layout({ title, page, children }: LayoutProps) {
+export default function PageLayout({ title, page, children }: LayoutProps) {
   return (
     <>
-      <LoginFormModal />
+      <LoginModal />
 
       <div css={styles.container}>
         <main css={styles.content}>

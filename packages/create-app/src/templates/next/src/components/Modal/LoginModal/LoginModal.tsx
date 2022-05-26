@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
 
-import Modal from '@/components/modal/Modal';
-import LoginForm from '@/containers/forms/login-form/LoginForm';
+import Modal from '@/components/Base/Modal/Modal';
+import LoginForm from '@/components/Form/LoginForm/LoginForm';
 
-import styles from './LoginFormModal.styles';
+import styles from './LoginModal.styles';
 
-export default function LoginFormModal() {
+export default function LoginModal() {
   const [isOpen, setIsOpen] = useState(true);
 
   const handleRequestClose = useCallback(() => setIsOpen(false), []);

@@ -9,8 +9,6 @@ const styles = {
       margin-top: 8px;
     }
   `,
-  group: css`
-  `,
   input: css`
     border-radius: 6px;
   `,

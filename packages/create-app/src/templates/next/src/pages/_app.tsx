@@ -1,8 +1,8 @@
 import { AppProps } from 'next/app';
 
-import Meta from '@/containers/meta/Meta';
-import EmotionProvider from '@/contexts/emotion-provider/EmotionProvider';
-import ThemeProvider from '@/contexts/theme-provider/ThemeProvider';
+import Meta from '@/components/Meta/Meta';
+import EmotionProvider from '@/components/Provider/EmotionProvider/EmotionProvider';
+import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (

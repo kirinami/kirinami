@@ -1,7 +1,7 @@
 import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 
-import { emotionCache } from '@/contexts/emotion-provider/EmotionProvider';
+import { emotionCache } from '@/components/Provider/EmotionProvider/EmotionProvider';
 
 function MyDocument() {
   return (
