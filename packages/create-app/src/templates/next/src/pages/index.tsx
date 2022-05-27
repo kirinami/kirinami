@@ -1,4 +1,5 @@
 import HomePage from '@/components/Page/HomePage/HomePage';
+import TodosProvider from '@/components/Provider/TodosProvider/TodosProvider';
 import todosApi from '@/helpers/api/todosApi';
 
 export const getServerSideProps = async () => {
@@ -14,5 +15,9 @@ export const getServerSideProps = async () => {
 };
 
 export default function Page({ todos }: Awaited<ReturnType<typeof getServerSideProps>>['props']) {
-  return <HomePage todos={todos} />;
+  return (
+    <TodosProvider todos={todos}>
+      <HomePage />
+    </TodosProvider>
+  );
 }

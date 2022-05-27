@@ -4,7 +4,7 @@ const styles = {
   list: css`
     position: relative;
   `,
-  item: (completed: boolean) => css`
+  item: (readonly?: boolean) => css`
     position: relative;
     display: flex;
     flex-direction: row;
@@ -14,9 +14,9 @@ const styles = {
     border-bottom: 1px solid #e0e0e0;
     font-size: 14px;
 
-    ${completed && css`
+    ${readonly && css`
       opacity: 0.4;
-      //pointer-events: none;
+      pointer-events: none;
     `};
 
     &:last-child {

@@ -1,9 +1,14 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  form: css`
+  form: (loading?: boolean) => css`
     display: flex;
     flex-direction: column;
+    
+    ${loading && css`
+      pointer-events: none;
+      filter: grayscale(50%);
+    `};
 
     > :not([hidden]) ~ :not([hidden]) {
       margin-top: 8px;

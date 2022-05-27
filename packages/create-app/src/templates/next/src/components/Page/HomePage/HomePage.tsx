@@ -1,72 +1,54 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import Badge from '@/components/Base/Badge/Badge';
 import Button from '@/components/Base/Button/Button';
 import Search from '@/components/Common/Search/Search';
 import TodoList from '@/components/Common/TodoList/TodoList';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
-import { TodoFormData } from '@/components/Form/TodoForm/TodoForm';
+import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
-import todosApi, { Todo } from '@/helpers/api/todosApi';
+import { Todo } from '@/helpers/api/todosApi';
+import useTodos from '@/hooks/useTodos';
 
 import styles from './HomePage.styles';
 
-export type HomePageProps = {
-  todos: Todo[],
-};
-
-export default function HomePage(props: HomePageProps) {
+export default function HomePage() {
   const [editTodoModalOpen, setEditTodoModalOpen] = useState(false);
-  const [editTodoModalLoading, setEditTodoModalLoading] = useState(false);
   const [editTodoModalTodo, setEditTodoModalTodo] = useState<Todo>();
 
-  const [todosLoading, setTodosLoading] = useState<number[]>([]);
-  const [todos, setTodos] = useState(props.todos);
+  const [removeTodoModalOpen, setRemoveTodoModalOpen] = useState(false);
+  const [removeTodoModalTodo, setRemoveTodoModalTodo] = useState<Todo>();
+
+  const { todos, updateTodo } = useTodos();
 
   const holdTodos = todos; // useMemo(() => todos.filter((todo) => !todo.completed), [todos]);
-  const completedTodos = todos; // useMemo(() => todos.filter((todo) => todo.completed), [todos]);
+  const completedTodos = useMemo(() => todos.filter((todo) => todo.completed), [todos]);
 
   const handleAdd = useCallback(() => {
     setEditTodoModalOpen(true);
-    setEditTodoModalLoading(false);
     setEditTodoModalTodo(undefined);
   }, []);
 
   const handleChange = useCallback(async (changedTodo: Todo) => {
-    const todo = await todosApi.update(changedTodo.id, {
+    await updateTodo(changedTodo.id, {
       completed: changedTodo.completed,
     });
-    setTodos((prevTodos) => prevTodos.map((prevTodo) => (prevTodo.id === todo.id ? { ...prevTodo, ...todo } : prevTodo)));
-  }, []);
+  }, [updateTodo]);
 
   const handleEdit = useCallback((todo: Todo) => {
     setEditTodoModalOpen(true);
-    setEditTodoModalLoading(false);
     setEditTodoModalTodo(todo);
   }, []);
 
   const handleRemove = useCallback((todo: Todo) => {
-    console.log(todo);
-    // await todosApi.remove(id);
-    // setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    setRemoveTodoModalOpen(true);
+    setRemoveTodoModalTodo(todo);
   }, []);
 
-  const handleClose = useCallback(() => {
+  const handleModalClose = useCallback(() => {
     setEditTodoModalOpen(false);
+    setRemoveTodoModalOpen(false);
   }, []);
-
-  const handleSubmit = useCallback(async (formData: TodoFormData) => {
-    setEditTodoModalLoading(true);
-    if (editTodoModalTodo) {
-      const todo = await todosApi.update(editTodoModalTodo.id, formData);
-      setTodos((prevTodos) => prevTodos.map((prevTodo) => (prevTodo.id === todo.id ? { ...prevTodo, ...todo } : prevTodo)));
-    } else {
-      const todo = await todosApi.create(formData);
-      setTodos((prevTodos) => [...prevTodos, todo]);
-    }
-    setEditTodoModalLoading(false);
-    handleClose();
-  }, [editTodoModalTodo, handleClose]);
 
   return (
     <>
@@ -91,12 +73,7 @@ export default function HomePage(props: HomePageProps) {
 
         <div css={styles.section}>
           <h3 css={styles.sectionTitle}>On Hold</h3>
-          <TodoList
-            todos={holdTodos}
-            onChange={handleChange}
-            onEdit={handleEdit}
-            onRemove={handleRemove}
-          />
+          <TodoList todos={holdTodos} onChange={handleChange} onEdit={handleEdit} onRemove={handleRemove} />
         </div>
 
         <div css={styles.section}>
@@ -104,17 +81,12 @@ export default function HomePage(props: HomePageProps) {
             <span>Completed</span>
             <Badge variant="danger">Inactive</Badge>
           </h3>
-          <TodoList todos={completedTodos} />
+          <TodoList readonly todos={completedTodos} />
         </div>
       </PageLayout>
 
-      <EditTodoModal
-        open={editTodoModalOpen}
-        loading={editTodoModalLoading}
-        todo={editTodoModalTodo}
-        onClose={handleClose}
-        onSubmit={handleSubmit}
-      />
+      <EditTodoModal open={editTodoModalOpen} todo={editTodoModalTodo} onClose={handleModalClose} />
+      <RemoveTodoModal open={removeTodoModalOpen} todo={removeTodoModalTodo} onClose={handleModalClose} />
     </>
   );
 }
