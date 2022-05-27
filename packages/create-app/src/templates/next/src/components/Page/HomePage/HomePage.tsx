@@ -29,9 +29,9 @@ export default function HomePage() {
     setEditTodoModalTodo(undefined);
   }, []);
 
-  const handleChange = useCallback(async (changedTodo: Todo) => {
-    await updateTodo(changedTodo.id, {
-      completed: changedTodo.completed,
+  const handleClick = useCallback(async (todo: Todo) => {
+    await updateTodo(todo.id, {
+      completed: !todo.completed,
     });
   }, [updateTodo]);
 
@@ -73,7 +73,7 @@ export default function HomePage() {
 
         <div css={styles.section}>
           <h3 css={styles.sectionTitle}>On Hold</h3>
-          <TodoList todos={holdTodos} onChange={handleChange} onEdit={handleEdit} onRemove={handleRemove} />
+          <TodoList todos={holdTodos} onClick={handleClick} onEdit={handleEdit} onRemove={handleRemove} />
         </div>
 
         <div css={styles.section}>

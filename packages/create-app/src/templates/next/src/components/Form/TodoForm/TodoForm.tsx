@@ -48,7 +48,8 @@ export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
   return (
     <form css={styles.form(loading)} noValidate onSubmit={handleSubmit}>
       <div css={styles.group}>
-        <input css={styles.input} type="text" placeholder="Title" {...form.register('title')} />
+        {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+        <input css={styles.input} type="text" placeholder="Title" autoFocus {...form.register('title')} />
         <small css={styles.error}>{formErrors.title?.message}</small>
       </div>
       <div css={styles.group}>

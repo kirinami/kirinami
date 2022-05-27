@@ -1,5 +1,3 @@
-import { ChangeEvent, useCallback } from 'react';
-
 import Icon from '@/components/Base/Icon/Icon';
 import Badge from '@/components/Base/Badge/Badge';
 import { Todo } from '@/helpers/api/todosApi';
@@ -9,25 +7,18 @@ import styles from './TodoList.styles';
 export type TodoListProps = {
   readonly?: boolean,
   todos: Todo[],
-  onChange?: (todo: Todo) => void,
+  onClick?: (todo: Todo) => void,
   onEdit?: (todo: Todo) => void,
   onRemove?: (todo: Todo) => void,
 };
 
-export default function TodoList({ readonly, todos, onChange, onEdit, onRemove }: TodoListProps) {
-  const handleChange = useCallback((todo: Todo) => (event: ChangeEvent<HTMLInputElement>) => {
-    onChange?.({
-      ...todo,
-      completed: event.target.checked,
-    });
-  }, [onChange]);
-
+export default function TodoList({ readonly, todos, onClick, onEdit, onRemove }: TodoListProps) {
   return (
     <ul css={styles.list}>
       {todos.map((todo) => (
         <li css={styles.item(readonly)} key={todo.id}>
-          <label css={styles.left}>
-            <input type="checkbox" checked={todo.completed} onChange={handleChange(todo)} />
+          <label css={styles.left} role="presentation" onClick={() => onClick?.(todo)}>
+            <input type="checkbox" checked={todo.completed} readOnly />
             <span>{todo.title}</span>
           </label>
           <div css={styles.right}>
