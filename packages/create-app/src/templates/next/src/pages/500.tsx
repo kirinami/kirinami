@@ -1,13 +1,7 @@
-import { useRouter } from 'next/router';
+import ServerErrorPage from '@/components/Page/ServerErrorPage/ServerErrorPage';
 
-import PageLayout from '@/components/Layout/PageLayout/PageLayout';
-
-export default function InternalServerErrorPage() {
-  const router = useRouter();
-
+export default function Page() {
   return (
-    <PageLayout title="Internal Server Error" page="pages/500.tsx">
-      URL: {router.pathname}
-    </PageLayout>
+    <ServerErrorPage />
   );
 }

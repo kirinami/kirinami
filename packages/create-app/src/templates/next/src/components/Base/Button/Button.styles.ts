@@ -6,11 +6,12 @@ const styles = {
     align-self: inherit;
     justify-content: center;
     align-items: center;
-    padding: 12px 18px;
-    border-radius: 6px;
+    padding: 12px 24px;
+    border-radius: 8px;
     color: #ffffff;
-    background: #0070f3;
+    background: #884CB2;
     cursor: pointer;
+    font-size: 14px;
     transition: opacity ease 300ms;
 
     &:hover {
@@ -18,7 +19,7 @@ const styles = {
     }
 
     &:disabled {
-      opacity: 0.8;
+      opacity: 0.6;
       pointer-events: none;
     }
 

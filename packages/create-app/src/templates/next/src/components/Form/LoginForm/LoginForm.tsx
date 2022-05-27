@@ -26,8 +26,8 @@ export default function LoginForm() {
 
   return (
     <form css={styles.form} noValidate onSubmit={handleSubmit}>
-      <input css={styles.input} type="email" {...form.register('email')} />
-      <input css={styles.input} type="password" {...form.register('password')} />
+      <input css={styles.input} type="email" placeholder="Email" {...form.register('email')} />
+      <input css={styles.input} type="password" placeholder="Password" {...form.register('password')} />
       <div css={styles.actions}>
         <Button type="submit">Submit</Button>
         <div css={styles.actionsMessage}>

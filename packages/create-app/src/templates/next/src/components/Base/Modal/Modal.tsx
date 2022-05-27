@@ -7,7 +7,8 @@ import styles from './Modal.styles';
 
 BaseModal.setAppElement('#__next');
 
-export type ModalProps = Omit<BaseModal.Props, 'className' | 'overlayClassName' | 'portalClassName' | 'htmlOpenClassName' | 'bodyOpenClassName'>;
+export type ModalProps = Omit<BaseModal.Props, 'className' | 'overlayClassName' | 'portalClassName' | 'htmlOpenClassName'
+| 'bodyOpenClassName' | 'closeTimeoutMS'>;
 
 export default function Modal({ children, onRequestClose, ...props }: ModalProps) {
   return (
@@ -18,6 +19,7 @@ export default function Modal({ children, onRequestClose, ...props }: ModalProps
           overlayClassName={css(styles.overlay)}
           className={css(styles.modal)}
           onRequestClose={onRequestClose}
+          closeTimeoutMS={200}
         >
           {!!onRequestClose && (
             <button css={styles.close} type="button" onClick={onRequestClose}>

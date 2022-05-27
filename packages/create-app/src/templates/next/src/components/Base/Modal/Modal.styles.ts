@@ -8,27 +8,44 @@ const styles = {
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+
+    &.ReactModal__Overlay {
+      opacity: 0;
+      transition: opacity 200ms ease-in-out;
+    }
+
+    &.ReactModal__Overlay--after-open{
+      opacity: 1;
+    }
+
+    &.ReactModal__Overlay--before-close{
+      opacity: 0;
+    }
   `,
   modal: css`
     position: relative;
-    width: 100%;
-    max-width: 480px;
-    min-height: 240px;
-    margin: 16px;
-    padding: 42px;
+    max-width: calc(100% - 36px);
+    padding: 36px;
     outline: none;
+    border-radius: 10px;
     background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 20%);
+    border: 1px solid #e2e0e0;
+    box-shadow: 0 4px 40px rgba(0, 0, 0, 0.2);
   `,
   close: css`
     position: absolute;
     top: 12px;
     right: 12px;
-    padding: 6px;
-    color: #5c5c5c;
-    background: #eeeeee;
-    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    color: #bebbbb;
+    background: #f2f2f2;
     
     &:hover {
       opacity: 0.8;

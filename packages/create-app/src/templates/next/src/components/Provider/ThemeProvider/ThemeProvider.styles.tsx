@@ -15,13 +15,13 @@ export const styles = {
     }
 
     html {
-      line-height: 1.5;
+      line-height: 1;
       -webkit-text-size-adjust: 100%;
       -moz-tab-size: 4;
       -o-tab-size: 4;
       tab-size: 4;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-      Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      font-family: 'Poppins', sans-serif;
+      font-weight: 400;
     }
 
     body {
@@ -49,6 +49,10 @@ export const styles = {
       color: inherit;
       text-decoration: inherit;
       cursor: pointer;
+
+      &:hover {
+        opacity: 0.8;
+      }
     }
 
     b, strong {
@@ -106,6 +110,11 @@ export const styles = {
       -webkit-appearance: button;
       background-color: transparent;
       background-image: none;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 0.8;
+      }
     }
 
     [type="search"] {
@@ -168,10 +177,6 @@ export const styles = {
       color: #9ca3af;
     }
 
-    button, [role="button"] {
-      cursor: pointer;
-    }
-
     select {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
       background-position: right 0.5rem center;
@@ -214,7 +219,6 @@ export const styles = {
 
     [type="text"], [type="email"], [type="url"], [type="password"], [type="number"], [type="date"], [type="datetime-local"],
     [type="month"], [type="search"], [type="tel"], [type="time"], [type="week"], [multiple], textarea, select {
-      width: 100%;
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
@@ -224,16 +228,12 @@ export const styles = {
       border-radius: 0;
       padding: 0.5rem 0.75rem;
       font-size: 1rem;
-      line-height: 1.5rem;
-    }
 
-    [type="text"]:focus, [type="email"]:focus, [type="url"]:focus, [type="password"]:focus, [type="number"]:focus,
-    [type="date"]:focus, [type="datetime-local"]:focus, [type="month"]:focus, [type="search"]:focus, [type="tel"]:focus,
-    [type="time"]:focus, [type="week"]:focus, [multiple]:focus, textarea:focus, select:focus {
-      outline: 2px solid transparent;
-      outline-offset: 2px;
-      //box-shadow: 1px 1px 1px #000000; // TODO
-      border-color: #2563eb;
+      &:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        border-color: #884CB2;
+      }
     }
 
     [type="checkbox"], [type="radio"] {
@@ -254,59 +254,58 @@ export const styles = {
       flex-shrink: 0;
       height: 1rem;
       width: 1rem;
-      color: #2563eb;
-      background-color: #ffffff;
-      border-color: #6b7280;
+      color: currentColor;
+      background-color: #f6f6f6;
+      border-color: #cdd1d9;
       border-width: 1px;
+
+      &:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+      }
+
+      &:checked {
+        border-color: transparent;
+        background-color: currentColor;
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        &:hover, &:focus {
+          border-color: transparent;
+          background-color: currentColor;
+        }
+      }
     }
 
     [type="checkbox"] {
       border-radius: 0;
+
+      &:checked {
+        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+      }
+
+      &:indeterminate {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3e%3c/svg%3e");
+        border-color: transparent;
+        background-color: currentColor;
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        &:hover, &:focus {
+          border-color: transparent;
+          background-color: currentColor;
+        }
+      }
     }
 
     [type="radio"] {
       border-radius: 100%;
-    }
 
-    [type="checkbox"]:focus, [type="radio"]:focus {
-      outline: 2px solid transparent;
-      outline-offset: 2px;
-      //box-shadow: 1px 1px 1px #000000; // TODO
-    }
-
-    [type="checkbox"]:checked, [type="radio"]:checked {
-      border-color: transparent;
-      background-color: currentColor;
-      background-size: 100% 100%;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    [type="checkbox"]:checked {
-      background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
-    }
-
-    [type="radio"]:checked {
-      background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
-    }
-
-    [type="checkbox"]:checked:hover, [type="checkbox"]:checked:focus, [type="radio"]:checked:hover, [type="radio"]:checked:focus {
-      border-color: transparent;
-      background-color: currentColor;
-    }
-
-    [type="checkbox"]:indeterminate {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3e%3c/svg%3e");
-      border-color: transparent;
-      background-color: currentColor;
-      background-size: 100% 100%;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    [type="checkbox"]:indeterminate:hover, [type="checkbox"]:indeterminate:focus {
-      border-color: transparent;
-      background-color: currentColor;
+      &:checked {
+        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+      }
     }
 
     [type="file"] {
@@ -317,11 +316,11 @@ export const styles = {
       padding: 0;
       font-size: unset;
       line-height: inherit;
-    }
 
-    [type="file"]:focus {
-      outline: 1px solid ButtonText;
-      outline: 1px auto -webkit-focus-ring-color;
+      &:focus {
+        outline: 1px solid ButtonText;
+        outline: 1px auto -webkit-focus-ring-color;
+      }
     }
 
     #__next {

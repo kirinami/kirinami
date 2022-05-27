@@ -1,35 +1,30 @@
-import { ReactNode } from 'react';
-import Link from 'next/link';
+import { ReactNode, useCallback } from 'react';
 
 import LoginModal from '@/components/Modal/LoginModal/LoginModal';
+import RegisterModal from '@/components/Modal/RegisterModal/RegisterModal';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './PageLayout.styles';
 
-export type LayoutProps = {
-  title: string,
-  page: string,
+export type PageLayoutProps = {
   children: ReactNode,
 };
 
-export default function PageLayout({ title, page, children }: LayoutProps) {
+export default function PageLayout({ children }: PageLayoutProps) {
+  const { user, setIsOpenLoginModal, setIsOpenRegisterModal } = useAuth();
+
+  const handleLoginClick = useCallback(() => setIsOpenLoginModal(true), []);
+
+  const handleRegisterClick = useCallback(() => setIsOpenRegisterModal(true), []);
+
   return (
     <>
       <LoginModal />
+      <RegisterModal />
 
       <div css={styles.container}>
         <main css={styles.content}>
-          <div css={styles.container}>
-            <h1 css={styles.title}>{title}</h1>
-            <p css={styles.description}>Get started by editing <code css={styles.code}>{page}</code></p>
-            <hr css={styles.delimiter} />
-            <div css={styles.menu}>
-              <Link href="/" passHref><a css={styles.link}>Home</a></Link>
-              <Link href="/todos" passHref><a css={styles.link}>Todos</a></Link>
-              <Link href="/404" passHref><a css={styles.link}>404</a></Link>
-            </div>
-            <hr css={styles.delimiter} />
-            <div css={styles.children}>{children}</div>
-          </div>
+          {children}
         </main>
 
         <footer css={styles.footer}>

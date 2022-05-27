@@ -6,11 +6,18 @@ const styles = {
     flex-direction: column;
 
     > :not([hidden]) ~ :not([hidden]) {
-      margin-top: 12px;
+      margin-top: 8px;
     }
+  `,
+  group: css`
   `,
   input: css`
     border-radius: 6px;
+  `,
+  inputError: css`
+    display: block;
+    height: 16px;
+    color: crimson;
   `,
   actions: css`
     display: flex;
