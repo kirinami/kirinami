@@ -1,18 +1,18 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  container: css`
-    display: flex;
-    flex-direction: column;
+  content: css`
+    width: 400px;
+    max-width: 100%;
 
     > :not([hidden]) ~ :not([hidden]) {
-      margin-top: 16px;
+      margin-top: 24px;
     }
   `,
-  title: css`
-    margin: 0;
-    line-height: 1.15;
-    font-size: 2rem;
+  heading: css`
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 36px;
   `,
 };
 

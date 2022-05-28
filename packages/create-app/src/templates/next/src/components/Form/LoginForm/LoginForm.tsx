@@ -35,6 +35,7 @@ export default function LoginForm({ onAfterSubmit }: LoginFormProps) {
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
       await login(formData.email, formData.password);
+
       onAfterSubmit?.();
     } catch (err) {
       //

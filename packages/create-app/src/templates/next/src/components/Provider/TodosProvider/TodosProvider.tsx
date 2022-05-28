@@ -23,7 +23,7 @@ export type TodosProviderProps = {
 };
 
 export default function TodosProvider({ children, ...props }: TodosProviderProps) {
-  const { eventEmitter } = useAuth();
+  const { subscribe } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,8 +32,6 @@ export default function TodosProvider({ children, ...props }: TodosProviderProps
   const resetTodos = useCallback(() => setTodos([]), []);
 
   const getTodos = useCallback(async () => {
-    console.log('getTodos');
-
     setLoading(true);
     setError('');
 
@@ -102,14 +100,14 @@ export default function TodosProvider({ children, ...props }: TodosProviderProps
   }, []);
 
   useEffect(() => {
-    const loginSubscription = eventEmitter.subscribe('login', getTodos);
-    const logoutSubscription = eventEmitter.subscribe('logout', resetTodos);
+    const loginSubscription = subscribe('login', getTodos);
+    const logoutSubscription = subscribe('logout', resetTodos);
 
     return () => {
       loginSubscription();
       logoutSubscription();
     };
-  }, [eventEmitter, getTodos, resetTodos]);
+  }, [subscribe, getTodos, resetTodos]);
 
   return (
     <TodosContext.Provider

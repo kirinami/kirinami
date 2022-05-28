@@ -1,40 +1,18 @@
-import { createContext, ReactNode, useCallback, useRef, useState } from 'react';
+import { createContext, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 import authApi from '@/helpers/api/authApi';
 import usersApi, { User } from '@/helpers/api/usersApi';
 import { headers } from '@/utils/request';
 import parseCookie from '@/utils/parseCookie';
 
-class EventEmitter {
-  id = 0;
-
-  listeners: Record<string, Record<string, () => void>> = {};
-
-  subscribe(type: string, listener: () => void) {
-    this.id += 1;
-    this.listeners[type] = this.listeners[type] || [];
-    this.listeners[type][this.id] = listener;
-
-    const id = this.id;
-
-    return () => {
-      delete this.listeners[type][id];
-    };
-  }
-
-  dispatch(type: string) {
-    Object.entries(this.listeners[type]).forEach(([, listener]) => listener());
-  }
-}
-
 export type AuthContextValue = {
   loading: boolean,
   error?: string,
   user?: User,
-  eventEmitter: EventEmitter,
   login: (email: string, password: string) => void,
   register: (firstName: string, lastName: string, email: string, password: string) => void,
   logout: () => void,
+  subscribe: (type: 'login' | 'logout', listener: () => void) => () => void,
   isOpenLoginModal: boolean,
   openLoginModal: () => void,
   closeLoginModal: () => void,
@@ -57,7 +35,26 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
   const [isOpenLoginModal, setIsOpenLoginModal] = useState(false);
   const [isOpenRegisterModal, setIsOpenRegisterModal] = useState(false);
 
-  const eventEmitterRef = useRef(new EventEmitter());
+  const idRef = useRef(0);
+
+  // eslint-disable-next-line no-spaced-func
+  const listenersRef = useRef<Record<string, Record<string, () => void>>>({});
+
+  const subscribe = useCallback((type: 'login' | 'logout', listener: () => void) => {
+    idRef.current += 1;
+    listenersRef.current[type] = listenersRef.current[type] || {};
+    listenersRef.current[type][idRef.current] = listener;
+
+    const id = idRef.current;
+
+    return () => {
+      delete listenersRef.current[type][id];
+    };
+  }, []);
+
+  const dispatch = useCallback((type: 'login' | 'logout') => {
+    Object.entries(listenersRef.current[type] || {}).forEach(([, listener]) => listener());
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
@@ -72,7 +69,7 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
       const user = await usersApi.getProfile();
       setUser(user);
 
-      eventEmitterRef.current.dispatch('login');
+      dispatch('login');
     } catch (err) {
       const error = new Error(err instanceof Error ? err.message : 'Undefined error occurred');
       setError(error.message);
@@ -80,7 +77,7 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dispatch]);
 
   const register = useCallback(async (firstName: string, lastName: string, email: string, password: string) => {
     setLoading(true);
@@ -95,7 +92,7 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
       const user = await usersApi.getProfile();
       setUser(user);
 
-      eventEmitterRef.current.dispatch('login');
+      dispatch('login');
     } catch (err) {
       const error = new Error(err instanceof Error ? err.message : 'Undefined error occurred');
       setError(error.message);
@@ -103,7 +100,7 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dispatch]);
 
   const logout = useCallback(() => {
     document.cookie = 'accessToken=; path=/;';
@@ -112,14 +109,14 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
 
     setUser(undefined);
 
-    eventEmitterRef.current.dispatch('logout');
-  }, []);
+    dispatch('logout');
+  }, [dispatch]);
 
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     const cookies = parseCookie(document.cookie);
 
     headers.Authorization = cookies.accessToken ? `Bearer ${cookies.accessToken}` : '';
-  }
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -127,16 +124,16 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
         loading,
         error,
         user,
-        eventEmitter: eventEmitterRef.current,
         login,
         register,
         logout,
+        subscribe,
         isOpenLoginModal,
         openLoginModal: () => setIsOpenLoginModal(true),
         closeLoginModal: () => setIsOpenLoginModal(false),
         isOpenRegisterModal,
         openRegisterModal: () => setIsOpenRegisterModal(true),
-        closeRegisterModal: () => setIsOpenRegisterModal(true),
+        closeRegisterModal: () => setIsOpenRegisterModal(false),
       }}
     >
       {children}
