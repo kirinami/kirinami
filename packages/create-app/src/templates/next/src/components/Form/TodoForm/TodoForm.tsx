@@ -5,7 +5,8 @@ import * as yup from 'yup';
 import Button from '@/components/Base/Button/Button';
 import Spinner from '@/components/Base/Spinner/Spinner';
 import { Todo } from '@/helpers/api/todosApi';
-import useTodos from '@/hooks/useTodos';
+
+import useTodos from '../../../hooks/useTodos';
 
 import styles from './TodoForm.styles';
 

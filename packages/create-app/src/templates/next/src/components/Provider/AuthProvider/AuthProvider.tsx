@@ -1,9 +1,10 @@
-import { createContext, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, ReactNode, useCallback, useEffect, useState } from 'react';
 
 import authApi from '@/helpers/api/authApi';
 import usersApi, { User } from '@/helpers/api/usersApi';
-import { headers } from '@/utils/request';
+import useEventEmitter from '@/hooks/useEventEmitter';
 import parseCookie from '@/utils/parseCookie';
+import { headers } from '@/utils/request';
 
 export type AuthContextValue = {
   loading: boolean,
@@ -35,26 +36,7 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
   const [isOpenLoginModal, setIsOpenLoginModal] = useState(false);
   const [isOpenRegisterModal, setIsOpenRegisterModal] = useState(false);
 
-  const idRef = useRef(0);
-
-  // eslint-disable-next-line no-spaced-func
-  const listenersRef = useRef<Record<string, Record<string, () => void>>>({});
-
-  const subscribe = useCallback((type: 'login' | 'logout', listener: () => void) => {
-    idRef.current += 1;
-    listenersRef.current[type] = listenersRef.current[type] || {};
-    listenersRef.current[type][idRef.current] = listener;
-
-    const id = idRef.current;
-
-    return () => {
-      delete listenersRef.current[type][id];
-    };
-  }, []);
-
-  const dispatch = useCallback((type: 'login' | 'logout') => {
-    Object.entries(listenersRef.current[type] || {}).forEach(([, listener]) => listener());
-  }, []);
+  const { subscribe, dispatch } = useEventEmitter();
 
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);

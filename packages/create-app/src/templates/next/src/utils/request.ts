@@ -2,9 +2,9 @@ export const headers = {
   Authorization: '',
 };
 
-export default function request<T>(method: string, url: string, body?: unknown) {
+export default function request<T>(method: string, url: string, body?: Record<string, unknown>) {
   return fetch(process.env.NEXT_PUBLIC_API_URL + url, {
-    method,
+    method: method.toUpperCase(),
     body: JSON.stringify(body),
     headers: {
       ...headers,

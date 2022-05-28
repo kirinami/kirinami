@@ -2,7 +2,8 @@ import { createContext, ReactNode, useCallback, useEffect, useState } from 'reac
 
 import { TodoFormData } from '@/components/Form/TodoForm/TodoForm';
 import todosApi, { Todo } from '@/helpers/api/todosApi';
-import useAuth from '@/hooks/useAuth';
+
+import useAuth from '../../../hooks/useAuth';
 
 export type TodosContextValue = {
   loading: boolean,

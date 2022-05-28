@@ -4,7 +4,8 @@ import * as yup from 'yup';
 
 import Button from '@/components/Base/Button/Button';
 import Spinner from '@/components/Base/Spinner/Spinner';
-import useAuth from '@/hooks/useAuth';
+
+import useAuth from '../../../hooks/useAuth';
 
 import styles from './LoginForm.styles';
 

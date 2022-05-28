@@ -7,8 +7,9 @@ import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoMo
 import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import { Todo } from '@/helpers/api/todosApi';
-import useAuth from '@/hooks/useAuth';
-import useTodos from '@/hooks/useTodos';
+
+import useAuth from '../../../hooks/useAuth';
+import useTodos from '../../../hooks/useTodos';
 
 import styles from './HomePage.styles';
 
