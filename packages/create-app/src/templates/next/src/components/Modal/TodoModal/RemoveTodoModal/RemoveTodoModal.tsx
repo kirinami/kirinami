@@ -4,8 +4,7 @@ import Modal from '@/components/Base/Modal/Modal';
 import Button from '@/components/Base/Button/Button';
 import Spinner from '@/components/Base/Spinner/Spinner';
 import { Todo } from '@/helpers/api/todosApi';
-
-import useTodos from '../../../../hooks/useTodos';
+import useTodos from '@/hooks/useTodos';
 
 import styles from './RemoveTodoModal.styles';
 

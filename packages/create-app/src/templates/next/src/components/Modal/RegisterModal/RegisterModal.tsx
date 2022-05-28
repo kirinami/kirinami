@@ -1,7 +1,6 @@
 import Modal from '@/components/Base/Modal/Modal';
 import RegisterForm from '@/components/Form/RegisterForm/RegisterForm';
-
-import useAuth from '../../../hooks/useAuth';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './RegisterModal.styles';
 

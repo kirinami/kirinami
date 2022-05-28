@@ -1,7 +1,6 @@
 import Modal from '@/components/Base/Modal/Modal';
 import LoginForm from '@/components/Form/LoginForm/LoginForm';
-
-import useAuth from '../../../hooks/useAuth';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './LoginModal.styles';
 
