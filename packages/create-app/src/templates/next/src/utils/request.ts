@@ -1,16 +1,30 @@
+export const headers = {
+  Authorization: '',
+};
+
 export default function request<T>(method: string, url: string, body?: unknown) {
   return fetch(process.env.NEXT_PUBLIC_API_URL + url, {
     method,
     body: JSON.stringify(body),
     headers: {
+      ...headers,
       'Content-Type': 'application/json; charset=utf-8',
-      Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjUzNDY3MTg2LCJleHAiOjE2NTQwNzE5ODZ9.K_WzbUMxTRxrC18vDrPWBmwiYSnZgoFW3Zx-TbYEFHA',
     },
     credentials: 'same-origin',
   })
-    .then((response) => {
+    .then(async (response) => {
       if (!response.ok) {
-        throw new Error(response.statusText);
+        let message;
+
+        try {
+          const data = await response.json();
+
+          message = data?.message || 'Undefined error occurred';
+        } catch (err) {
+          message = 'Undefined error occurred';
+        }
+
+        throw new Error(message);
       }
 
       return response.json() as Promise<T>;

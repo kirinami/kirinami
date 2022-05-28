@@ -30,11 +30,9 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
     />
   ));
 
-  Object.assign(initialProps, {
+  return Object.assign(initialProps, {
     styles: initialStyles.concat(emotionStyles),
   });
-
-  return initialProps;
 };
 
 export default MyDocument;

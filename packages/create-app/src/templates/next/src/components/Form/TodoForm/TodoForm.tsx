@@ -24,7 +24,7 @@ export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
   const { loading, error, createTodo, updateTodo } = useTodos();
 
   const form = useForm<TodoFormData>({
-    resolver: yupResolver(yup.object().shape({
+    resolver: yupResolver(yup.object({
       title: yup.string().required().min(2),
       completed: yup.boolean().required(),
     })),
@@ -36,13 +36,17 @@ export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
   const formErrors = form.formState.errors;
 
   const handleSubmit = form.handleSubmit(async (formData) => {
-    if (todo) {
-      await updateTodo(todo.id, formData);
-    } else {
-      await createTodo(formData);
-    }
+    try {
+      if (todo) {
+        await updateTodo(todo.id, formData);
+      } else {
+        await createTodo(formData);
+      }
 
-    onAfterSubmit?.();
+      onAfterSubmit?.();
+    } catch (err) {
+      //
+    }
   });
 
   return (

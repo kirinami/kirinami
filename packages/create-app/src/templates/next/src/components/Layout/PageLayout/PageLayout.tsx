@@ -1,8 +1,9 @@
-import { ReactNode, useCallback } from 'react';
+import { ReactNode } from 'react';
 
+import Auth from '@/components/Common/Auth/Auth';
+import Menu from '@/components/Common/Menu/Menu';
 import LoginModal from '@/components/Modal/LoginModal/LoginModal';
 import RegisterModal from '@/components/Modal/RegisterModal/RegisterModal';
-import useAuth from '@/hooks/useAuth';
 
 import styles from './PageLayout.styles';
 
@@ -11,18 +12,14 @@ export type PageLayoutProps = {
 };
 
 export default function PageLayout({ children }: PageLayoutProps) {
-  const { user, setIsOpenLoginModal, setIsOpenRegisterModal } = useAuth();
-
-  const handleLoginClick = useCallback(() => setIsOpenLoginModal(true), []);
-
-  const handleRegisterClick = useCallback(() => setIsOpenRegisterModal(true), []);
-
   return (
     <>
-      <LoginModal />
-      <RegisterModal />
-
       <div css={styles.container}>
+        <div css={styles.header}>
+          <Menu />
+          <Auth />
+        </div>
+
         <main css={styles.content}>
           {children}
         </main>
@@ -33,6 +30,9 @@ export default function PageLayout({ children }: PageLayoutProps) {
           </a>
         </footer>
       </div>
+
+      <LoginModal />
+      <RegisterModal />
     </>
   );
 }

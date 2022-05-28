@@ -17,10 +17,10 @@ export default function TodoList({ readonly, todos, onClick, onEdit, onRemove }:
     <ul css={styles.list}>
       {todos.map((todo) => (
         <li css={styles.item(readonly)} key={todo.id}>
-          <label css={styles.left} role="presentation" onClick={() => onClick?.(todo)}>
+          <button css={styles.left} type="button" onClick={() => onClick?.(todo)}>
             <input type="checkbox" checked={todo.completed} readOnly />
             <span>{todo.title}</span>
-          </label>
+          </button>
           <div css={styles.right}>
             <Badge variant={todo.completed ? 'secondary' : 'warning'}>{todo.completed ? 'Completed' : 'Pending'}</Badge>
             <div css={styles.actions}>

@@ -7,12 +7,10 @@ import useAuth from '@/hooks/useAuth';
 import styles from './RegisterModal.styles';
 
 export default function RegisterModal() {
-  const { isOpenRegisterModal, setIsOpenRegisterModal } = useAuth();
-
-  const handleRequestClose = useCallback(() => setIsOpenRegisterModal(false), []);
+  const { isOpenRegisterModal, closeRegisterModal } = useAuth();
 
   return (
-    <Modal isOpen={isOpenRegisterModal} onRequestClose={handleRequestClose}>
+    <Modal isOpen={isOpenRegisterModal} onRequestClose={closeRegisterModal}>
       <div css={styles.container}>
         <h3 css={styles.title}>Register</h3>
         <RegisterForm />

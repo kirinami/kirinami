@@ -1,5 +1,3 @@
-import { useCallback } from 'react';
-
 import Modal from '@/components/Base/Modal/Modal';
 import LoginForm from '@/components/Form/LoginForm/LoginForm';
 import useAuth from '@/hooks/useAuth';
@@ -7,15 +5,13 @@ import useAuth from '@/hooks/useAuth';
 import styles from './LoginModal.styles';
 
 export default function LoginModal() {
-  const { isOpenLoginModal, setIsOpenLoginModal } = useAuth();
-
-  const handleRequestClose = useCallback(() => setIsOpenLoginModal(false), []);
+  const { isOpenLoginModal, closeLoginModal } = useAuth();
 
   return (
-    <Modal isOpen={isOpenLoginModal} onRequestClose={handleRequestClose}>
-      <div css={styles.container}>
-        <h3 css={styles.title}>Login</h3>
-        <LoginForm />
+    <Modal isOpen={isOpenLoginModal} onRequestClose={closeLoginModal}>
+      <div css={styles.content}>
+        <h3 css={styles.heading}>Login</h3>
+        <LoginForm onAfterSubmit={closeLoginModal} />
       </div>
     </Modal>
   );

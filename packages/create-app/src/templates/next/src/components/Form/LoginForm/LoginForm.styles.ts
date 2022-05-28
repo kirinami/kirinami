@@ -1,16 +1,34 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  form: css`
+  form: (loading?: boolean) => css`
     display: flex;
     flex-direction: column;
 
+    ${loading && css`
+      pointer-events: none;
+      filter: grayscale(50%);
+    `};
+
     > :not([hidden]) ~ :not([hidden]) {
-      margin-top: 12px;
+      margin-top: 8px;
     }
   `,
+  group: css`
+  `,
   input: css`
+    width: 100%;
     border-radius: 6px;
+    background-color: #f6f6f6;
+    font-size: 12px;
+    line-height: 18px;
+    margin-bottom: 4px;
+    padding: 12px 20px;
+  `,
+  error: css`
+    display: block;
+    height: 16px;
+    color: crimson;
   `,
   actions: css`
     display: flex;
@@ -19,6 +37,11 @@ const styles = {
     > :not([hidden]) ~ :not([hidden]) {
       margin-left: 16px;
     }
+  `,
+  actionsButton: css`
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 18px;
   `,
   actionsMessage: css`
     display: flex;

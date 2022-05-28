@@ -77,6 +77,10 @@ module.exports = {
       exceptAfterSingleLine: true,
     }],
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/indent': ['error', 2, {
+      SwitchCase: 1,
+      ignoredNodes: ['TSTypeParameterInstantiation'],
+    }],
   },
   settings: {
     'import/resolver': {

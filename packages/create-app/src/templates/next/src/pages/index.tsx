@@ -1,14 +1,18 @@
 import HomePage from '@/components/Page/HomePage/HomePage';
 import TodosProvider from '@/components/Provider/TodosProvider/TodosProvider';
-import todosApi from '@/helpers/api/todosApi';
+import todosApi, { Todo } from '@/helpers/api/todosApi';
 
 export const getServerSideProps = async () => {
-  const todos = await todosApi.getAll();
-  const user = null; // await usersApi.getProfile();
+  let todos: Todo[];
+
+  try {
+    todos = await todosApi.getAll();
+  } catch (err) {
+    todos = [];
+  }
 
   return {
     props: {
-      user,
       todos,
     },
   };
