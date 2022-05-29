@@ -1,7 +1,7 @@
-import Container from '@/components/container/Container';
+import HomePage from '@/components/Page/HomePage/HomePage';
 
-export default function IndexPage() {
+export default function Page() {
   return (
-    <Container title="Index" page="pages/index.tsx" />
+    <HomePage />
   );
 }

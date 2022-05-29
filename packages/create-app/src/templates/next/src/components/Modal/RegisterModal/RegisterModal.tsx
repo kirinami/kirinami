@@ -4,7 +4,7 @@ import useAuth from '@/hooks/useAuth';
 
 import styles from './RegisterModal.styles';
 
-export default function LoginModal() {
+export default function RegisterModal() {
   const { isOpenRegisterModal, closeRegisterModal } = useAuth();
 
   return (

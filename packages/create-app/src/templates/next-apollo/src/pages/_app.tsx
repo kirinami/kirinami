@@ -1,32 +1,32 @@
-import '@/styles/_app.scss';
-
-import { useMemo } from 'react';
-import Modal from 'react-modal';
 import { AppProps } from 'next/app';
-import Head from 'next/head';
-import { ApolloProvider } from '@apollo/client';
+import withApollo from 'next-with-apollo';
+import { ApolloClient, ApolloProvider, NormalizedCacheObject } from '@apollo/client';
+import { getDataFromTree } from '@apollo/client/react/ssr';
 
-import Layout from '@/containers/layout/Layout';
-import { initApolloClient } from '@/helpers/initApolloClient';
+import Meta from '@/components/Meta/Meta';
+import EmotionProvider from '@/components/Provider/EmotionProvider/EmotionProvider';
+import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
+import getApolloClient from '@/helpers/getApolloClient';
+import getEmotionServer from '@/helpers/getEmotionServer';
 
-Modal.setAppElement('#__next');
+type MyAppProps = AppProps & {
+  apollo: ApolloClient<NormalizedCacheObject>,
+};
 
-export default function MyApp({ Component, pageProps }: AppProps) {
-  const apolloClient = useMemo(() => initApolloClient(pageProps.extractData), [pageProps.extractData]);
-
+function MyApp({ Component, pageProps, apollo }: MyAppProps) {
   return (
-    <ApolloProvider client={apolloClient}>
-      <Layout>
-        <Head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <meta name="description" content="Next.js Starter powered by KIRINAMI" />
-          <meta name="keywords" content="Next.js, TypeScript, SCSS" />
-
-          <title>Next.js Starter powered by KIRINAMI</title>
-        </Head>
-        <Component {...pageProps} />
-      </Layout>
+    <ApolloProvider client={apollo}>
+      <EmotionProvider>
+        <ThemeProvider>
+          <Meta />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </EmotionProvider>
     </ApolloProvider>
   );
 }
+
+export default withApollo(
+  ({ ctx, initialState }) => [getApolloClient(ctx, initialState), getEmotionServer()][0],
+  { getDataFromTree },
+)(MyApp);
