@@ -1,6 +1,6 @@
 import { useDispatch as useBaseDispatch } from 'react-redux';
 
-import { ReduxStore } from '@/helpers/initReduxStore';
+import { ReduxStore } from '@/helpers/getReduxStore';
 
 export type Dispatch = ReduxStore['dispatch'];
 

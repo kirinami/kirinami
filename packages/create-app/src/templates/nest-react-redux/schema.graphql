@@ -1,0 +1,57 @@
+type Todo {
+  id: Int!
+  title: String!
+  completed: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  userId: Float!
+}
+
+# A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+scalar DateTime
+
+type User {
+  id: Int!
+  email: String!
+  firstName: String!
+  lastName: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  todos: [Todo!]!
+}
+
+type Auth {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type Query {
+  usersProfile: User!
+  todosAll: [Todo!]!
+  todosById(id: Float!): Todo!
+}
+
+type Mutation {
+  login(email: String!, password: String!): Auth!
+  register(
+    email: String!
+    password: String!
+    firstName: String!
+    lastName: String!
+  ): Auth!
+  refresh: Auth!
+  todosCreate(todo: CreateTodoInput!): Todo!
+  todosUpdate(id: Float!, todo: UpdateTodoInput!): Todo!
+  todosDelete(id: Float!): Todo!
+}
+
+input CreateTodoInput {
+  title: String!
+  completed: Boolean!
+}
+
+input UpdateTodoInput {
+  title: String
+  completed: Boolean
+}

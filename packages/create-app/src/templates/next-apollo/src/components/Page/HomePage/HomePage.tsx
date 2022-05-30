@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import Badge from '@/components/Base/Badge/Badge';
-import Button from '@/components/Base/Button/Button';
+import Badge from '@/components/Common/Badge/Badge';
+import Button from '@/components/Common/Button/Button';
 import TodoList from '@/components/Common/TodoList/TodoList';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
@@ -9,6 +9,8 @@ import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/Remove
 import useAuth from '@/hooks/useAuth';
 import useTodos from '@/hooks/useTodos';
 import { Todo } from '@/stores/todos/fragments/Todo';
+
+import Spinner from '../../Common/Spinner/Spinner';
 
 import styles from './HomePage.styles';
 
@@ -20,7 +22,9 @@ export default function HomePage() {
   const [removeTodoModalTodo, setRemoveTodoModalTodo] = useState<Todo>();
 
   const { user, openLogin } = useAuth();
-  const { todos, updateTodo } = useTodos();
+  const { loading, error, todos, updateTodo } = useTodos();
+
+  console.log(loading, error, todos);
 
   const holdTodos = todos;
   const completedTodos = useMemo(() => todos.filter((todo) => todo.completed), [todos]);
@@ -77,6 +81,12 @@ export default function HomePage() {
               <Badge variant="danger">Inactive</Badge>
             </h3>
             <TodoList readonly todos={completedTodos} />
+          </div>
+        )}
+
+        {loading && (
+          <div css={styles.spinner}>
+            <Spinner size={32} />
           </div>
         )}
       </PageLayout>

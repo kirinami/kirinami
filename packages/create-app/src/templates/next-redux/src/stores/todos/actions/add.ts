@@ -1,14 +1,15 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import Todo from '@/types/Todo';
-import http from '@/utils/http';
+import request from '@/utils/request';
+
+import Todo from '../types/Todo';
 
 type Req = Pick<Todo, 'title' | 'completed'>;
 
 type Res = Todo;
 
 const todosAdd = createAsyncThunk<Res, Req>('todos/add', async ({ title, completed }) => {
-  const { data: todo } = await http.post<Res>('/todos', {
+  const todo = await request<Res>('POST', '/todos', {
     title,
     completed,
   });

@@ -1,32 +1,62 @@
-import '@/styles/_app.scss';
-
-import { useMemo } from 'react';
-import Modal from 'react-modal';
+import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
-import { AppProps } from 'next/app';
-import Head from 'next/head';
+import App, { AppContext, AppProps } from 'next/app';
 
-import Layout from '@/containers/layout/Layout';
-import initReduxStore from '@/helpers/initReduxStore';
+import Meta from '@/components/Meta/Meta';
+import { context } from '@/components/Provider/ReduxProvider/ReduxProvider';
+import EmotionProvider from '@/components/Provider/EmotionProvider/EmotionProvider';
+import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
+import getEmotionServer from '@/helpers/getEmotionServer';
+import getReduxStore from '@/helpers/getReduxStore';
+import { headers } from '@/utils/request';
+import parseCookie from '@/utils/parseCookie';
 
-Modal.setAppElement('#__next');
+type MyAppProps = AppProps & {
+  store: any,
+  state: any,
+};
 
-export default function MyApp({ Component, pageProps }: AppProps) {
-  const reduxStore = useMemo(() => initReduxStore(pageProps.extractData), [pageProps.extractData]);
-
+function MyApp({ Component, pageProps, store, state }: MyAppProps) {
+  console.log(Component, pageProps, store);
   return (
-    <Provider store={reduxStore}>
-      <Layout>
-        <Head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <meta name="description" content="Next.js Starter powered by KIRINAMI" />
-          <meta name="keywords" content="Next.js, TypeScript, SCSS" />
-
-          <title>Next.js Starter powered by KIRINAMI</title>
-        </Head>
-        <Component {...pageProps} />
-      </Layout>
+    <Provider store={store || getReduxStore(state)}>
+      <EmotionProvider>
+        <ThemeProvider>
+          <Meta />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </EmotionProvider>
     </Provider>
   );
 }
+
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  getEmotionServer();
+
+  const initialProps = await App.getInitialProps(appContext);
+
+  if (typeof window === 'undefined') {
+    headers.Authorization = `Bearer ${parseCookie(appContext.ctx.req?.headers.cookie ?? document.cookie).accessToken}`;
+
+    const store = getReduxStore();
+
+    console.log(111111111);
+    renderToString(<appContext.AppTree {...initialProps} store={store} state={store.getState()} />);
+
+    console.log(context.requests);
+
+    await Promise.all(Object.values(context.requests || {}).map((r: any) => r()));
+
+    context.requests = [];
+
+    Object.assign(initialProps, {
+      state: store.getState(),
+    });
+
+    console.log(222222222);
+  }
+
+  return initialProps;
+};
+
+export default MyApp;

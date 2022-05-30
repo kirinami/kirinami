@@ -1,6 +1,6 @@
 import { useSelector as useBaseSelector } from 'react-redux';
 
-import { ReduxStore } from '@/helpers/initReduxStore';
+import { ReduxStore } from '@/helpers/getReduxStore';
 
 export type State = ReturnType<ReduxStore['getState']>;
 

@@ -1,14 +1,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-import Todo from '@/types/Todo';
-import http from '@/utils/http';
+import request from '@/utils/request';
+
+import Todo from '../types/Todo';
 
 type Req = void;
 
 type Res = Todo[];
 
 const todosRetrieve = createAsyncThunk<Res, Req>('todos/retrieve', async () => {
-  const { data: todos } = await http.get<Res>('/todos');
+  console.log('request');
+  const todos = await request<Res>('GET', '/todos');
 
   return todos;
 });

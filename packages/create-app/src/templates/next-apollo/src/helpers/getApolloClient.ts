@@ -73,16 +73,17 @@ const createHttpLink = () => new HttpLink({
 
 const createApolloClient = () => new ApolloClient({
   ssrMode: isServer,
+  ssrForceFetchDelay: isServer ? 100 : undefined,
   link: createHttpLink(),
   cache: createCache(),
   defaultOptions: {
     query: {
-      fetchPolicy: 'network-only',
-      errorPolicy: 'all',
+      fetchPolicy: isServer ? 'network-only' : 'cache-first',
+      errorPolicy: 'none',
     },
     mutate: {
       fetchPolicy: 'network-only',
-      errorPolicy: 'all',
+      errorPolicy: 'none',
     },
   },
 });

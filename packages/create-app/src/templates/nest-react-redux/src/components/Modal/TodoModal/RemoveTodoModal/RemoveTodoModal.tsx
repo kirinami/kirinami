@@ -1,0 +1,44 @@
+import { useCallback } from 'react';
+
+import Modal from '@/components/Common/Modal/Modal';
+import Button from '@/components/Common/Button/Button';
+import Spinner from '@/components/Common/Spinner/Spinner';
+import useTodos from '@/hooks/useTodos';
+import { Todo } from '@/apollo/todos/fragments/Todo';
+
+import styles from './RemoveTodoModal.styles';
+
+export type RemoveTodoModalProps = {
+  open: boolean,
+  todo?: Todo,
+  onClose: () => void,
+};
+
+export default function RemoveTodoModal({ open, todo, onClose }: RemoveTodoModalProps) {
+  const { deleteTodo } = useTodos();
+
+  const handleSubmit = useCallback(async () => {
+    if (!todo) return;
+
+    await deleteTodo(todo?.id);
+    onClose();
+  }, [todo, onClose, deleteTodo]);
+
+  return (
+    <Modal isOpen={open} onRequestClose={onClose}>
+      <div css={styles.content}>
+        <h3 css={styles.heading}>Remove {todo?.title}</h3>
+        <p css={styles.description}>Are you sure you’d like to remove this todo?</p>
+        <div css={styles.actions}>
+          <Button onClick={handleSubmit}>
+            {false && (<Spinner variant="light" size={16} />)}
+            <span>Submit</span>
+          </Button>
+          <Button variant="secondary" onClick={onClose}>
+            <span>Cancel</span>
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}

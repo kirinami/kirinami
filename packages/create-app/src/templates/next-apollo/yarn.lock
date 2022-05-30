@@ -1683,7 +1683,7 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha1-Sr6/7tdUHywnrPspvbvRXI1bpPc=
 
-next-with-apollo@^5.3.0:
+next-with-apollo@5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/next-with-apollo/-/next-with-apollo-5.3.0.tgz#cf0de2ebebf6abbdc576837a79be083266715c1c"
   integrity sha512-g3GdxSf68W6vK8iY8yMNQ+lLl6ZiS3N2oMUTtMhFASbeVl/XVBRxpo6hVQ7YFLEFaSEG4Vxga3f27b9S1a3Fxg==

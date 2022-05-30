@@ -1,11 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import Todo from '@/types/Todo';
-
 import todosRetrieve from './actions/retrieve';
 import todosAdd from './actions/add';
 import todosUpdate from './actions/update';
 import todosDelete from './actions/delete';
+import Todo from './types/Todo';
 
 type InitialState = {
   todos: Todo[],
@@ -29,14 +28,14 @@ const todosSlice = createSlice({
     });
 
     builder.addCase(todosUpdate.fulfilled, (state, { payload }) => {
-      const todoIndex = state.todos.findIndex(todo => todo.id === payload.id);
+      const todoIndex = state.todos.findIndex((todo) => todo.id === payload.id);
       if (todoIndex === -1) return;
 
       state.todos[todoIndex] = payload;
     });
 
     builder.addCase(todosDelete.fulfilled, (state, { payload }) => {
-      state.todos = state.todos.filter(todo => todo.id !== payload.id);
+      state.todos = state.todos.filter((todo) => todo.id !== payload.id);
     });
   },
 });

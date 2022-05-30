@@ -7,18 +7,13 @@ import { TODOS_DELETE_MUTATION, TodosDeleteInput, TodosDeleteMutation } from '@/
 import { TODOS_ALL_QUERY, TodosAllQuery } from '@/stores/todos/queries/todos/todosAll';
 
 export default function useTodos() {
-  const getTodosQueryResult = useQuery<TodosAllQuery>(TODOS_ALL_QUERY, {
-    errorPolicy: 'ignore',
-  });
+  const getTodosQueryResult = useQuery<TodosAllQuery>(TODOS_ALL_QUERY);
 
   const [createTodoMutation, createTodoMutationResult] = useMutation<TodosCreateMutation, TodosCreateInput>(TODOS_CREATE_MUTATION);
   const [updateTodoMutation, updateTodoMutationResult] = useMutation<TodosUpdateMutation, TodosUpdateInput>(TODOS_UPDATE_MUTATION);
   const [deleteTodoMutation, deleteTodoMutationResult] = useMutation<TodosDeleteMutation, TodosDeleteInput>(TODOS_DELETE_MUTATION);
 
-  const loading = getTodosQueryResult.loading
-    || createTodoMutationResult.loading
-    || updateTodoMutationResult.loading
-    || deleteTodoMutationResult.loading;
+  const loading = getTodosQueryResult.loading;
 
   const error = getTodosQueryResult.error
     || createTodoMutationResult.error
@@ -88,5 +83,19 @@ export default function useTodos() {
     return data?.todo;
   }, [deleteTodoMutation]);
 
-  return { loading, error, todos, createTodo, updateTodo, deleteTodo };
+  return useMemo(() => ({
+    loading,
+    error,
+    todos,
+    createTodo,
+    updateTodo,
+    deleteTodo,
+  }), [
+    loading,
+    error,
+    todos,
+    createTodo,
+    updateTodo,
+    deleteTodo,
+  ]);
 }
