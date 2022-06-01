@@ -1,7 +1,1 @@
-import ServerErrorPage from '@/components/Page/ServerErrorPage/ServerErrorPage';
-
-export default function Page() {
-  return (
-    <ServerErrorPage />
-  );
-}
+export { default } from '@/components/Page/ServerErrorPage/ServerErrorPage';

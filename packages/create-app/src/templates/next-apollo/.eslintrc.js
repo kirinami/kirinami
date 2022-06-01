@@ -12,6 +12,7 @@ module.exports = {
   rules: {
     'no-console': 'warn',
     'no-param-reassign': 'off',
+    'no-restricted-exports': 'off',
     'max-len': ['error', 136, 2, {
       ignoreUrls: true,
       ignoreRegExpLiterals: true,

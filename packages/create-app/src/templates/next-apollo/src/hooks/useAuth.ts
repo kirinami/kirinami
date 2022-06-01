@@ -26,9 +26,7 @@ export default function useAuth() {
 
   const { isLoginOpen, isRegisterOpen } = useReactiveVar(reactiveVar);
 
-  const loading = isReady && (usersProfileQueryResult.loading
-    || loginMutationResult.loading
-    || registerMutationResult.loading);
+  const loading = isReady && (usersProfileQueryResult.loading || loginMutationResult.loading || registerMutationResult.loading);
 
   const error = usersProfileQueryResult.error
     || loginMutationResult.error
