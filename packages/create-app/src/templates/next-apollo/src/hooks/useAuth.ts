@@ -5,12 +5,16 @@ import { USERS_PROFILE_QUERY, UsersProfileQuery } from '@/stores/todos/queries/u
 import { LOGIN_MUTATION, LoginInput, LoginMutation } from '@/stores/todos/mutations/auth/login';
 import { REGISTER_MUTATION, RegisterInput, RegisterMutation } from '@/stores/todos/mutations/auth/register';
 
+import useIsReady from './useIsReady';
+
 const reactiveVar = makeVar({
   isLoginOpen: false,
   isRegisterOpen: false,
 });
 
 export default function useAuth() {
+  const isReady = useIsReady();
+
   const apolloClient = useApolloClient();
 
   const usersProfileQueryResult = useQuery<UsersProfileQuery>(USERS_PROFILE_QUERY, {
@@ -22,9 +26,9 @@ export default function useAuth() {
 
   const { isLoginOpen, isRegisterOpen } = useReactiveVar(reactiveVar);
 
-  const loading = usersProfileQueryResult.loading
+  const loading = isReady && (usersProfileQueryResult.loading
     || loginMutationResult.loading
-    || registerMutationResult.loading;
+    || registerMutationResult.loading);
 
   const error = usersProfileQueryResult.error
     || loginMutationResult.error

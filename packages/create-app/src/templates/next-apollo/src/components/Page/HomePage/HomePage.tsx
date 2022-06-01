@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import Badge from '@/components/Common/Badge/Badge';
 import Button from '@/components/Common/Button/Button';
+import Spinner from '@/components/Common/Spinner/Spinner';
 import TodoList from '@/components/Common/TodoList/TodoList';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
@@ -9,8 +10,6 @@ import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/Remove
 import useAuth from '@/hooks/useAuth';
 import useTodos from '@/hooks/useTodos';
 import { Todo } from '@/stores/todos/fragments/Todo';
-
-import Spinner from '../../Common/Spinner/Spinner';
 
 import styles from './HomePage.styles';
 

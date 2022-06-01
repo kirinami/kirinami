@@ -1,32 +1,25 @@
-import { AppProps } from 'next/app';
-import withApollo from 'next-with-apollo';
-import { ApolloClient, ApolloProvider, NormalizedCacheObject } from '@apollo/client';
-import { getDataFromTree } from '@apollo/client/react/ssr';
+import App, { AppProps } from 'next/app';
+import { ApolloProvider } from '@apollo/client';
+import { CacheProvider } from '@emotion/react';
 
-import Meta from '@/components/Meta/Meta';
-import EmotionProvider from '@/components/Provider/EmotionProvider/EmotionProvider';
+import Meta from '@/components/Common/Meta/Meta';
 import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
 import getApolloClient from '@/helpers/getApolloClient';
-import getEmotionServer from '@/helpers/getEmotionServer';
+import getEmotionCache from '@/helpers/getEmotionCache';
 
-type MyAppProps = AppProps & {
-  apollo: ApolloClient<NormalizedCacheObject>,
-};
-
-function MyApp({ Component, pageProps, apollo }: MyAppProps) {
+function MyApp({ Component, pageProps: { apolloClient, apolloState, ...pageProps } }: AppProps) {
   return (
-    <ApolloProvider client={apollo}>
-      <EmotionProvider>
+    <ApolloProvider client={apolloClient || getApolloClient(null, apolloState)}>
+      <CacheProvider value={getEmotionCache()}>
         <ThemeProvider>
           <Meta />
           <Component {...pageProps} />
         </ThemeProvider>
-      </EmotionProvider>
+      </CacheProvider>
     </ApolloProvider>
   );
 }
 
-export default withApollo(
-  ({ ctx, initialState }) => [getApolloClient(ctx, initialState), getEmotionServer()][0],
-  { getDataFromTree },
-)(MyApp);
+MyApp.getInitialProps = App.getInitialProps;
+
+export default MyApp;

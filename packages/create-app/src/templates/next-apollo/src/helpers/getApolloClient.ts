@@ -1,7 +1,6 @@
 import { IncomingHttpHeaders } from 'http';
 import { NextPageContext } from 'next';
 import { ApolloClient, ApolloLink, from, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
-import { onError } from '@apollo/client/link/error';
 
 import parseCookie from '@/utils/parseCookie';
 
@@ -89,7 +88,7 @@ const createApolloClient = () => new ApolloClient({
   },
 });
 
-export default function getApolloClient(ctx?: NextPageContext, initialState?: NormalizedCacheObject) {
+export default function getApolloClient(ctx?: NextPageContext | null, initialState?: NormalizedCacheObject) {
   const apolloClient = apolloClientMemo ?? createApolloClient();
 
   apolloClient.setLink(from([
@@ -105,6 +104,10 @@ export default function getApolloClient(ctx?: NextPageContext, initialState?: No
     }),
     createHttpLink(),
   ]));
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  apolloClient.toJSON = () => null;
 
   if (initialState) {
     const existingCache = apolloClient.extract();
