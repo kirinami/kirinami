@@ -54,7 +54,7 @@ const styles = {
     justify-content: center;
     width: 100%;
     padding: 32px;
-  `
+  `,
 };
 
 export default styles;

@@ -22,9 +22,7 @@ export default function HomePage() {
   const [removeTodoModalTodo, setRemoveTodoModalTodo] = useState<Todo>();
 
   const { user, openLogin } = useAuth();
-  const { loading, error, todos, updateTodo } = useTodos();
-
-  console.log(loading, error, todos);
+  const { loading, todos, updateTodo } = useTodos();
 
   const holdTodos = todos;
   const completedTodos = useMemo(() => todos.filter((todo) => todo.completed), [todos]);

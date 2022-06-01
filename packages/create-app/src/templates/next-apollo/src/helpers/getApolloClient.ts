@@ -1,6 +1,7 @@
 import { IncomingHttpHeaders } from 'http';
 import { NextPageContext } from 'next';
 import { ApolloClient, ApolloLink, from, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
 
 import parseCookie from '@/utils/parseCookie';
 
@@ -10,10 +11,10 @@ const isServer = typeof window === 'undefined';
 
 const createCache = () => new InMemoryCache();
 
-const createAuthLink = (headers?: IncomingHttpHeaders, onSave?: () => void) => {
-  const cookies = parseCookie(isServer ? headers?.cookie || '' : document.cookie);
-
+const createAuthLink = (headers?: IncomingHttpHeaders, onChange?: () => void) => {
   const authLink = new ApolloLink((operation, forward) => {
+    const cookies = parseCookie(isServer ? headers?.cookie || '' : document.cookie);
+
     operation.setContext(({ headers = {} }) => ({
       headers: {
         ...headers,
@@ -78,7 +79,7 @@ const createApolloClient = () => new ApolloClient({
   cache: createCache(),
   defaultOptions: {
     query: {
-      fetchPolicy: isServer ? 'network-only' : 'cache-first',
+      fetchPolicy: 'network-only',
       errorPolicy: 'none',
     },
     mutate: {
