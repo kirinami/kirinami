@@ -2,6 +2,7 @@ FROM node:16.13-alpine AS builder
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 ENV NODE_OPTIONS --max_old_space_size=4096
+COPY patches patches
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
@@ -21,4 +22,5 @@ COPY --from=builder /app/package.json /app/yarn.lock ./
 ENV NODE_ENV production
 ENV NODE_OPTIONS --max_old_space_size=4096
 ENV NEXT_TELEMETRY_DISABLED 1
+EXPOSE 3000
 CMD ["yarn", "start"]
