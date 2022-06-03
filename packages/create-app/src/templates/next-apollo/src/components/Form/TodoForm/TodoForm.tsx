@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -21,12 +22,17 @@ export type TodoFormProps = {
 };
 
 export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
+  const { t } = useTranslation();
+
   const { loading, error, createTodo, updateTodo } = useTodos();
 
   const form = useForm<TodoFormData>({
     resolver: yupResolver(yup.object({
-      title: yup.string().required().min(2),
-      completed: yup.boolean().required(),
+      title: yup.string()
+        .required(t('forms.todo.validation.title.required'))
+        .min(2, t('forms.todo.validation.title.min', { count: 2 })),
+      completed: yup.boolean()
+        .required(t('forms.todo.validation.completed.required')),
     })),
     defaultValues: {
       title: todo?.title || '',
@@ -53,20 +59,20 @@ export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
     <form css={styles.form(loading)} noValidate onSubmit={handleSubmit}>
       <div css={styles.group}>
         {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-        <input css={styles.input} type="text" placeholder="Title" autoFocus {...form.register('title')} />
+        <input css={styles.input} type="text" placeholder={t('forms.todo.title')} autoFocus {...form.register('title')} />
         <small css={styles.error}>{formErrors.title?.message}</small>
       </div>
       <div css={styles.group}>
         <label css={styles.checkbox}>
           <input type="checkbox" {...form.register('completed')} />
-          <span>Completed</span>
+          <span>{t('common.completed')}</span>
         </label>
         <small css={styles.error}>{formErrors.completed?.message}</small>
       </div>
       <div css={styles.actions}>
         <Button css={styles.actionsButton} type="submit">
           {loading && (<Spinner variant="light" size={16} />)}
-          <span>Submit</span>
+          <span>{t('common.submit')}</span>
         </Button>
         <small css={styles.actionsMessage}>{error?.message}</small>
       </div>

@@ -8,7 +8,7 @@ const styles = {
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(4px);
     z-index: 1000;
 
     &.ReactModal__Overlay {

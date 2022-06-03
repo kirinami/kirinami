@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import Icon from '@/components/Common/Icon/Icon';
 import Badge from '@/components/Common/Badge/Badge';
 import { Todo } from '@/stores/todos/fragments/Todo';
@@ -13,6 +15,8 @@ export type TodoListProps = {
 };
 
 export default function TodoList({ readonly, todos, onClick, onEdit, onRemove }: TodoListProps) {
+  const { t } = useTranslation();
+
   return (
     <ul css={styles.list}>
       {todos.map((todo) => (
@@ -22,7 +26,9 @@ export default function TodoList({ readonly, todos, onClick, onEdit, onRemove }:
             <span>{todo.title}</span>
           </button>
           <div css={styles.right}>
-            <Badge variant={todo.completed ? 'secondary' : 'warning'}>{todo.completed ? 'Completed' : 'Pending'}</Badge>
+            <Badge variant={todo.completed ? 'secondary' : 'warning'}>
+              {todo.completed ? t('common.completed') : t('common.pending')}
+            </Badge>
             <div css={styles.actions}>
               <button css={styles.action} type="button" onClick={() => onEdit?.(todo)}>
                 <Icon name="pencil" size={14} />

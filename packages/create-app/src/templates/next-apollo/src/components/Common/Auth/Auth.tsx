@@ -1,8 +1,12 @@
+import { useTranslation } from 'react-i18next';
+
 import useAuth from '@/hooks/useAuth';
 
 import styles from './Auth.styles';
 
 export default function Auth() {
+  const { t } = useTranslation();
+
   const { user, logout, openLogin, openRegister } = useAuth();
 
   return (
@@ -11,17 +15,16 @@ export default function Auth() {
         <>
           <div><small>{user.firstName} {user.lastName}</small></div>
           <button css={styles.button} type="button" onClick={logout}>
-            <small>Logout</small>
+            <small>{t('auth.logout')}</small>
           </button>
         </>
       ) : (
         <>
           <button css={styles.button} type="button" onClick={openLogin}>
-            <small>Login</small>
+            <small>{t('auth.login')}</small>
           </button>
-          <small>{' | '}</small>
           <button css={styles.button} type="button" onClick={openRegister}>
-            <small>Register</small>
+            <small>{t('auth.register')}</small>
           </button>
         </>
       )}

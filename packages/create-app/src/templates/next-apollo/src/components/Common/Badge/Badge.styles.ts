@@ -6,7 +6,7 @@ const styles = {
     font-size: 12px;
     line-height: 12px;
     padding: 4px 8px;
-    min-width: 92px;
+    min-width: 102px;
     border-radius: 12px;
     text-align: center;
 

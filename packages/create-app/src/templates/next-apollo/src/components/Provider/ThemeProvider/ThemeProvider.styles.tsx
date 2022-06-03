@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 
 export const styles = {
-  global: css`
+  reset: css`
     *, ::before, ::after {
       box-sizing: border-box;
       border-width: 0;
@@ -20,8 +20,6 @@ export const styles = {
       -moz-tab-size: 4;
       -o-tab-size: 4;
       tab-size: 4;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 400;
     }
 
     body {
@@ -327,6 +325,12 @@ export const styles = {
       display: flex;
       flex-direction: column;
       height: 100%;
+    }
+  `,
+  root: css`
+    html {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
     }
   `,
 };

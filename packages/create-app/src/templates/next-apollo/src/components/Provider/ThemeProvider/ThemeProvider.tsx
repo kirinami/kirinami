@@ -29,7 +29,8 @@ export default function Theme({ children }: { children: ReactNode }) {
 
   return (
     <BaseThemeProvider theme={themes[theme]}>
-      <Global styles={styles.global} />
+      <Global styles={styles.reset} />
+      <Global styles={styles.root} />
       <ThemeContext.Provider value={{ theme, changeTheme, toggleTheme }}>
         {children}
       </ThemeContext.Provider>

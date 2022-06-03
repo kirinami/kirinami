@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import Badge from '@/components/Common/Badge/Badge';
 import Button from '@/components/Common/Button/Button';
@@ -14,6 +15,8 @@ import { Todo } from '@/stores/todos/fragments/Todo';
 import styles from './HomePage.styles';
 
 export default function HomePage() {
+  const { t } = useTranslation();
+
   const [editTodoModalOpen, setEditTodoModalOpen] = useState(false);
   const [editTodoModalTodo, setEditTodoModalTodo] = useState<Todo>();
 
@@ -60,8 +63,10 @@ export default function HomePage() {
     <>
       <PageLayout>
         <div css={styles.title}>
-          <h1 css={styles.heading}>You’ve got <span>{holdTodos.length} task</span> today</h1>
-          <Button onClick={handleAdd}>Add New</Button>
+          <h1 css={styles.heading}>
+            <Trans t={t} i18nKey="pages.home.title" values={{ count: holdTodos.length }} components={[<span />]} /><br />
+          </h1>
+          <Button onClick={handleAdd}>{t('pages.home.add_new')}</Button>
         </div>
 
         {holdTodos.length > 0 && (
@@ -74,8 +79,8 @@ export default function HomePage() {
         {completedTodos.length > 0 && (
           <div css={styles.section}>
             <h3 css={styles.sectionTitle}>
-              <span>Completed</span>
-              <Badge variant="danger">Inactive</Badge>
+              <span>{t('common.completed')}</span>
+              <Badge variant="danger">{t('common.inactive')}</Badge>
             </h3>
             <TodoList readonly todos={completedTodos} />
           </div>

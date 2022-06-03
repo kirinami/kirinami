@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -20,14 +21,24 @@ export type RegisterFormProps = {
 };
 
 export default function RegisterForm({ onAfterSubmit }: RegisterFormProps) {
+  const { t } = useTranslation();
+
   const { loading, error, register } = useAuth();
 
   const form = useForm<RegisterFormData>({
     resolver: yupResolver(yup.object({
-      firstName: yup.string().required().min(2),
-      lastName: yup.string().required().min(2),
-      email: yup.string().required().email(),
-      password: yup.string().required().min(8),
+      firstName: yup.string()
+        .required(t('forms.auth.validation.firstName.required'))
+        .min(2, t('forms.auth.validation.firstName.min', { count: 2 })),
+      lastName: yup.string()
+        .required(t('forms.auth.validation.lastName.required'))
+        .min(2, t('forms.auth.validation.lastName.min', { count: 2 })),
+      email: yup.string()
+        .required(t('forms.auth.validation.email.required'))
+        .email(t('forms.auth.validation.email.email')),
+      password: yup.string()
+        .required(t('forms.auth.validation.password.required'))
+        .min(8, t('forms.auth.validation.password.min', { count: 8 })),
     })),
     defaultValues: {
       firstName: '',
@@ -52,25 +63,25 @@ export default function RegisterForm({ onAfterSubmit }: RegisterFormProps) {
     <form css={styles.form(loading)} noValidate onSubmit={handleSubmit}>
       <div css={styles.group}>
         {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-        <input css={styles.input} type="text" placeholder="First Name" autoFocus {...form.register('firstName')} />
+        <input css={styles.input} type="text" placeholder={t('forms.auth.firstName')} autoFocus {...form.register('firstName')} />
         <small css={styles.error}>{formErrors.firstName?.message}</small>
       </div>
       <div css={styles.group}>
-        <input css={styles.input} type="text" placeholder="Last Name" {...form.register('lastName')} />
+        <input css={styles.input} type="text" placeholder={t('forms.auth.lastName')} {...form.register('lastName')} />
         <small css={styles.error}>{formErrors.lastName?.message}</small>
       </div>
       <div css={styles.group}>
-        <input css={styles.input} type="email" placeholder="Email" {...form.register('email')} />
+        <input css={styles.input} type="email" placeholder={t('forms.auth.email')} {...form.register('email')} />
         <small css={styles.error}>{formErrors.email?.message}</small>
       </div>
       <div css={styles.group}>
-        <input css={styles.input} type="password" placeholder="Password" {...form.register('password')} />
+        <input css={styles.input} type="password" placeholder={t('forms.auth.password')} {...form.register('password')} />
         <small css={styles.error}>{formErrors.password?.message}</small>
       </div>
       <div css={styles.actions}>
         <Button css={styles.actionsButton} type="submit">
           {loading && (<Spinner variant="light" size={16} />)}
-          <span>Submit</span>
+          <span>{t('common.submit')}</span>
         </Button>
         <small css={styles.actionsMessage}>{error?.message}</small>
       </div>

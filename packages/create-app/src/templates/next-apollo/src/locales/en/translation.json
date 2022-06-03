@@ -1,0 +1,88 @@
+{
+  "menu": {
+    "home": "Home",
+    "not_found": "404"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "common": {
+    "completed": "Completed",
+    "pending": "Pending",
+    "inactive": "Inactive",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "forms": {
+    "auth": {
+      "validation": {
+        "firstName": {
+          "required": "First Name is a required field",
+          "min": "First Name must be at least {{count}} characters"
+        },
+        "lastName": {
+          "required": "Last Name is a required field",
+          "min": "Last Name must be at least {{count}} characters"
+        },
+        "email": {
+          "required": "Email is a required field",
+          "email": "Email must be a valid"
+        },
+        "password": {
+          "required": "Password is a required field",
+          "min": "Password must be at least {{count}} characters"
+        }
+      },
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "password": "Password"
+    },
+    "todo": {
+      "validation": {
+        "title": {
+          "required": "Title is a required field",
+          "min": "Title must be at least {{count}} characters"
+        },
+        "completed": {
+          "required": "Обов'язкове полем"
+        }
+      },
+      "title": "Title"
+    }
+  },
+  "modals": {
+    "login": {
+      "title": "Login"
+    },
+    "register": {
+      "title": "Register"
+    },
+    "edit_todo": {
+      "create_title": "Create Todo",
+      "update_title": "Update {{name}}"
+    },
+    "remove_todo": {
+      "title": "Remove {{name}}",
+      "description": "Are you sure you’d like to remove this todo?"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "You’ve got <0>{{count}} tasks</0> today",
+      "title_one": "You’ve got <0>{{count}} task</0> today",
+      "add_new": "Add new"
+    },
+    "not_found": {
+      "title": "Not Found: <0>{{url}}</0>"
+    },
+    "server_error": {
+      "title": "Server Error: <0>{{url}}</0>"
+    }
+  },
+  "footer": {
+    "created_by": "Created by <0>{{name}}</0>"
+  }
+}

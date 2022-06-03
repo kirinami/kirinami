@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  menu: css`
+  languages: css`
     display: flex;
     flex-direction: row;
     
@@ -29,7 +29,7 @@ const styles = {
       }
     }
   `,
-  itemLink: (active: boolean) => css`
+  itemButton: (active: boolean) => css`
     font-weight: ${active ? 'bold' : 'normal'};
     color: #884cb2;
   `,

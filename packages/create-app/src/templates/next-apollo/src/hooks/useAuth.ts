@@ -47,8 +47,8 @@ export default function useAuth() {
     }
 
     if (data?.login) {
-      document.cookie = `accessToken=${data.login.accessToken}; path=/;`;
-      document.cookie = `refreshToken=${data.login.refreshToken}; path=/;`;
+      document.cookie = `access-token=${data.login.accessToken}; path=/;`;
+      document.cookie = `refresh-token=${data.login.refreshToken}; path=/;`;
 
       await apolloClient.resetStore();
     }
@@ -71,8 +71,8 @@ export default function useAuth() {
     }
 
     if (data?.register) {
-      document.cookie = `accessToken=${data.register.accessToken}; path=/;`;
-      document.cookie = `refreshToken=${data.register.refreshToken}; path=/;`;
+      document.cookie = `access-token=${data.register.accessToken}; path=/;`;
+      document.cookie = `refresh-token=${data.register.refreshToken}; path=/;`;
 
       await apolloClient.resetStore();
     }
@@ -81,8 +81,8 @@ export default function useAuth() {
   }, [apolloClient, registerMutation]);
 
   const logout = useCallback(async () => {
-    document.cookie = 'accessToken=; path=/;';
-    document.cookie = 'refreshToken=; path=/;';
+    document.cookie = 'access-token=; path=/;';
+    document.cookie = 'refresh-token=; path=/;';
 
     await apolloClient.resetStore();
   }, [apolloClient]);

@@ -3,8 +3,9 @@ import { streamToString } from 'next/dist/server/node-web-streams-helper';
 import { getMarkupFromTree } from '@apollo/client/react/ssr';
 import createEmotionServer from '@emotion/server/create-instance';
 
-import getApolloClient from '@/helpers/getApolloClient';
-import getEmotionCache from '@/helpers/getEmotionCache';
+import initApolloClient from '@/helpers/initApolloClient';
+import initEmotionCache from '@/helpers/initEmotionCache';
+import initTranslations from '@/helpers/initTranslations';
 
 function MyDocument() {
   return (
@@ -12,7 +13,7 @@ function MyDocument() {
       <Head>
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500;600;700&display=swap"
         />
       </Head>
       <body>
@@ -24,14 +25,19 @@ function MyDocument() {
 }
 
 MyDocument.getInitialProps = async (ctx: DocumentContext) => {
-  const apolloClient = getApolloClient(ctx);
+  const apolloClient = initApolloClient(ctx);
 
-  const emotionServer = createEmotionServer(getEmotionCache());
+  const emotionCache = initEmotionCache();
+  const emotionServer = createEmotionServer(emotionCache);
+
+  const translations = initTranslations(ctx);
 
   ctx.renderPage = ((renderPage) => () => renderPage({
     enhanceApp: (App) => function EnhanceApp(props) {
       Object.assign(props.pageProps, {
         apolloClient,
+        emotionCache,
+        translations,
       });
 
       return <App {...props} />;

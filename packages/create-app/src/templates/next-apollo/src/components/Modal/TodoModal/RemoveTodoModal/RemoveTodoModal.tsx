@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Modal from '@/components/Common/Modal/Modal';
 import Button from '@/components/Common/Button/Button';
@@ -15,6 +16,8 @@ export type RemoveTodoModalProps = {
 };
 
 export default function RemoveTodoModal({ open, todo, onClose }: RemoveTodoModalProps) {
+  const { t } = useTranslation();
+
   const { loading, deleteTodo } = useTodos();
 
   const handleSubmit = useCallback(async () => {
@@ -27,15 +30,15 @@ export default function RemoveTodoModal({ open, todo, onClose }: RemoveTodoModal
   return (
     <Modal isOpen={open} onRequestClose={onClose}>
       <div css={styles.content}>
-        <h3 css={styles.heading}>Remove {todo?.title}</h3>
-        <p css={styles.description}>Are you sure you’d like to remove this todo?</p>
+        <h3 css={styles.heading}>{t('modals.remove_todo.title', { name: todo?.title })}</h3>
+        <p css={styles.description}>{t('modals.remove_todo.description')}</p>
         <div css={styles.actions}>
           <Button onClick={handleSubmit}>
             {loading && (<Spinner variant="light" size={16} />)}
-            <span>Submit</span>
+            <span>{t('common.submit')}</span>
           </Button>
           <Button variant="secondary" onClick={onClose}>
-            <span>Cancel</span>
+            <span>{t('common.cancel')}</span>
           </Button>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import Modal from '@/components/Common/Modal/Modal';
 import TodoForm from '@/components/Form/TodoForm/TodoForm';
 import { Todo } from '@/stores/todos/fragments/Todo';
@@ -11,10 +13,16 @@ export type EditTodoModalProps = {
 };
 
 export default function EditTodoModal({ open, todo, onClose }: EditTodoModalProps) {
+  const { t } = useTranslation();
+
   return (
     <Modal isOpen={open} onRequestClose={onClose}>
       <div css={styles.content}>
-        <h3 css={styles.heading}>{!todo ? 'Create' : 'Update'} Todo</h3>
+        <h3 css={styles.heading}>
+          {!todo
+            ? t('modals.edit_todo.create_title')
+            : t('modals.edit_todo.update_title', { name: todo.title })}
+        </h3>
         <TodoForm todo={todo} onAfterSubmit={onClose} />
       </div>
     </Modal>
