@@ -51,6 +51,7 @@ const styles = {
   `,
   actions: css`
     display: flex;
+    flex-direction: row;
     align-items: center;
 
     > :not([hidden]) ~ :not([hidden]) {

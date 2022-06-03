@@ -1,11 +1,11 @@
-import { makeVar, useApolloClient, useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { useCallback, useMemo } from 'react';
+import { makeVar, useApolloClient, useMutation, useQuery, useReactiveVar } from '@apollo/client';
 
-import { USERS_PROFILE_QUERY, UsersProfileQuery } from '@/stores/todos/queries/users/usersProfile';
-import { LOGIN_MUTATION, LoginInput, LoginMutation } from '@/stores/todos/mutations/auth/login';
-import { REGISTER_MUTATION, RegisterInput, RegisterMutation } from '@/stores/todos/mutations/auth/register';
+import useIsReady from '@/hooks/useIsReady';
 
-import useIsReady from './useIsReady';
+import { USERS_PROFILE_QUERY, UsersProfileQuery } from '../queries/users/usersProfile';
+import { LOGIN_MUTATION, LoginInput, LoginMutation } from '../mutations/auth/login';
+import { REGISTER_MUTATION, RegisterInput, RegisterMutation } from '../mutations/auth/register';
 
 const reactiveVar = makeVar({
   isLoginOpen: false,
@@ -17,22 +17,16 @@ export default function useAuth() {
 
   const apolloClient = useApolloClient();
 
-  const usersProfileQueryResult = useQuery<UsersProfileQuery>(USERS_PROFILE_QUERY, {
+  const { isLoginOpen, isRegisterOpen } = useReactiveVar(reactiveVar);
+
+  const userQueryResult = useQuery<UsersProfileQuery>(USERS_PROFILE_QUERY, {
     errorPolicy: 'ignore',
   });
 
   const [loginMutation, loginMutationResult] = useMutation<LoginMutation, LoginInput>(LOGIN_MUTATION);
   const [registerMutation, registerMutationResult] = useMutation<RegisterMutation, RegisterInput>(REGISTER_MUTATION);
 
-  const { isLoginOpen, isRegisterOpen } = useReactiveVar(reactiveVar);
-
-  const loading = isReady && (usersProfileQueryResult.loading || loginMutationResult.loading || registerMutationResult.loading);
-
-  const error = usersProfileQueryResult.error
-    || loginMutationResult.error
-    || registerMutationResult.error;
-
-  const user = useMemo(() => usersProfileQueryResult.data?.user || null, [usersProfileQueryResult.data?.user]);
+  const user = useMemo(() => userQueryResult.data?.user || null, [userQueryResult.data?.user]);
 
   const login = useCallback(async (email: string, password: string) => {
     const { data, errors } = await loginMutation({
@@ -95,18 +89,51 @@ export default function useAuth() {
 
   const closeRegister = useCallback(() => reactiveVar({ ...reactiveVar(), isRegisterOpen: false }), []);
 
-  return {
+  return useMemo(() => ({
     isLoginOpen,
     isRegisterOpen,
-    loading,
-    error,
+
     user,
+    userLoading: isReady && userQueryResult.loading,
+    userError: userQueryResult.error,
+
     login,
+    loginLoading: loginMutationResult.loading,
+    loginError: loginMutationResult.error,
+
     register,
+    registerLoading: registerMutationResult.loading,
+    registerError: registerMutationResult.error,
+
     logout,
+
     openLogin,
     closeLogin,
     openRegister,
     closeRegister,
-  };
+  }), [
+    isReady,
+
+    isLoginOpen,
+    isRegisterOpen,
+
+    user,
+    userQueryResult.loading,
+    userQueryResult.error,
+
+    login,
+    loginMutationResult.loading,
+    loginMutationResult.error,
+
+    register,
+    registerMutationResult.loading,
+    registerMutationResult.error,
+
+    logout,
+
+    openLogin,
+    closeLogin,
+    openRegister,
+    closeRegister,
+  ]);
 }

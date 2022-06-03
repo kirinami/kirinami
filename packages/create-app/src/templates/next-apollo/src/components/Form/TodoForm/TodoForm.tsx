@@ -5,8 +5,8 @@ import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useTodos from '@/hooks/useTodos';
-import { Todo } from '@/stores/todos/fragments/Todo';
+import useTodos from '@/stores/actions/useTodos';
+import { Todo } from '@/stores/fragments/Todo';
 
 import styles from './TodoForm.styles';
 
@@ -24,7 +24,10 @@ export type TodoFormProps = {
 export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
   const { t } = useTranslation();
 
-  const { loading, error, createTodo, updateTodo } = useTodos();
+  const { createTodo, createTodoLoading, createTodoError, updateTodo, updateTodoLoading, updateTodoError } = useTodos();
+
+  const loading = createTodoLoading || updateTodoLoading;
+  const error = createTodoError || updateTodoError;
 
   const form = useForm<TodoFormData>({
     resolver: yupResolver(yup.object({

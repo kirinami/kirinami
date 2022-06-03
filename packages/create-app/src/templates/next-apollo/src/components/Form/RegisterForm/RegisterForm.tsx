@@ -5,7 +5,7 @@ import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useAuth from '@/hooks/useAuth';
+import useAuth from '@/stores/actions/useAuth';
 
 import styles from './RegisterForm.styles';
 
@@ -23,7 +23,10 @@ export type RegisterFormProps = {
 export default function RegisterForm({ onAfterSubmit }: RegisterFormProps) {
   const { t } = useTranslation();
 
-  const { loading, error, register } = useAuth();
+  const { register, registerLoading, registerError } = useAuth();
+
+  const loading = registerLoading;
+  const error = registerError;
 
   const form = useForm<RegisterFormData>({
     resolver: yupResolver(yup.object({

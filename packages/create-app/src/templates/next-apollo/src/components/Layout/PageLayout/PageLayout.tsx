@@ -31,7 +31,7 @@ export default function PageLayout({ children }: PageLayoutProps) {
 
         <footer css={styles.footer}>
           <a href="https://kirinami.com" target="_blank" rel="noopener noreferrer">
-            <Trans t={t} i18nKey="footer.created_by" values={{ name: 'KIRINAMI ' }} components={[<strong />]} />
+            <Trans t={t} i18nKey="common.created_by" components={[<strong />]} />
           </a>
         </footer>
       </div>

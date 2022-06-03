@@ -22,10 +22,23 @@ const styles = {
   actions: css`
     display: flex;
     flex-direction: row;
+    align-items: center;
 
     > :not([hidden]) ~ :not([hidden]) {
       margin-left: 10px;
     }
+  `,
+  actionsButton: css`
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 18px;
+  `,
+  actionsMessage: css`
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-end;
+    color: crimson;
   `,
 };
 

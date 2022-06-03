@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import Modal from '@/components/Common/Modal/Modal';
 import RegisterForm from '@/components/Form/RegisterForm/RegisterForm';
-import useAuth from '@/hooks/useAuth';
+import useAuth from '@/stores/actions/useAuth';
 
 import styles from './RegisterModal.styles';
 

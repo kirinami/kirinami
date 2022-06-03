@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import Modal from '@/components/Common/Modal/Modal';
 import TodoForm from '@/components/Form/TodoForm/TodoForm';
-import { Todo } from '@/stores/todos/fragments/Todo';
+import { Todo } from '@/stores/fragments/Todo';
 
 import styles from './EditTodoModal.styles';
 

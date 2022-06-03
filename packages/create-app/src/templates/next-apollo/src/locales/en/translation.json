@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "Next.js Starter powered by KIRINAMI",
+    "description": "Next.js Starter powered by KIRINAMI"
+  },
   "menu": {
     "home": "Home",
     "not_found": "404"
@@ -13,7 +17,8 @@
     "pending": "Pending",
     "inactive": "Inactive",
     "submit": "Submit",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "created_by": "Created by <0>KIRINAMI</0>"
   },
   "forms": {
     "auth": {
@@ -81,8 +86,5 @@
     "server_error": {
       "title": "Server Error: <0>{{url}}</0>"
     }
-  },
-  "footer": {
-    "created_by": "Created by <0>{{name}}</0>"
   }
 }

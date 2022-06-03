@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "Next.js Starter створено в KIRINAMI",
+    "description": "Next.js Starter створено в KIRINAMI"
+  },
   "menu": {
     "home": "Головна",
     "not_found": "404"
@@ -13,7 +17,8 @@
     "pending": "В очікуванні",
     "inactive": "Неактивний",
     "submit": "Відправити",
-    "cancel": "Відмінити"
+    "cancel": "Відмінити",
+    "created_by": "Створено в <0>KIRINAMI</0>"
   },
   "forms": {
     "auth": {
@@ -82,8 +87,5 @@
     "server_error": {
       "title": "Помилка на сервері: <0>{{url}}</0>"
     }
-  },
-  "footer": {
-    "created_by": "Створено в <0>{{name}}</0>"
   }
 }

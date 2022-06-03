@@ -13,7 +13,7 @@ module.exports = {
     'no-console': 'warn',
     'no-param-reassign': 'off',
     'no-restricted-exports': 'off',
-    'max-len': ['error', 136, 2, {
+    'max-len': ['error', 128, 2, {
       ignoreUrls: true,
       ignoreRegExpLiterals: true,
       ignoreStrings: true,

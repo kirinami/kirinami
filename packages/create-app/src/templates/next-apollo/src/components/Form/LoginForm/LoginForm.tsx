@@ -5,7 +5,7 @@ import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useAuth from '@/hooks/useAuth';
+import useAuth from '@/stores/actions/useAuth';
 
 import styles from './LoginForm.styles';
 
@@ -21,7 +21,10 @@ export type LoginFormProps = {
 export default function LoginForm({ onAfterSubmit }: LoginFormProps) {
   const { t } = useTranslation();
 
-  const { loading, error, login } = useAuth();
+  const { login, loginLoading, loginError } = useAuth();
+
+  const loading = loginLoading;
+  const error = loginError;
 
   const form = useForm<LoginFormData>({
     resolver: yupResolver(yup.object({

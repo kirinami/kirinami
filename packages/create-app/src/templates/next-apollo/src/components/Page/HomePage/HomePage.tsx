@@ -8,9 +8,9 @@ import TodoList from '@/components/Common/TodoList/TodoList';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
 import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
-import useAuth from '@/hooks/useAuth';
-import useTodos from '@/hooks/useTodos';
-import { Todo } from '@/stores/todos/fragments/Todo';
+import useAuth from '@/stores/actions/useAuth';
+import useTodos from '@/stores/actions/useTodos';
+import { Todo } from '@/stores/fragments/Todo';
 
 import styles from './HomePage.styles';
 
@@ -24,9 +24,8 @@ export default function HomePage() {
   const [removeTodoModalTodo, setRemoveTodoModalTodo] = useState<Todo>();
 
   const { user, openLogin } = useAuth();
-  const { loading, todos, updateTodo } = useTodos();
+  const { todos, todosLoading, updateTodo } = useTodos();
 
-  const holdTodos = todos;
   const completedTodos = useMemo(() => todos.filter((todo) => todo.completed), [todos]);
 
   const handleAdd = useCallback(() => {
@@ -64,15 +63,15 @@ export default function HomePage() {
       <PageLayout>
         <div css={styles.title}>
           <h1 css={styles.heading}>
-            <Trans t={t} i18nKey="pages.home.title" values={{ count: holdTodos.length }} components={[<span />]} /><br />
+            <Trans t={t} i18nKey="pages.home.title" values={{ count: todos.length }} components={[<span />]} /><br />
           </h1>
           <Button onClick={handleAdd}>{t('pages.home.add_new')}</Button>
         </div>
 
-        {holdTodos.length > 0 && (
+        {todos.length > 0 && (
           <div css={styles.section}>
             <h3 css={styles.sectionTitle}>On Hold</h3>
-            <TodoList todos={holdTodos} onClick={handleClick} onEdit={handleEdit} onRemove={handleRemove} />
+            <TodoList todos={todos} onClick={handleClick} onEdit={handleEdit} onRemove={handleRemove} />
           </div>
         )}
 
@@ -86,7 +85,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {loading && (
+        {todosLoading && (
           <div css={styles.spinner}>
             <Spinner size={32} />
           </div>
