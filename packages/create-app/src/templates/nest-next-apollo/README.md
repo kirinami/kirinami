@@ -1,4 +1,4 @@
-# Nest Starter
+# Nest-Next-Apollo Starter
 
 This project was bootstrapped with [NestJS](https://github.com/nestjs/nest) and [TypeORM](https://github.com/typeorm/typeorm).
 
@@ -41,3 +41,27 @@ Your api is ready to be deployed!
 ## Learn More
 
 You can learn more in the [NestJS documentation](https://docs.nestjs.com/) and [TypeORM documentation](https://typeorm.io/).
+
+## Deploy via Docker
+
+docker-compose.yml
+```yaml
+version: '3.7'
+
+services:
+  postgres:
+    env_file:
+      - .env.local
+    image: postgres:13.2-alpine
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    restart: unless-stopped
+
+  app:
+    env_file:
+      - .env.local
+    build: .
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+```
