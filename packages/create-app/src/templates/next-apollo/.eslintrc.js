@@ -81,7 +81,12 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/indent': ['error', 2, {
       SwitchCase: 1,
-      ignoredNodes: ['TSTypeParameterInstantiation'],
+      ignoredNodes: [
+        'TSTypeParameterInstantiation',
+        'FunctionExpression > .params[decorators.length > 0]',
+        'FunctionExpression > .params > :matches(Decorator, :not(:first-child))',
+        'ClassBody.body > PropertyDefinition[decorators.length > 0] > .key',
+      ],
     }],
   },
   settings: {

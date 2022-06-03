@@ -19,5 +19,3 @@ let override = true;
     override = false;
   }
 });
-
-process.env.__NEXT_REACT_ROOT = 'true';

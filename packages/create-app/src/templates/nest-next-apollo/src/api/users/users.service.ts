@@ -1,22 +1,24 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { In } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
 import { groupBy, reduce, uniq } from 'lodash';
 
 import { createDataLoader } from '@/api/utils/create-data-loader';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
-import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly userRepository: UserRepository) {
+  constructor(
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+  ) {
   }
 
   async findOneById(id: number, relations?: string[]) {
     if (relations && !relations.includes('todos')) throw new BadRequestException();
 
-    return this.userRepository.findOne({
+    return this.usersRepository.findOne({
       where: {
         id,
       },
@@ -25,7 +27,7 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
-    return this.userRepository.findOne({
+    return this.usersRepository.findOne({
       where: {
         email,
       },
@@ -44,7 +46,7 @@ export class UsersService {
 
   async loadOneById(id: number) {
     return createDataLoader<number, User | undefined>('users/loadOneById', async (ids) => {
-      const users = await this.userRepository.find({
+      const users = await this.usersRepository.find({
         where: {
           id: In(uniq(ids)),
         },
@@ -62,7 +64,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     const password = await User.hashPassword(createUserDto.password);
 
-    return this.userRepository.save(this.userRepository.create({
+    return this.usersRepository.save(this.usersRepository.create({
       ...createUserDto,
       password,
     }))

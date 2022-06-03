@@ -1,32 +1,29 @@
-import '@/styles/_app.scss';
-
-import { useMemo } from 'react';
-import Modal from 'react-modal';
-import { AppProps } from 'next/app';
-import Head from 'next/head';
+import { I18nextProvider } from 'react-i18next';
+import App, { AppContext, AppProps } from 'next/app';
 import { ApolloProvider } from '@apollo/client';
+import { CacheProvider } from '@emotion/react';
 
-import Layout from '@/containers/layout/Layout';
-import { initApolloClient } from '@/helpers/initApolloClient';
+import Meta from '@/components/Common/Meta/Meta';
+import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
+import initApolloClient from '@/helpers/initApolloClient';
+import initEmotionCache from '@/helpers/initEmotionCache';
+import initTranslations from '@/helpers/initTranslations';
 
-Modal.setAppElement('#__next');
-
-export default function MyApp({ Component, pageProps }: AppProps) {
-  const apolloClient = useMemo(() => initApolloClient(pageProps.extractData), [pageProps.extractData]);
-
+function MyApp({ Component, pageProps: { apolloClient, apolloState, emotionCache, translations, ...pageProps } }: AppProps) {
   return (
-    <ApolloProvider client={apolloClient}>
-      <Layout>
-        <Head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-          <meta name="description" content="Next.js Starter powered by KIRINAMI" />
-          <meta name="keywords" content="Next.js, TypeScript, SCSS" />
-
-          <title>Next.js Starter powered by KIRINAMI</title>
-        </Head>
-        <Component {...pageProps} />
-      </Layout>
+    <ApolloProvider client={apolloClient || initApolloClient(null, apolloState)}>
+      <CacheProvider value={emotionCache || initEmotionCache()}>
+        <I18nextProvider i18n={translations || initTranslations()}>
+          <ThemeProvider>
+            <Meta />
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </I18nextProvider>
+      </CacheProvider>
     </ApolloProvider>
   );
 }
+
+MyApp.getInitialProps = async (appContext: AppContext) => App.getInitialProps(appContext);
+
+export default MyApp;

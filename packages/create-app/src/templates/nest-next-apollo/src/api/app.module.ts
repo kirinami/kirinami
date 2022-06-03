@@ -1,8 +1,10 @@
+import path from 'path';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloDriver } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request } from 'express';
+import { DataSource } from 'typeorm';
 
 import { AuthModule } from './auth/auth.module';
 import { TodosModule } from './todos/todos.module';
@@ -41,10 +43,9 @@ import { UsersModule } from './users/users.module';
           },
         },
       },
-      path: 'api/graphql',
       introspection: true,
       playground: true,
-      autoSchemaFile: true,
+      autoSchemaFile: path.resolve('scheme.graphql'),
     }),
     AuthModule,
     TodosModule,
@@ -54,4 +55,6 @@ import { UsersModule } from './users/users.module';
   providers: [],
 })
 export class AppModule {
+  constructor(private readonly dataSource: DataSource) {
+  }
 }

@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { Token } from './token.entity';
-import { TokenRepository } from './token.repository';
 
 @Injectable()
 export class TokensService {
-  constructor(private readonly tokenRepository: TokenRepository) {
+  constructor(
+    @InjectRepository(Token) private readonly tokensRepository: Repository<Token>,
+  ) {
   }
 
   async set(key: string, value: string, ttl?: number): Promise<Token>;
@@ -15,7 +18,7 @@ export class TokensService {
     const key = typeof keyOrUserId === 'string' ? keyOrUserId : valueOrKey as string;
     const value = typeof keyOrUserId === 'string' ? valueOrKey : ttlOrValue as string;
 
-    const token = await this.tokenRepository.findOne({
+    const token = await this.tokensRepository.findOne({
       where: {
         userId,
         key,
@@ -23,13 +26,13 @@ export class TokensService {
     });
 
     if (token) {
-      return this.tokenRepository.save(this.tokenRepository.merge(token, {
+      return this.tokensRepository.save(this.tokensRepository.merge(token, {
         value,
         ttl,
       }));
     }
 
-    return this.tokenRepository.save(this.tokenRepository.create({
+    return this.tokensRepository.save(this.tokensRepository.create({
       userId,
       key,
       value,
@@ -37,13 +40,13 @@ export class TokensService {
     }));
   }
 
-  async get(key: string): Promise<Token | undefined>;
-  async get(userId: number, key: string): Promise<Token | undefined>;
-  async get(keyOrUserId: string | number, orKey?: string): Promise<Token | undefined> {
+  async get(key: string): Promise<Token | null>;
+  async get(userId: number, key: string): Promise<Token | null>;
+  async get(keyOrUserId: string | number, orKey?: string): Promise<Token | null> {
     const userId = typeof keyOrUserId === 'number' ? keyOrUserId : undefined;
     const key = typeof keyOrUserId === 'string' ? keyOrUserId : orKey as string;
 
-    return this.tokenRepository.findOne({
+    return this.tokensRepository.findOne({
       where: {
         userId,
         key,

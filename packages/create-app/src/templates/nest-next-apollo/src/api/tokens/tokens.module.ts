@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { TokenRepository } from './token.repository';
+import { Token } from './token.entity';
 import { TokensService } from './tokens.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      TokenRepository,
+      Token,
     ]),
   ],
   providers: [TokensService],

@@ -1,6 +1,4 @@
-import Todo from '../types/Todo';
-
-const delay = (ms = 500) => new Promise<Todo>((resolve) => {
+const delay = (ms = 500) => new Promise((resolve) => {
   setTimeout(resolve, ms);
 });
 

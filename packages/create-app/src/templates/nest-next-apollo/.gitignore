@@ -23,6 +23,7 @@ tmp
 .nest
 .next
 .env*.local
+schema.graphql
 
 # misc
 .DS_Store

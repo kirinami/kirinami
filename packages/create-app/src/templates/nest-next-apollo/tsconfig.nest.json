@@ -1,27 +1,36 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "strict": true,
-    "declaration": false,
+    "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "allowJs": true,
     "target": "es2017",
     "sourceMap": true,
-    "outDir": ".nest",
-    "baseUrl": ".",
+    "outDir": "./.nest",
+    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": ["./src/*"]
+    },
+    "jsx": "preserve",
+    "jsxImportSource": "@emotion/react",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "strict": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "isolatedModules": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts"],
   "exclude": ["node_modules"]
 }
