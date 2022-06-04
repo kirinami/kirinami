@@ -13,7 +13,7 @@ try {
 const { DataSource } = require('typeorm');
 
 module.exports = {
-  connectionSource: new DataSource({
+  default: new DataSource({
     cli: {
       migrationsDir: 'db/migrations',
     },
