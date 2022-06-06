@@ -34,7 +34,16 @@ const styles = {
   `,
   itemLink: (active = false) => css`
     font-weight: ${active ? 'bold' : 'normal'};
-    color: #884cb2;
+    padding: 0;
+    border: 0;
+    color: #f3477a;
+    background-color: transparent;
+    cursor: pointer;
+
+    &:hover {
+      color: #f3477a;
+      opacity: 0.8;
+    }
   `,
 };
 

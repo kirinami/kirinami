@@ -6,7 +6,7 @@
   "menu": {
     "home": "Home",
     "todos": "Todos",
-    "admin": "Admin Panel"
+    "admin": "Admin"
   },
   "auth": {
     "login": "Login",

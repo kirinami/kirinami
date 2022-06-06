@@ -26,8 +26,6 @@ function MyApp({ Component, pageProps: { i18n, apolloClient, apolloState, emotio
 }
 
 MyApp.getInitialProps = async (appContext: AppContext) => {
-  console.log('MyApp.getInitialProps');
-
   const initialProps = await App.getInitialProps(appContext);
 
   const ctx = appContext.ctx;
@@ -37,7 +35,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     const apolloClient = initApolloClient(ctx);
     const emotionCache = initEmotionCache();
 
-    const { data } = await apolloClient.query<RetrieveUserData, RetrieveUserVars>({
+    const { data } = await apolloClient.query<RetrieveUserData | undefined, RetrieveUserVars>({
       query: RETRIEVE_USER,
       errorPolicy: 'ignore',
     });
@@ -46,7 +44,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       i18n,
       apolloClient,
       emotionCache,
-      user: data.retrieveUser || null,
+      user: data?.retrieveUser || null,
     };
   }
 

@@ -21,8 +21,6 @@ function MyDocument() {
 }
 
 MyDocument.getInitialProps = async (ctx: DocumentContext) => {
-  console.log('MyDocument.getInitialProps');
-
   const pageProps = ctx.req!.pageProps;
   const renderPage = ctx.renderPage;
 

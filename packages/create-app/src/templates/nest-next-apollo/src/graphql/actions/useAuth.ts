@@ -1,11 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { makeVar, useApolloClient, useMutation, useQuery, useReactiveVar } from '@apollo/client';
 
+import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/graphql/queries/users/retrieveUser';
+import { LOGIN, LoginData, LoginVars } from '@/graphql/mutations/auth/login';
+import { REGISTER, RegisterData, RegisterVars } from '@/graphql/mutations/auth/register';
 import useIsReady from '@/hooks/useIsReady';
-
-import { GET_CURRENT_USER, RetrieveUser } from '../queries/users/retrieveUser';
-import { LOGIN_MUTATION, LoginInput, LoginMutation } from '../mutations/auth/login';
-import { REGISTER_MUTATION, RegisterInput, RegisterMutation } from '../mutations/auth/register';
 
 const reactiveVar = makeVar({
   isLoginOpen: false,
@@ -19,14 +18,14 @@ export default function useAuth() {
 
   const { isLoginOpen, isRegisterOpen } = useReactiveVar(reactiveVar);
 
-  const getCurrentUserResult = useQuery<RetrieveUser>(GET_CURRENT_USER, {
+  const { loading, error, data } = useQuery<RetrieveUserData, RetrieveUserVars>(RETRIEVE_USER, {
     errorPolicy: 'ignore',
   });
 
-  const [loginMutation, loginMutationResult] = useMutation<LoginMutation, LoginInput>(LOGIN_MUTATION);
-  const [registerMutation, registerMutationResult] = useMutation<RegisterMutation, RegisterInput>(REGISTER_MUTATION);
+  const [loginMutation, loginResult] = useMutation<LoginData, LoginVars>(LOGIN);
+  const [registerMutation, registerResult] = useMutation<RegisterData, RegisterVars>(REGISTER);
 
-  const user = useMemo(() => getCurrentUserResult.data?.getCurrentUser || null, [getCurrentUserResult.data?.getCurrentUser]);
+  const user = useMemo(() => data?.retrieveUser || null, [data?.retrieveUser]);
 
   const login = useCallback(async (email: string, password: string) => {
     const { data, errors } = await loginMutation({
@@ -94,16 +93,16 @@ export default function useAuth() {
     isRegisterOpen,
 
     user,
-    userLoading: isReady && getCurrentUserResult.loading,
-    userError: getCurrentUserResult.error,
+    userLoading: isReady && loading,
+    userError: error,
 
     login,
-    loginLoading: loginMutationResult.loading,
-    loginError: loginMutationResult.error,
+    loginLoading: loginResult.loading,
+    loginError: loginResult.error,
 
     register,
-    registerLoading: registerMutationResult.loading,
-    registerError: registerMutationResult.error,
+    registerLoading: registerResult.loading,
+    registerError: registerResult.error,
 
     logout,
 
@@ -118,16 +117,16 @@ export default function useAuth() {
     isRegisterOpen,
 
     user,
-    getCurrentUserResult.loading,
-    getCurrentUserResult.error,
+    loading,
+    error,
 
     login,
-    loginMutationResult.loading,
-    loginMutationResult.error,
+    loginResult.loading,
+    loginResult.error,
 
     register,
-    registerMutationResult.loading,
-    registerMutationResult.error,
+    registerResult.loading,
+    registerResult.error,
 
     logout,
 

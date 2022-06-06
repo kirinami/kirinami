@@ -11,14 +11,14 @@ const styles = {
     padding: 20px 16px 0 16px;
 
     > :not([hidden]) ~ :not([hidden]) {
-      margin-top: 32px;
+      margin-top: 28px;
     }
   `,
   header: css`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 36px;
+    height: 44px;
 
     > :not([hidden]) ~ :not([hidden]) {
       margin-left: 12px;

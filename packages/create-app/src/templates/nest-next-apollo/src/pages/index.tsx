@@ -2,12 +2,12 @@ import { Trans, useTranslation } from 'react-i18next';
 
 import Title from '@/components/Common/Title/Title';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
-import useUser from '@/hooks/useUser';
+import useAuth from '@/graphql/actions/useAuth';
 
 export default function IndexPage() {
   const { t } = useTranslation();
 
-  const user = useUser();
+  const { user } = useAuth();
 
   return (
     <PageLayout>

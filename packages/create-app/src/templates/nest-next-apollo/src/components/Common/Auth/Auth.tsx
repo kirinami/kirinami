@@ -13,19 +13,13 @@ export default function Auth() {
     <div css={styles.auth}>
       {user ? (
         <>
-          <div><small>{user.firstName} {user.lastName}</small></div>
-          <button css={styles.button} type="button" onClick={logout}>
-            <small>{t('auth.logout')}</small>
-          </button>
+          <div>{user.firstName} {user.lastName}</div>
+          <button css={styles.button} type="button" onClick={logout}>{t('auth.logout')}</button>
         </>
       ) : (
         <>
-          <button css={styles.button} type="button" onClick={openLogin}>
-            <small>{t('auth.login')}</small>
-          </button>
-          <button css={styles.button} type="button" onClick={openRegister}>
-            <small>{t('auth.register')}</small>
-          </button>
+          <button css={styles.button} type="button" onClick={openLogin}>{t('auth.login')}</button>
+          <button css={styles.button} type="button" onClick={openRegister}>{t('auth.register')}</button>
         </>
       )}
     </div>
