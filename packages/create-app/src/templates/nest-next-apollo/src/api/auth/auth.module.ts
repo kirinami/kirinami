@@ -7,8 +7,6 @@ import { UsersModule } from '@/api/users/users.module';
 
 import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
-import { LocalStrategy } from './strategies/local.strategy';
-import { AuthController } from './auth.controller';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 
@@ -22,11 +20,9 @@ import { AuthService } from './auth.service';
   providers: [
     JwtAccessStrategy,
     JwtRefreshStrategy,
-    LocalStrategy,
     AuthResolver,
     AuthService,
   ],
-  controllers: [AuthController],
   exports: [AuthService],
 })
 export class AuthModule {

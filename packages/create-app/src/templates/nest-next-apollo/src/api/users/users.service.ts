@@ -1,78 +1,78 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
-import { groupBy, reduce, uniq } from 'lodash';
+import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import bcrypt from 'bcryptjs';
 
-import { createDataLoader } from '@/api/utils/create-data-loader';
-
-import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
-  ) {
+  constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {
   }
 
-  async findOneById(id: number, relations?: string[]) {
-    if (relations && !relations.includes('todos')) throw new BadRequestException();
-
-    return this.usersRepository.findOne({
-      where: {
-        id,
-      },
-      relations,
-    });
-  }
-
-  async findOneByEmail(email: string) {
-    return this.usersRepository.findOne({
-      where: {
-        email,
-      },
-    });
-  }
-
-  async findOneByCredentials(email: string, password: string) {
-    const user = await this.findOneByEmail(email);
-    if (!user) return null;
-
-    const match = await User.comparePassword(password, user.password);
-    if (!match) return null;
-
-    return user;
-  }
-
-  async loadOneById(id: number) {
-    return createDataLoader<number, User | undefined>('users/loadOneById', async (ids) => {
-      const users = await this.usersRepository.find({
-        where: {
-          id: In(uniq(ids)),
+  async findAll({ page, size, ...options }: { page: number, size: number } & Pick<FindManyOptions, 'where'>) {
+    const [users, total] = await Promise.all([
+      this.usersRepository.find({
+        order: {
+          id: 'ASC',
         },
-      });
+        ...options,
+        skip: Math.abs(size * (page - 1)),
+        take: Math.abs(size),
+      }),
+      this.usersRepository.count(options),
+    ]);
 
-      return reduce<Record<number, User[]>, Record<number, User>>(
-        groupBy(users, 'id'),
-        (acc, [user], key) => ({ ...acc, [key]: user }),
-        {},
-      );
-    }, undefined)
-      .load(id);
+    return {
+      users,
+      total,
+    };
   }
 
-  async create(createUserDto: CreateUserDto) {
-    const password = await User.hashPassword(createUserDto.password);
+  async findOne(options: Pick<FindOneOptions, 'where'>) {
+    return this.usersRepository.findOne(options);
+  }
 
-    return this.usersRepository.save(this.usersRepository.create({
-      ...createUserDto,
-      password,
-    }))
-      .catch((err) => {
+  async create({ input }: { input: DeepPartial<Omit<User, 'id'>> & Pick<User, 'password'> }) {
+    const password = await bcrypt.hash(input.password, 10);
+
+    return this.usersRepository.save(this.usersRepository.create({ ...input, password }))
+      .catch<User>((err) => {
         if (/(email)[\s\S]+(already exists)/.test(err.detail)) {
           throw new BadRequestException(['email already exists']);
         }
+
         return err;
       });
+  }
+
+  async update({ input, ...options }: { input: DeepPartial<Omit<User, 'id'>> } & Pick<FindOneOptions, 'where'>) {
+    const user = await this.findOne(options);
+    if (!user) return null;
+
+    let password;
+    if (input.password) {
+      password = await bcrypt.hash(input.password, 10);
+    }
+
+    return this.usersRepository.save(this.usersRepository.merge(user, { ...input, password }))
+      .catch<User>((err) => {
+        if (/(email)[\s\S]+(already exists)/.test(err.detail)) {
+          throw new BadRequestException(['email already exists']);
+        }
+
+        return err;
+      });
+  }
+
+  async remove(options: Pick<FindOneOptions, 'where'>) {
+    const user = await this.findOne(options);
+    if (!user) return null;
+
+    await this.usersRepository.delete({
+      id: user.id,
+    });
+
+    return user;
   }
 }

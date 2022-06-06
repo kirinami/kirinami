@@ -8,8 +8,8 @@
     "allowSyntheticDefaultImports": true,
     "target": "es2017",
     "sourceMap": true,
-    "outDir": "./.nest",
-    "baseUrl": "./",
+    "outDir": ".nest",
+    "baseUrl": ".",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -20,7 +20,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     },
     "jsx": "preserve",
     "jsxImportSource": "@emotion/react",
@@ -31,6 +31,6 @@
     "esModuleInterop": true,
     "isolatedModules": true
   },
-  "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/api/**/*.ts", "src/main.ts"],
+  "exclude": [".nest", ".next", "node_modules"]
 }

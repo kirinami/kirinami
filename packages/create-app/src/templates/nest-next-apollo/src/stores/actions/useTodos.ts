@@ -4,9 +4,9 @@ import { Reference, useMutation, useQuery } from '@apollo/client';
 import useIsReady from '@/hooks/useIsReady';
 
 import { TODOS_ALL_QUERY, TodosAllQuery } from '../queries/todos/todosAll';
-import { TODOS_CREATE_MUTATION, TodosCreateInput, TodosCreateMutation } from '../mutations/todos/todosCreate';
-import { TODOS_UPDATE_MUTATION, TodosUpdateInput, TodosUpdateMutation } from '../mutations/todos/todosUpdate';
-import { TODOS_DELETE_MUTATION, TodosDeleteInput, TodosDeleteMutation } from '../mutations/todos/todosDelete';
+import { TODOS_CREATE_MUTATION, TodosCreateInput, TodosCreateMutation } from '../mutations/todos/createTodo';
+import { TODOS_UPDATE_MUTATION, TodosUpdateInput, TodosUpdateMutation } from '../mutations/todos/updateTodo';
+import { TODOS_DELETE_MUTATION, TodosDeleteInput, TodosDeleteMutation } from '../mutations/todos/removeTodo';
 
 export default function useTodos() {
   const isReady = useIsReady();
@@ -25,7 +25,7 @@ export default function useTodos() {
     TODOS_DELETE_MUTATION,
   );
 
-  const todos = useMemo(() => todosQueryResult.data?.todos || [], [todosQueryResult.data?.todos]);
+  const todos = useMemo(() => todosQueryResult.data?.todosAll.todos || [], [todosQueryResult.data?.todosAll.todos]);
 
   const createTodo = useCallback(async (todo: TodosCreateInput['todo']) => {
     const { data, errors } = await createTodoMutation({

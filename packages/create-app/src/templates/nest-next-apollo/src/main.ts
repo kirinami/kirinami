@@ -6,10 +6,9 @@ import path from 'path';
 import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import next from 'next';
 
-import { MyClassSerializerInterceptor } from './api/utils/class-serializer-interceptor';
+import { MyClassSerializerInterceptor } from './api/utils/my-class-serializer-interceptor';
 import { AppExceptionFilter } from './api/app.exception';
 import { AppModule } from './api/app.module';
 
@@ -33,28 +32,18 @@ async function main() {
 
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
+    // whitelist: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    },
+    exceptionFactory: (errors) => {
+      console.log(errors);
+    },
   }));
 
   app.useGlobalFilters(new AppExceptionFilter(handler, app.get(HttpAdapterHost).httpAdapter));
 
   app.useGlobalInterceptors(new MyClassSerializerInterceptor(app.get(Reflector)));
-
-  SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(
-    app,
-    new DocumentBuilder()
-      .setTitle('Nest-Next-Apollo Starter API')
-      .setDescription('The Nest+Next Apollo Starter API documentation')
-      .setVersion('0.0.1')
-      .addBearerAuth()
-      .build(),
-  ), {
-    customSiteTitle: 'Nest+Next Apollo Starter API',
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  });
 
   await app.listen(3000, '0.0.0.0');
 }

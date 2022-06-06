@@ -3,20 +3,7 @@
   "sourceRoot": "src",
   "entryFile": "main",
   "compilerOptions": {
-    "tsConfigPath": "tsconfig.nest.json",
-    "plugins": [
-      {
-        "name": "@nestjs/swagger",
-        "options": {
-          "dtoFileNameSuffix": [
-            ".dto.ts",
-            ".entity.ts"
-          ],
-          "controllerFileNameSuffix": ".controller.ts",
-          "introspectComments": true
-        }
-      }
-    ]
+    "tsConfigPath": "tsconfig.nest.json"
   },
   "generateOptions": {
     "spec": false

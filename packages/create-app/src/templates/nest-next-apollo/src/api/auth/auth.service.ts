@@ -4,16 +4,12 @@ import bcrypt from 'bcryptjs';
 
 import { TokensService } from '@/api/tokens/tokens.service';
 import { User } from '@/api/users/user.entity';
-import { UsersService } from '@/api/users/users.service';
-
-import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly tokensService: TokensService,
-    private readonly usersService: UsersService,
   ) {
   }
 
@@ -39,11 +35,5 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  async register(registerDto: RegisterDto) {
-    const user = await this.usersService.create(registerDto);
-
-    return this.login(user);
   }
 }

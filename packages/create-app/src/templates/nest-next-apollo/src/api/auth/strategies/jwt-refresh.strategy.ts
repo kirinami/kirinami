@@ -14,10 +14,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     private readonly usersService: UsersService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        ExtractJwt.fromHeader('refresh-token'),
-        ExtractJwt.fromBodyField('refreshToken'),
-      ]),
+      jwtFromRequest: ExtractJwt.fromHeader('refresh-token'),
       secretOrKey: process.env.REFRESH_TOKEN_SECRET,
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
       passReqToCallback: true,
@@ -25,10 +22,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
   }
 
   async validate(req: Request, payload: { id: number }) {
-    const jwtToken = ExtractJwt.fromExtractors([
-      ExtractJwt.fromHeader('refresh-token'),
-      ExtractJwt.fromBodyField('refreshToken'),
-    ])(req);
+    const jwtToken = ExtractJwt.fromHeader('refresh-token')(req);
     if (!jwtToken) throw new UnauthorizedException();
 
     const refreshToken = await this.tokensService.get(payload.id, 'refreshToken');
@@ -37,7 +31,11 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     const isMatch = await bcrypt.compare(jwtToken, refreshToken.value);
     if (!isMatch) throw new UnauthorizedException();
 
-    const user = await this.usersService.findOneById(payload.id);
+    const user = await this.usersService.findOne({
+      where: {
+        id: payload.id,
+      },
+    });
     if (!user) throw new UnauthorizedException();
 
     return user;

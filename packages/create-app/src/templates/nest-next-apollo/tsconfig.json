@@ -18,10 +18,10 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/*"]
     },
     "jsxImportSource": "@emotion/react"
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "next-env.d.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [".nest", ".next", "node_modules"]
 }

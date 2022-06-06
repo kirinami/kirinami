@@ -5,6 +5,7 @@ export type User = {
   firstName: string,
   lastName: string,
   email: string,
+  roles: string[],
 };
 
 export const USER = gql`
@@ -13,5 +14,6 @@ export const USER = gql`
     firstName
     lastName
     email
+    roles
   }
 `;

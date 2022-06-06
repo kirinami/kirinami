@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from '@/api/users/users.module';
 
 import { Todo } from './todo.entity';
-import { TodosController } from './todos.controller';
 import { TodosResolver } from './todos.resolver';
 import { TodosService } from './todos.service';
 
@@ -16,7 +15,6 @@ import { TodosService } from './todos.service';
     forwardRef(() => UsersModule),
   ],
   providers: [TodosResolver, TodosService],
-  controllers: [TodosController],
   exports: [TodosService],
 })
 export class TodosModule {

@@ -24,7 +24,11 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
     const jwtToken = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
     if (!jwtToken) throw new UnauthorizedException();
 
-    const user = await this.usersService.findOneById(payload.id);
+    const user = await this.usersService.findOne({
+      where: {
+        id: payload.id,
+      },
+    });
     if (!user) throw new UnauthorizedException();
 
     return user;

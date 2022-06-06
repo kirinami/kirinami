@@ -4,6 +4,7 @@
 
 type Todo {
   id: Int!
+  userId: Int!
   title: String!
   completed: Boolean!
   createdAt: DateTime!
@@ -21,43 +22,86 @@ type User {
   email: String!
   firstName: String!
   lastName: String!
+  roles: [Role!]!
   createdAt: DateTime!
   updatedAt: DateTime!
-  todos: [Todo!]!
 }
 
-type Auth {
+enum Role {
+  Admin
+  User
+}
+
+type UsersPaginationOutput {
+  users: [User!]!
+  total: Float!
+}
+
+type AuthOutput {
   accessToken: String!
   refreshToken: String!
 }
 
+type TodosPaginationOutput {
+  todos: [Todo!]!
+  total: Float!
+}
+
 type Query {
-  usersProfile: User!
-  todosAll: [Todo!]!
-  todosById(id: Float!): Todo!
+  retrieveUsers(page: Int = 1, size: Int = 10): UsersPaginationOutput!
+  retrieveUser(id: Int): User!
+  retrieveTodos(my: Boolean = false, page: Int = 1, size: Int = 10): TodosPaginationOutput!
+  retrieveTodo(id: Int!): Todo!
 }
 
 type Mutation {
-  login(email: String!, password: String!): Auth!
-  register(email: String!, password: String!, firstName: String!, lastName: String!): Auth!
-  refresh: Auth!
-  todosCreate(todo: CreateTodoInput!): Todo!
-  todosUpdate(id: Float!, todo: UpdateTodoInput!): Todo!
-  todosDelete(id: Float!): Todo!
+  login(input: LoginInput!): AuthOutput!
+  register(input: RegisterInput!): AuthOutput!
+  refresh: AuthOutput!
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: Int!, input: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+  createTodo(input: CreateTodoInput!): Todo!
+  updateTodo(id: Int!, input: UpdateTodoInput!): Todo!
+  removeTodo(id: Int!): Todo!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RegisterInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+}
+
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  roles: [Role!]
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  email: String
+  password: String
+  roles: [Role!]
 }
 
 input CreateTodoInput {
+  userId: Int
   title: String!
   completed: Boolean!
 }
 
 input UpdateTodoInput {
+  userId: Int
   title: String
   completed: Boolean
-}
-
-type Subscription {
-  todosAdded: Todo!
-  todosUpdated: Todo!
-  todosDeleted: Todo!
 }

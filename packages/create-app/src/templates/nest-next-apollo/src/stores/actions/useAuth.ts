@@ -3,7 +3,7 @@ import { makeVar, useApolloClient, useMutation, useQuery, useReactiveVar } from 
 
 import useIsReady from '@/hooks/useIsReady';
 
-import { USERS_PROFILE_QUERY, UsersProfileQuery } from '../queries/users/usersProfile';
+import { GET_CURRENT_USER, RetrieveUser } from '../queries/users/retrieveUser';
 import { LOGIN_MUTATION, LoginInput, LoginMutation } from '../mutations/auth/login';
 import { REGISTER_MUTATION, RegisterInput, RegisterMutation } from '../mutations/auth/register';
 
@@ -19,14 +19,14 @@ export default function useAuth() {
 
   const { isLoginOpen, isRegisterOpen } = useReactiveVar(reactiveVar);
 
-  const userQueryResult = useQuery<UsersProfileQuery>(USERS_PROFILE_QUERY, {
+  const getCurrentUserResult = useQuery<RetrieveUser>(GET_CURRENT_USER, {
     errorPolicy: 'ignore',
   });
 
   const [loginMutation, loginMutationResult] = useMutation<LoginMutation, LoginInput>(LOGIN_MUTATION);
   const [registerMutation, registerMutationResult] = useMutation<RegisterMutation, RegisterInput>(REGISTER_MUTATION);
 
-  const user = useMemo(() => userQueryResult.data?.user || null, [userQueryResult.data?.user]);
+  const user = useMemo(() => getCurrentUserResult.data?.getCurrentUser || null, [getCurrentUserResult.data?.getCurrentUser]);
 
   const login = useCallback(async (email: string, password: string) => {
     const { data, errors } = await loginMutation({
@@ -94,8 +94,8 @@ export default function useAuth() {
     isRegisterOpen,
 
     user,
-    userLoading: isReady && userQueryResult.loading,
-    userError: userQueryResult.error,
+    userLoading: isReady && getCurrentUserResult.loading,
+    userError: getCurrentUserResult.error,
 
     login,
     loginLoading: loginMutationResult.loading,
@@ -118,8 +118,8 @@ export default function useAuth() {
     isRegisterOpen,
 
     user,
-    userQueryResult.loading,
-    userQueryResult.error,
+    getCurrentUserResult.loading,
+    getCurrentUserResult.error,
 
     login,
     loginMutationResult.loading,

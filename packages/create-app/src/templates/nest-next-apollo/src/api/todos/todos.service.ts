@@ -1,71 +1,56 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { DeepPartial, In, Repository } from 'typeorm';
-import { groupBy, uniq } from 'lodash';
-
-import { createDataLoader } from '@/api/utils/create-data-loader';
+import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 
 import { Todo } from './todo.entity';
 
 @Injectable()
 export class TodosService {
-  constructor(
-    @InjectRepository(Todo) private readonly todosRepository: Repository<Todo>,
-  ) {
+  constructor(@InjectRepository(Todo) private readonly todosRepository: Repository<Todo>) {
   }
 
-  async findOneByIdAndUserId(id: number, userId: number, relations?: string[]) {
-    if (relations && !relations.includes('user')) throw new BadRequestException();
-
-    return this.todosRepository.findOne({
-      where: {
-        id,
-        userId,
-      },
-      relations,
-    });
-  }
-
-  async findAllByUserId(userId: number, relations?: string[]) {
-    if (relations && !relations.includes('user')) throw new BadRequestException();
-
-    return this.todosRepository.find({
-      where: {
-        userId,
-      },
-      relations,
-      order: {
-        id: 'ASC',
-      },
-    });
-  }
-
-  async loadAllByUserId(userId: number) {
-    return createDataLoader<number, Todo[]>('todos/loadAllByUserId', async (userIds) => {
-      const todos = await this.todosRepository.find({
-        where: {
-          userId: In(uniq(userIds)),
-        },
+  async finaAll({ page, size, ...options }: { page: number, size: number } & Pick<FindManyOptions, 'where'>) {
+    const [todos, total] = await Promise.all([
+      this.todosRepository.find({
         order: {
           id: 'ASC',
         },
-      });
+        ...options,
+        skip: Math.abs(size * (page - 1)),
+        take: Math.abs(size),
+      }),
+      this.todosRepository.count(options),
+    ]);
 
-      return groupBy(todos, 'userId');
-    }, [])
-      .load(userId);
+    return {
+      todos,
+      total,
+    };
   }
 
-  async createByUserId(userId: number, partialTodo: DeepPartial<Todo>) {
-    return this.todosRepository.save(this.todosRepository.create({ ...partialTodo, userId }));
+  async findOne(options: Pick<FindOneOptions, 'where'>) {
+    return this.todosRepository.findOne(options);
   }
 
-  async updateByIdAndUserId(id: number, userId: number, partialTodo: QueryDeepPartialEntity<Todo>) {
-    return this.todosRepository.update({ id, userId }, { ...partialTodo });
+  async create({ input }: { input: DeepPartial<Omit<Todo, 'id'>> }) {
+    return this.todosRepository.save(this.todosRepository.create(input));
   }
 
-  async deleteByIdAndUserId(id: number, userId: number) {
-    return this.todosRepository.delete({ id, userId });
+  async update({ input, ...options }: { input: DeepPartial<Omit<Todo, 'id'>> } & Pick<FindOneOptions, 'where'>) {
+    const todo = await this.findOne(options);
+    if (!todo) return null;
+
+    return this.todosRepository.save(this.todosRepository.merge(todo, input));
+  }
+
+  async remove(options: Pick<FindOneOptions, 'where'>) {
+    const todo = await this.findOne(options);
+    if (!todo) return null;
+
+    await this.todosRepository.delete({
+      id: todo.id,
+    });
+
+    return todo;
   }
 }

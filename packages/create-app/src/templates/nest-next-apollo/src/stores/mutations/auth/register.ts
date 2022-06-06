@@ -1,22 +1,22 @@
 import { gql } from '@apollo/client';
 
-export type RegisterMutation = {
-  register: {
-    accessToken: string,
-    refreshToken: string,
-  },
-};
-
-export type RegisterInput = {
+export type RegisterVars = {
   firstName: string,
   lastName: string,
   email: string,
   password: string,
 };
 
-export const REGISTER_MUTATION = gql`
-  mutation Register($firstName: String!, $lastName: String!, $email: String!, $password: String!) {
-    register(firstName: $firstName, lastName: $lastName, email: $email, password: $password) {
+export type RegisterData = {
+  register: {
+    accessToken: string,
+    refreshToken: string,
+  },
+};
+
+export const REGISTER = gql`
+  mutation Register($input: RegisterInput!) {
+    register(input: $input) {
       accessToken
       refreshToken
     }

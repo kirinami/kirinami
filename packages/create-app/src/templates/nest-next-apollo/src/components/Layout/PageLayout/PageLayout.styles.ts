@@ -41,7 +41,7 @@ const styles = {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 2rem 0;
+    padding: 1.75rem;
     border-top: 1px solid #eaeaea;
   `,
 };

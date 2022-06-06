@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Next.js Starter powered by KIRINAMI",
-    "description": "Next.js Starter powered by KIRINAMI"
+    "title": "Nest.js + Next.js Starter powered by KIRINAMI",
+    "description": "Nest.js + Next.js Starter powered by KIRINAMI"
   },
   "menu": {
     "home": "Home",
