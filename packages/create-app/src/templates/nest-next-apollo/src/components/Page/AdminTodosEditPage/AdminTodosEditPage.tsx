@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
-import { Button, Checkbox, Input, Modal } from 'antd';
+import { Button, Checkbox, Input, Modal, Select, Spin } from 'antd';
 import { DeleteFilled, ExclamationCircleOutlined, SaveFilled } from '@ant-design/icons';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { debounce, omit } from 'lodash';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
 import { RETRIEVE_TODOS } from '@/stores/queries/todos/retrieveTodos';
@@ -13,11 +14,17 @@ import { RETRIEVE_TODO, RetrieveTodoData, RetrieveTodoVars } from '@/stores/quer
 import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/stores/mutations/todos/createTodo';
 import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/stores/mutations/todos/updateTodo';
 import { REMOVE_TODO, RemoveTodoData, RemoveTodoVars } from '@/stores/mutations/todos/removeTodo';
+import { SEARCH_USERS, SearchUsersData, SearchUsersVars } from '@/stores/queries/users/searchUsers';
 
 import styles from './AdminTodosEditPage.styles';
 
 type FormData = {
-  userId: number,
+  user: {
+    id: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+  },
   title: string,
   completed: boolean,
 };
@@ -36,28 +43,49 @@ export default function AdminTodosEditPage() {
   const [updateTodo, { loading: updateLoading }] = useMutation<UpdateTodoData, UpdateTodoVars>(UPDATE_TODO);
   const [removeTodo, { loading: removeLoading }] = useMutation<RemoveTodoData, RemoveTodoVars>(REMOVE_TODO);
 
+  const [searchUsers, {
+    loading: searchLoading,
+    data: searchData,
+  }] = useLazyQuery<SearchUsersData, SearchUsersVars>(SEARCH_USERS);
+
   const todo = useMemo(() => data?.retrieveTodo || null, [data?.retrieveTodo]);
 
   const form = useForm<FormData>({
     resolver: yupResolver(yup.object({
-      userId: yup.number().required().positive(),
+      user: yup.object().required(),
       title: yup.string().required().min(2),
       completed: yup.boolean().required(),
     })),
     defaultValues: {
-      userId: todo?.user.id,
+      user: todo ? {
+        id: todo.user.id,
+        firstName: todo.user.firstName,
+        lastName: todo.user.lastName,
+        email: todo.user.email,
+      } : undefined,
       title: todo?.title || '',
       completed: todo?.completed || false,
     },
   });
   const formErrors = form.formState.errors;
 
+  const handleSearch = useMemo(() => debounce((search: string) => {
+    searchUsers({
+      variables: {
+        search,
+      },
+    });
+  }, 350), [searchUsers]);
+
   const handleSubmit = form.handleSubmit(async (formData) => {
     if (todo?.id) {
       await updateTodo({
         variables: {
           id: todo.id,
-          input: formData,
+          input: {
+            ...omit(formData, 'user'),
+            userId: formData.user.id,
+          },
         },
       });
 
@@ -66,7 +94,10 @@ export default function AdminTodosEditPage() {
 
     const { data } = await createTodo({
       variables: {
-        input: formData,
+        input: {
+          ...omit(formData, 'user'),
+          userId: formData.user.id,
+        },
       },
       update(cache, { data }) {
         if (!data) return;
@@ -130,7 +161,12 @@ export default function AdminTodosEditPage() {
 
   useEffect(() => {
     form.reset({
-      userId: todo?.user.id,
+      user: todo ? {
+        id: todo.user.id,
+        firstName: todo.user.firstName,
+        lastName: todo.user.lastName,
+        email: todo.user.email,
+      } : undefined,
       title: todo?.title || '',
       completed: todo?.completed || false,
     });
@@ -172,12 +208,33 @@ export default function AdminTodosEditPage() {
       <form css={styles.form} id="hook-form" onSubmit={handleSubmit}>
         <Controller
           control={form.control}
-          name="userId"
-          render={({ field }) => (
+          name="user"
+          render={({ field: { value: user, onChange, ...restField } }) => (
             <div css={styles.formGroup}>
               <div css={styles.formGroupLabel}>User:</div>
-              <Input css={styles.formGroupInput(!!formErrors.userId)} {...field} />
-              <small css={styles.formGroupError}>{formErrors.userId?.message}</small>
+              <Select
+                css={styles.formGroupInput(!!formErrors.user)}
+                labelInValue
+                showSearch
+                filterOption={false}
+                notFoundContent={searchLoading ? <Spin size="small" /> : null}
+                value={user && {
+                  user,
+                  value: user.id,
+                  label: `${user.firstName} ${user.lastName} (${user.email})`,
+                }}
+                options={searchData?.searchUsers.map((user) => ({
+                  user,
+                  value: user.id,
+                  label: `${user.firstName} ${user.lastName} (${user.email})`,
+                }))}
+                onSearch={handleSearch}
+                onChange={(_, option) => !Array.isArray(option) && onChange(option.user)}
+                {...restField}
+              />
+              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+              {/* @ts-ignore */}
+              <small css={styles.formGroupError}>{formErrors.user?.message}</small>
             </div>
           )}
         />

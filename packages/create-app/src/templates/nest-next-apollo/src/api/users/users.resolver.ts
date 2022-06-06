@@ -1,6 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
+import { Raw } from 'typeorm';
 
 import { CurrentUser } from '@/api/auth/decorators/current-user.decorator';
 import { JwtAccess } from '@/api/auth/decorators/jwt-access.decorator';
@@ -18,6 +19,14 @@ export class UsersResolver {
   private readonly pubSub = new PubSub();
 
   constructor(private readonly usersService: UsersService) {
+  }
+
+  @RolesAccess([Role.Admin])
+  @Query(() => [User])
+  async searchUsers(@Args('search', { type: () => String, nullable: true, defaultValue: 1 }) search: string) {
+    if (search.length < 3) return [];
+
+    return this.usersService.searchAll(search);
   }
 
   @RolesAccess([Role.Admin])

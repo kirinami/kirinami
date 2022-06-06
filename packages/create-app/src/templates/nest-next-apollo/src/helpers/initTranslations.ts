@@ -11,7 +11,7 @@ const i18n = createInstance()
 
 export default function initTranslations(ctx?: NextPageContext | null) {
   const cookies = parseCookie(typeof window === 'undefined' ? ctx?.req?.headers?.cookie || '' : document.cookie);
-  const language = cookies['accept-language'];
+  const language = cookies['accept-language'] || 'en';
 
   if (i18n.isInitialized) {
     if (i18n.language !== language) {

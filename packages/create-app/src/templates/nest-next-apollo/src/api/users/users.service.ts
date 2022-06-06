@@ -10,7 +10,17 @@ export class UsersService {
   constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {
   }
 
-  async findAll({ page, size, ...options }: { page: number, size: number } & Pick<FindManyOptions, 'where'>) {
+  async searchAll(search: string) {
+    return this.usersRepository.createQueryBuilder('user')
+      .where('CONCAT(user.firstName, \' \', user.lastName, \' \', user.email) ILIKE :search', {
+        search: `%${search}%`,
+      })
+      .orderBy('user.id', 'ASC')
+      .limit(10)
+      .getMany();
+  }
+
+  async findAll({ page = 1, size = 10, ...options }: { page?: number, size?: number } & Pick<FindManyOptions<User>, 'where'>) {
     const [users, total] = await Promise.all([
       this.usersRepository.find({
         order: {
@@ -29,7 +39,7 @@ export class UsersService {
     };
   }
 
-  async findOne(options: Pick<FindOneOptions, 'where'>) {
+  async findOne(options: Pick<FindOneOptions<User>, 'where'>) {
     return this.usersRepository.findOne(options);
   }
 
@@ -46,7 +56,7 @@ export class UsersService {
       });
   }
 
-  async update({ input, ...options }: { input: DeepPartial<Omit<User, 'id'>> } & Pick<FindOneOptions, 'where'>) {
+  async update({ input, ...options }: { input: DeepPartial<Omit<User, 'id'>> } & Pick<FindOneOptions<User>, 'where'>) {
     const user = await this.findOne(options);
     if (!user) return null;
 
@@ -65,7 +75,7 @@ export class UsersService {
       });
   }
 
-  async remove(options: Pick<FindOneOptions, 'where'>) {
+  async remove(options: Pick<FindOneOptions<User>, 'where'>) {
     const user = await this.findOne(options);
     if (!user) return null;
 

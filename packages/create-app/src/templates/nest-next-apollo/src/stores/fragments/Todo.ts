@@ -6,6 +6,7 @@ export type Todo = {
     id: number,
     firstName: string,
     lastName: string,
+    email: string,
   },
   title: string,
   completed: boolean,
@@ -18,6 +19,7 @@ export const TODO = gql`
       id
       firstName
       lastName
+      email
     }
     title
     completed

@@ -9,7 +9,7 @@ export class TodosService {
   constructor(@InjectRepository(Todo) private readonly todosRepository: Repository<Todo>) {
   }
 
-  async finaAll({ page, size, ...options }: { page: number, size: number } & Pick<FindManyOptions, 'where'>) {
+  async finaAll({ page = 1, size = 10, ...options }: { page?: number, size?: number } & Pick<FindManyOptions, 'where'>) {
     const [todos, total] = await Promise.all([
       this.todosRepository.find({
         order: {

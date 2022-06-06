@@ -48,6 +48,7 @@ type TodosPaginationOutput {
 }
 
 type Query {
+  searchUsers(search: String = "1"): [User!]!
   retrieveUsers(page: Int = 1, size: Int = 10): UsersPaginationOutput!
   retrieveUser(id: Int): User!
   retrieveTodos(my: Boolean = false, page: Int = 1, size: Int = 10): TodosPaginationOutput!
