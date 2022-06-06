@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import useAuth from '@/stores/actions/useAuth';
+import useAuth from '@/graphql/actions/useAuth';
 
 import styles from './Auth.styles';
 

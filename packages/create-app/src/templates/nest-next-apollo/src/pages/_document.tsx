@@ -3,10 +3,6 @@ import { streamToString } from 'next/dist/server/node-web-streams-helper';
 import { getMarkupFromTree } from '@apollo/client/react/ssr';
 import createEmotionServer from '@emotion/server/create-instance';
 
-import initApolloClient from '@/helpers/initApolloClient';
-import initEmotionCache from '@/helpers/initEmotionCache';
-import initTranslations from '@/helpers/initTranslations';
-
 function MyDocument() {
   return (
     <Html lang="en">
@@ -25,20 +21,14 @@ function MyDocument() {
 }
 
 MyDocument.getInitialProps = async (ctx: DocumentContext) => {
-  const apolloClient = initApolloClient(ctx);
+  console.log('MyDocument.getInitialProps');
 
-  const emotionCache = initEmotionCache();
-  const emotionServer = createEmotionServer(emotionCache);
+  const pageProps = ctx.req!.pageProps;
+  const renderPage = ctx.renderPage;
 
-  const translations = initTranslations(ctx);
-
-  ctx.renderPage = ((renderPage) => () => renderPage({
+  ctx.renderPage = () => renderPage({
     enhanceApp: (App) => function EnhanceApp(props) {
-      Object.assign(props.pageProps, {
-        apolloClient,
-        emotionCache,
-        translations,
-      });
+      Object.assign(props.pageProps, pageProps);
 
       return <App {...props} />;
     },
@@ -58,12 +48,17 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
         stream: stream!,
         html,
         pageProps: {
-          apolloClient,
-          apolloState: apolloClient.extract(),
+          i18n: undefined,
+          apolloClient: undefined,
+          apolloState: pageProps.apolloClient.extract(),
+          emotionCache: undefined,
+          user: undefined,
         },
       };
     },
-  }))(ctx.renderPage);
+  });
+
+  const emotionServer = createEmotionServer(pageProps.emotionCache);
 
   const initialProps = await Document.getInitialProps(ctx);
   const initialStyles = initialProps.styles ? ([] as unknown[]).concat(initialProps.styles) : [];

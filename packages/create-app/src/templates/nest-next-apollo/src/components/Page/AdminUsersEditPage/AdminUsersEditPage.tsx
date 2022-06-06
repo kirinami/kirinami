@@ -8,11 +8,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/stores/queries/users/retrieveUser';
-import { CREATE_USER, CreateUserData, CreateUserVars } from '@/stores/mutations/users/createUser';
-import { UPDATE_USER, UpdateUserData, UpdateUserVars } from '@/stores/mutations/users/updateUser';
-import { REMOVE_USER, RemoveUserData, RemoveUserVars } from '@/stores/mutations/users/removeUser';
-import { RETRIEVE_USERS } from '@/stores/queries/users/retrieveUsers';
+import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/graphql/queries/users/retrieveUser';
+import { CREATE_USER, CreateUserData, CreateUserVars } from '@/graphql/mutations/users/createUser';
+import { UPDATE_USER, UpdateUserData, UpdateUserVars } from '@/graphql/mutations/users/updateUser';
+import { REMOVE_USER, RemoveUserData, RemoveUserVars } from '@/graphql/mutations/users/removeUser';
+import { RETRIEVE_USERS } from '@/graphql/queries/users/retrieveUsers';
 
 import styles from './AdminUsersEditPage.styles';
 

@@ -8,9 +8,9 @@ import TodoList from '@/components/Common/TodoList/TodoList';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
 import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
-import useAuth from '@/stores/actions/useAuth';
-import useTodos from '@/stores/actions/useTodos';
-import { Todo } from '@/stores/fragments/Todo';
+import useAuth from '@/graphql/actions/useAuth';
+import useTodos from '@/graphql/actions/useTodos';
+import { Todo } from '@/graphql/fragments/Todo';
 
 import styles from './HomePage.styles';
 

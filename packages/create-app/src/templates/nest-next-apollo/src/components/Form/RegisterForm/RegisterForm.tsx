@@ -5,7 +5,7 @@ import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useAuth from '@/stores/actions/useAuth';
+import useAuth from '@/graphql/actions/useAuth';
 
 import styles from './RegisterForm.styles';
 

@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import Modal from '@/components/Common/Modal/Modal';
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useTodos from '@/stores/actions/useTodos';
-import { Todo } from '@/stores/fragments/Todo';
+import useTodos from '@/graphql/actions/useTodos';
+import { Todo } from '@/graphql/fragments/Todo';
 
 import styles from './RemoveTodoModal.styles';
 

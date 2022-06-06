@@ -6,7 +6,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@apollo/client';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_USERS, RetrieveUsersData, RetrieveUsersVars } from '@/stores/queries/users/retrieveUsers';
+import { RETRIEVE_USERS, RetrieveUsersData, RetrieveUsersVars } from '@/graphql/queries/users/retrieveUsers';
 
 import styles from './AdminUsersHomePage.styles';
 

@@ -6,7 +6,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@apollo/client';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_TODOS, RetrieveTodosData, RetrieveTodosVars } from '@/stores/queries/todos/retrieveTodos';
+import { RETRIEVE_TODOS, RetrieveTodosData, RetrieveTodosVars } from '@/graphql/queries/todos/retrieveTodos';
 
 import styles from './AdminTodosHomePage.styles';
 

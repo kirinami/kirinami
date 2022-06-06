@@ -9,12 +9,12 @@ import * as yup from 'yup';
 import { debounce, omit } from 'lodash';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_TODOS } from '@/stores/queries/todos/retrieveTodos';
-import { RETRIEVE_TODO, RetrieveTodoData, RetrieveTodoVars } from '@/stores/queries/todos/retrieveTodo';
-import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/stores/mutations/todos/createTodo';
-import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/stores/mutations/todos/updateTodo';
-import { REMOVE_TODO, RemoveTodoData, RemoveTodoVars } from '@/stores/mutations/todos/removeTodo';
-import { SEARCH_USERS, SearchUsersData, SearchUsersVars } from '@/stores/queries/users/searchUsers';
+import { RETRIEVE_TODOS } from '@/graphql/queries/todos/retrieveTodos';
+import { RETRIEVE_TODO, RetrieveTodoData, RetrieveTodoVars } from '@/graphql/queries/todos/retrieveTodo';
+import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/graphql/mutations/todos/createTodo';
+import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
+import { REMOVE_TODO, RemoveTodoData, RemoveTodoVars } from '@/graphql/mutations/todos/removeTodo';
+import { SEARCH_USERS, SearchUsersData, SearchUsersVars } from '@/graphql/queries/users/searchUsers';
 
 import styles from './AdminTodosEditPage.styles';
 

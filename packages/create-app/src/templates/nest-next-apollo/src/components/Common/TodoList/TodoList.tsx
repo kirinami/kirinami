@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import Icon from '@/components/Common/Icon/Icon';
 import Badge from '@/components/Common/Badge/Badge';
-import { Todo } from '@/stores/fragments/Todo';
+import { Todo } from '@/graphql/fragments/Todo';
 
 import styles from './TodoList.styles';
 

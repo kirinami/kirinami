@@ -4,6 +4,9 @@ const styles = {
   menu: css`
     display: flex;
     flex-direction: row;
+    margin: 0;
+    padding: 0;
+    list-style: none;
     
     > :not([hidden]) ~ :not([hidden]) {
       margin-left: 16px;
@@ -29,7 +32,7 @@ const styles = {
       }
     }
   `,
-  itemLink: (active: boolean) => css`
+  itemLink: (active = false) => css`
     font-weight: ${active ? 'bold' : 'normal'};
     color: #884cb2;
   `,

@@ -56,9 +56,9 @@ export class TodosResolver {
       if (input.userId && currentUser.id !== input.userId) {
         throw new ForbiddenException();
       }
-
-      input.userId = currentUser.id;
     }
+
+    input.userId = input.userId || currentUser.id;
 
     return this.todosService.create({
       input,

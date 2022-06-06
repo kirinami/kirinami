@@ -1,7 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
-import { Raw } from 'typeorm';
 
 import { CurrentUser } from '@/api/auth/decorators/current-user.decorator';
 import { JwtAccess } from '@/api/auth/decorators/jwt-access.decorator';
@@ -50,9 +49,9 @@ export class UsersResolver {
       if (id && currentUser.id !== id) {
         throw new ForbiddenException();
       }
-
-      id = currentUser.id;
     }
+
+    id = id || currentUser.id;
 
     return this.usersService.findOne({
       where: {

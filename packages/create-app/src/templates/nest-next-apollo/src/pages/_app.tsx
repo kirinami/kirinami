@@ -5,15 +5,16 @@ import { CacheProvider } from '@emotion/react';
 
 import Meta from '@/components/Common/Meta/Meta';
 import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
+import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/graphql/queries/users/retrieveUser';
 import initApolloClient from '@/helpers/initApolloClient';
 import initEmotionCache from '@/helpers/initEmotionCache';
 import initTranslations from '@/helpers/initTranslations';
 
-function MyApp({ Component, pageProps: { apolloClient, apolloState, emotionCache, translations, ...pageProps } }: AppProps) {
+function MyApp({ Component, pageProps: { i18n, apolloClient, apolloState, emotionCache, ...pageProps } }: AppProps) {
   return (
     <ApolloProvider client={apolloClient || initApolloClient(null, apolloState)}>
       <CacheProvider value={emotionCache || initEmotionCache()}>
-        <I18nextProvider i18n={translations || initTranslations()}>
+        <I18nextProvider i18n={i18n || initTranslations()}>
           <ThemeProvider>
             <Meta />
             <Component {...pageProps} />
@@ -24,6 +25,32 @@ function MyApp({ Component, pageProps: { apolloClient, apolloState, emotionCache
   );
 }
 
-MyApp.getInitialProps = async (appContext: AppContext) => App.getInitialProps(appContext);
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  console.log('MyApp.getInitialProps');
+
+  const initialProps = await App.getInitialProps(appContext);
+
+  const ctx = appContext.ctx;
+
+  if (ctx.req) {
+    const i18n = initTranslations(ctx);
+    const apolloClient = initApolloClient(ctx);
+    const emotionCache = initEmotionCache();
+
+    const { data } = await apolloClient.query<RetrieveUserData, RetrieveUserVars>({
+      query: RETRIEVE_USER,
+      errorPolicy: 'ignore',
+    });
+
+    ctx.req.pageProps = {
+      i18n,
+      apolloClient,
+      emotionCache,
+      user: data.retrieveUser || null,
+    };
+  }
+
+  return initialProps;
+};
 
 export default MyApp;

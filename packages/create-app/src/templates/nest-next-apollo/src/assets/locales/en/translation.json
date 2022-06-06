@@ -5,7 +5,8 @@
   },
   "menu": {
     "home": "Home",
-    "not_found": "404"
+    "todos": "Todos",
+    "admin": "Admin Panel"
   },
   "auth": {
     "login": "Login",
@@ -76,6 +77,9 @@
   },
   "pages": {
     "home": {
+      "title": "Welcome, <0>{{name}}</0>"
+    },
+    "todos": {
       "title": "You’ve got <0>{{count}} tasks</0> today",
       "title_one": "You’ve got <0>{{count}} task</0> today",
       "add_new": "Add new"
