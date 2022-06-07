@@ -15,6 +15,7 @@
     "logout": "Logout"
   },
   "common": {
+    "all": "All",
     "completed": "Completed",
     "pending": "Pending",
     "inactive": "Inactive",
@@ -54,7 +55,7 @@
           "min": "Title must be at least {{count}} characters"
         },
         "completed": {
-          "required": "Обов'язкове полем"
+          "required": "Completed is a required field"
         }
       },
       "title": "Title"

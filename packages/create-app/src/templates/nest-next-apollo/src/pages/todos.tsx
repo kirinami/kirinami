@@ -5,16 +5,15 @@ import { useMutation, useQuery } from '@apollo/client';
 import Title from '@/components/Common/Title/Title';
 import Badge from '@/components/Common/Badge/Badge';
 import Button from '@/components/Common/Button/Button';
+import Section from '@/components/Common/Section/Section';
 import TodoList from '@/components/Common/TodoList/TodoList';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
-import styles from '@/components/Page/HomePage/HomePage.styles';
+import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
+import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
 import { Todo } from '@/graphql/fragments/Todo';
 import { RETRIEVE_TODOS, RetrieveTodosData, RetrieveTodosVars } from '@/graphql/queries/todos/retrieveTodos';
 import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
 import useAuth from '@/hooks/useAuth';
-
-import EditTodoModal from '../components/Modal/TodoModal/EditTodoModal/EditTodoModal';
-import RemoveTodoModal from '../components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
 
 export default function TodosPage() {
   const { t } = useTranslation();
@@ -89,20 +88,22 @@ export default function TodosPage() {
       </Title>
 
       {todos.length > 0 && (
-        <div css={styles.section}>
-          <h3 css={styles.sectionTitle}>All</h3>
+        <Section title={t('common.all')}>
           <TodoList todos={todos} onClick={handleClick} onEdit={handleEdit} onRemove={handleRemove} />
-        </div>
+        </Section>
       )}
 
       {completedTodos.length > 0 && (
-        <div css={styles.section}>
-          <h3 css={styles.sectionTitle}>
-            <span>{t('common.completed')}</span>
-            <Badge variant="danger">{t('common.inactive')}</Badge>
-          </h3>
+        <Section
+          title={(
+            <>
+              <span>{t('common.completed')}</span>
+              <Badge variant="danger">{t('common.inactive')}</Badge>
+            </>
+          )}
+        >
           <TodoList readonly todos={completedTodos} />
-        </div>
+        </Section>
       )}
 
       <EditTodoModal open={editTodoModalOpen} todo={editTodoModalTodo} onClose={handleModalClose} />
