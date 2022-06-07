@@ -1,10 +1,12 @@
 import { gql } from '@apollo/client';
 
 export type RegisterVars = {
-  firstName: string,
-  lastName: string,
-  email: string,
-  password: string,
+  input: {
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+  },
 };
 
 export type RegisterData = {

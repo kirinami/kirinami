@@ -15,7 +15,7 @@ export default function LoginModal() {
     <Modal isOpen={isLoginOpen} onRequestClose={closeLogin}>
       <div css={styles.content}>
         <h3 css={styles.heading}>{t('modals.login.title')}</h3>
-        {/* <LoginForm onAfterSubmit={closeLogin} /> */}
+        <LoginForm onAfterSubmit={closeLogin} />
       </div>
     </Modal>
   );

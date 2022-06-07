@@ -13,7 +13,7 @@ const styles = {
     position: relative;
     padding: 0;
     border: 0;
-    color: #f3477a;
+    color: #884cb2;
     background-color: transparent;
     cursor: pointer;
 

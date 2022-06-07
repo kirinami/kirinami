@@ -14,8 +14,8 @@ export default function RegisterModal() {
   return (
     <Modal isOpen={isRegisterOpen} onRequestClose={closeRegister}>
       <div css={styles.content}>
-        <h3 css={styles.heading}>{t('modals.login.title')}</h3>
-        {/* <RegisterForm onAfterSubmit={closeRegister} /> */}
+        <h3 css={styles.heading}>{t('modals.register.title')}</h3>
+        <RegisterForm onAfterSubmit={closeRegister} />
       </div>
     </Modal>
   );

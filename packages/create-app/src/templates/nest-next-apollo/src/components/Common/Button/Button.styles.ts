@@ -6,7 +6,8 @@ const styles = {
     align-self: inherit;
     justify-content: center;
     align-items: center;
-    padding: 12px 24px;
+    padding: 10px 18px;
+    border: 0;
     border-radius: 8px;
     cursor: pointer;
     font-size: 14px;

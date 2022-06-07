@@ -1,8 +1,10 @@
 import { gql } from '@apollo/client';
 
 export type LoginVars = {
-  email: string,
-  password: string,
+  input: {
+    email: string,
+    password: string,
+  },
 };
 
 export type LoginData = {

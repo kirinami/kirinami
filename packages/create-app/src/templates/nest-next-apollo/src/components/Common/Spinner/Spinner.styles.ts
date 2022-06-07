@@ -17,7 +17,7 @@ const styles = {
   spinner: (variant: 'primary' | 'secondary' | 'light' = 'primary', size = 16) => css`
     width: ${size}px;
     height: ${size}px;
-    border-width: 1px;
+    border: 1px solid;
     border-radius: 50%;
     animation: ${spin} 1s linear infinite;
 

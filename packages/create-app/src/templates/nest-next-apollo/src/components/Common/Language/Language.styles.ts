@@ -36,12 +36,12 @@ const styles = {
     font-weight: ${active ? 'bold' : 'normal'};
     padding: 0;
     border: 0;
-    color: #f3477a;
+    color: #884cb2;
     background-color: transparent;
     cursor: pointer;
     
     &:hover {
-      color: #f3477a;
+      color: #884cb2;
       opacity: 0.8;
     }  
   `,

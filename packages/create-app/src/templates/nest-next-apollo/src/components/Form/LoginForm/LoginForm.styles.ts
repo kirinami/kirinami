@@ -18,12 +18,16 @@ const styles = {
   `,
   input: css`
     width: 100%;
+    border: 1px solid #c4c4c4;
     border-radius: 6px;
     background-color: #f6f6f6;
     font-size: 12px;
     line-height: 18px;
-    margin-bottom: 4px;
     padding: 12px 20px;
+    
+    &:focus-visible {
+      outline-color: #884cb2;
+    }
   `,
   error: css`
     display: block;

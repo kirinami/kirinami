@@ -35,7 +35,7 @@ const styles = {
       margin-top: 16px;
 
       @media (min-width: 670px) {
-        margin-top: 28px;
+        margin-top: 24px;
       }
     }
   `,

@@ -1,12 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
+import { useMutation } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { omit } from 'lodash';
 import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useTodos from '@/graphql/actions/useTodos';
 import { Todo } from '@/graphql/fragments/Todo';
+import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/graphql/mutations/todos/createTodo';
+import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './TodoForm.styles';
 
@@ -24,10 +28,13 @@ export type TodoFormProps = {
 export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
   const { t } = useTranslation();
 
-  const { createTodo, createTodoLoading, createTodoError, updateTodo, updateTodoLoading, updateTodoError } = useTodos();
+  const { user } = useAuth();
 
-  const loading = createTodoLoading || updateTodoLoading;
-  const error = createTodoError || updateTodoError;
+  const [createTodo, { loading: createLoading, error: createError }] = useMutation<CreateTodoData, CreateTodoVars>(CREATE_TODO);
+  const [updateTodo, { loading: updateLoading, error: updateError }] = useMutation<UpdateTodoData, UpdateTodoVars>(UPDATE_TODO);
+
+  const loading = createLoading || updateLoading;
+  const error = createError || updateError;
 
   const form = useForm<TodoFormData>({
     resolver: yupResolver(yup.object({
@@ -45,11 +52,41 @@ export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
   const formErrors = form.formState.errors;
 
   const handleSubmit = form.handleSubmit(async (formData) => {
+    if (!user) return;
+
     try {
-      if (todo) {
-        await updateTodo(todo.id, formData);
+      if (todo?.id) {
+        await updateTodo({
+          variables: {
+            id: todo.id,
+            input: {
+              ...omit(formData, 'user'),
+              userId: user.id,
+            },
+          },
+        });
       } else {
-        await createTodo(formData);
+        await createTodo({
+          variables: {
+            input: {
+              ...omit(formData, 'user'),
+              userId: user.id,
+            },
+          },
+          update(cache, { data }) {
+            if (!data) return;
+
+            cache.modify({
+              fields: {
+                retrieveTodos: (ref, { toReference }) => ({
+                  ...ref,
+                  todos: [...ref.todos, toReference(data.createTodo)],
+                  total: ref.total + 1,
+                }),
+              },
+            });
+          },
+        });
       }
 
       onAfterSubmit?.();

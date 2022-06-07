@@ -3,6 +3,9 @@ import { css } from '@emotion/react';
 const styles = {
   list: css`
     position: relative;
+    margin-bottom: 0;
+    padding: 0;
+    list-style: none;
   `,
   item: (readonly?: boolean) => css`
     position: relative;
@@ -31,6 +34,9 @@ const styles = {
     display: flex;
     align-items: center;
     width: 100%;
+    padding: 0;
+    border: none;
+    background-color: transparent;
     user-select: none;
     cursor: pointer;
 
@@ -75,9 +81,16 @@ const styles = {
     align-items: center;
     width: 22px;
     height: 22px;
+    padding: 0;
+    border: none;
     border-radius: 50%;
     color: #bebbbb;
     background: #f2f2f2;
+    cursor: pointer;
+    
+    &:hover {
+      opacity: 0.8;
+    }
   `,
 };
 
