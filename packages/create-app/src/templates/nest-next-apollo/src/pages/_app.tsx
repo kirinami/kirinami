@@ -11,12 +11,9 @@ import initApolloClient from '@/helpers/initApolloClient';
 import initEmotionCache from '@/helpers/initEmotionCache';
 import initTranslations from '@/helpers/initTranslations';
 
-import NotFoundPage from './404';
-
 function MyApp({
-  Component,
   pageProps: { i18n, apolloClient, apolloState, emotionCache, user, ...pageProps },
-  router,
+  Component,
 }: AppProps) {
   return (
     <ApolloProvider client={apolloClient || initApolloClient(null, apolloState)}>
@@ -25,9 +22,7 @@ function MyApp({
           <AuthProvider user={user}>
             <ThemeProvider>
               <Meta />
-              {router.pathname.startsWith('/admin') && !user?.roles.includes('Admin')
-                ? <NotFoundPage {...pageProps} />
-                : <Component {...pageProps} />}
+              <Component {...pageProps} />
             </ThemeProvider>
           </AuthProvider>
         </I18nextProvider>

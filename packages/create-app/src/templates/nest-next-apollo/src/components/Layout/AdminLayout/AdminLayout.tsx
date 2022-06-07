@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -7,6 +7,8 @@ import { Breadcrumb, ConfigProvider, Layout as AntLayout, Menu } from 'antd';
 import { BookFilled, ContactsFilled, DashboardFilled, HomeOutlined } from '@ant-design/icons';
 
 import logo from '@/assets/logo.svg';
+import useAuth from '@/hooks/useAuth';
+import NotFoundPage from '@/pages/404';
 
 import styles from './AdminLayout.styles';
 
@@ -17,11 +19,17 @@ export type AdminLayoutProps = {
 };
 
 export default function AdminLayout({ breadcrumbs, actions, children }: AdminLayoutProps) {
-  const router = useRouter();
-
   const { t } = useTranslation();
 
+  const router = useRouter();
+
+  const { user } = useAuth();
+
   const [collapsed, setCollapsed] = useState(true);
+
+  if (router.pathname.startsWith('/admin') && !user?.roles.includes('Admin')) {
+    return <NotFoundPage />;
+  }
 
   return (
     <ConfigProvider locale={en_US}>

@@ -1,11 +1,24 @@
+import { Button } from 'antd';
+import { LogoutOutlined } from '@ant-design/icons';
+
+import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
 import useAuth from '@/hooks/useAuth';
 
 export default function AdminIndexPage() {
-  const { user } = useAuth();
-
-  console.log(user);
+  const { logout } = useAuth();
 
   return (
-    <div>AdminIndexPage</div>
+    <AdminLayout
+      breadcrumbs={[
+        { href: '/admin', label: 'Home' },
+      ]}
+      actions={(
+        <Button type="primary" danger onClick={logout}>
+          <LogoutOutlined /> Logout
+        </Button>
+      )}
+    >
+      Admin Index
+    </AdminLayout>
   );
 }
