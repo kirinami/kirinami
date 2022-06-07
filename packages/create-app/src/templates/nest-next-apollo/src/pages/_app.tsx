@@ -4,21 +4,32 @@ import { ApolloProvider } from '@apollo/client';
 import { CacheProvider } from '@emotion/react';
 
 import Meta from '@/components/Common/Meta/Meta';
+import AuthProvider from '@/components/Provider/AuthProvider/AuthProvider';
 import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
 import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/graphql/queries/users/retrieveUser';
 import initApolloClient from '@/helpers/initApolloClient';
 import initEmotionCache from '@/helpers/initEmotionCache';
 import initTranslations from '@/helpers/initTranslations';
 
-function MyApp({ Component, pageProps: { i18n, apolloClient, apolloState, emotionCache, ...pageProps } }: AppProps) {
+import NotFoundPage from './404';
+
+function MyApp({
+  Component,
+  pageProps: { i18n, apolloClient, apolloState, emotionCache, user, ...pageProps },
+  router,
+}: AppProps) {
   return (
     <ApolloProvider client={apolloClient || initApolloClient(null, apolloState)}>
       <CacheProvider value={emotionCache || initEmotionCache()}>
         <I18nextProvider i18n={i18n || initTranslations()}>
-          <ThemeProvider>
-            <Meta />
-            <Component {...pageProps} />
-          </ThemeProvider>
+          <AuthProvider user={user}>
+            <ThemeProvider>
+              <Meta />
+              {router.pathname.startsWith('/admin') && !user?.roles.includes('Admin')
+                ? <NotFoundPage {...pageProps} />
+                : <Component {...pageProps} />}
+            </ThemeProvider>
+          </AuthProvider>
         </I18nextProvider>
       </CacheProvider>
     </ApolloProvider>
@@ -26,27 +37,28 @@ function MyApp({ Component, pageProps: { i18n, apolloClient, apolloState, emotio
 }
 
 MyApp.getInitialProps = async (appContext: AppContext) => {
+  const { ctx } = appContext;
+
+  const apolloClient = initApolloClient(ctx);
+  const emotionCache = initEmotionCache();
+  const i18n = initTranslations(ctx);
+
+  const { data } = await apolloClient.query<RetrieveUserData | undefined, RetrieveUserVars>({
+    query: RETRIEVE_USER,
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'ignore',
+  });
+
   const initialProps = await App.getInitialProps(appContext);
 
-  const ctx = appContext.ctx;
+  Object.assign(initialProps.pageProps, {
+    i18n,
+    apolloClient,
+    emotionCache,
+    user: data?.retrieveUser || null,
+  });
 
-  if (ctx.req) {
-    const i18n = initTranslations(ctx);
-    const apolloClient = initApolloClient(ctx);
-    const emotionCache = initEmotionCache();
-
-    const { data } = await apolloClient.query<RetrieveUserData | undefined, RetrieveUserVars>({
-      query: RETRIEVE_USER,
-      errorPolicy: 'ignore',
-    });
-
-    ctx.req.pageProps = {
-      i18n,
-      apolloClient,
-      emotionCache,
-      user: data?.retrieveUser || null,
-    };
-  }
+  if (ctx.req) ctx.req.pageProps = initialProps.pageProps;
 
   return initialProps;
 };

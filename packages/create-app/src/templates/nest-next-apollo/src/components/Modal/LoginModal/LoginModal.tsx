@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import Modal from '@/components/Common/Modal/Modal';
 import LoginForm from '@/components/Form/LoginForm/LoginForm';
-import useAuth from '@/graphql/actions/useAuth';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './LoginModal.styles';
 
@@ -15,7 +15,7 @@ export default function LoginModal() {
     <Modal isOpen={isLoginOpen} onRequestClose={closeLogin}>
       <div css={styles.content}>
         <h3 css={styles.heading}>{t('modals.login.title')}</h3>
-        <LoginForm onAfterSubmit={closeLogin} />
+        {/* <LoginForm onAfterSubmit={closeLogin} /> */}
       </div>
     </Modal>
   );

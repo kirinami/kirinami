@@ -21,15 +21,9 @@ function MyDocument() {
 }
 
 MyDocument.getInitialProps = async (ctx: DocumentContext) => {
-  const pageProps = ctx.req!.pageProps;
-  const renderPage = ctx.renderPage;
+  const { req: { pageProps }, renderPage } = ctx;
 
   ctx.renderPage = () => renderPage({
-    enhanceApp: (App) => function EnhanceApp(props) {
-      Object.assign(props.pageProps, pageProps);
-
-      return <App {...props} />;
-    },
     enhanceRenderShell: async (Tree, { renderToReadableStream }) => {
       let stream: ReadableStream;
 
@@ -50,7 +44,6 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
           apolloClient: undefined,
           apolloState: pageProps.apolloClient.extract(),
           emotionCache: undefined,
-          user: undefined,
         },
       };
     },

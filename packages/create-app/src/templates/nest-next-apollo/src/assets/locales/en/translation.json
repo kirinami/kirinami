@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Nest.js + Next.js Starter powered by KIRINAMI",
-    "description": "Nest.js + Next.js Starter powered by KIRINAMI"
+    "title": "Nest.js + Next.js Starter created by KIRINAMI",
+    "description": "Nest.js + Next.js Starter created by KIRINAMI"
   },
   "menu": {
     "home": "Home",
@@ -9,6 +9,7 @@
     "admin": "Admin"
   },
   "auth": {
+    "anonymous": "Anonymous",
     "login": "Login",
     "register": "Register",
     "logout": "Logout"

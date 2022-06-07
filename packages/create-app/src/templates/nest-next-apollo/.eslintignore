@@ -34,3 +34,4 @@ tmp
 # javascript
 *.js
 *.jsx
+*.d.ts

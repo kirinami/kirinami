@@ -1,8 +1,10 @@
-export const getServerSideProps = async () => ({
-  props: {},
-});
+import useAuth from '@/hooks/useAuth';
 
-export default function AdminIndexPage({}: Awaited<ReturnType<typeof getServerSideProps>>['props']) {
+export default function AdminIndexPage() {
+  const { user } = useAuth();
+
+  console.log(user);
+
   return (
     <div>AdminIndexPage</div>
   );

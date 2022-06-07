@@ -1,8 +1,8 @@
 diff --git a/node_modules/next/dist/server/render.js b/node_modules/next/dist/server/render.js
-index be8bf66..3c0680e 100755
+index 16eab34..416fa25 100755
 --- a/node_modules/next/dist/server/render.js
 +++ b/node_modules/next/dist/server/render.js
-@@ -755,7 +755,13 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
+@@ -754,7 +754,13 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
                  }
                  const { App: EnhancedApp , Component: EnhancedComponent  } = enhanceComponents(options, App, Component);
                  if (renderShell) {
@@ -17,7 +17,7 @@ index be8bf66..3c0680e 100755
                          const forwardStream = (0, _nodeWebStreamsHelper).readableStreamTee(stream)[1];
                          const html = await (0, _nodeWebStreamsHelper).streamToString(forwardStream);
                          return {
-@@ -789,7 +795,7 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
+@@ -788,7 +794,7 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
                  documentCtx
              };
          }
@@ -26,7 +26,7 @@ index be8bf66..3c0680e 100755
              const EnhancedApp = _App || App;
              const EnhancedComponent = _Component || Component;
              return ctx.err && ErrorDebug ? /*#__PURE__*/ _react.default.createElement(Body, null, /*#__PURE__*/ _react.default.createElement(ErrorDebug, {
-@@ -841,8 +847,14 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
+@@ -840,8 +846,14 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
              }
          } else {
              // Enabling react concurrent rendering mode: __NEXT_REACT_ROOT = true
@@ -43,7 +43,7 @@ index be8bf66..3c0680e 100755
                      ReactDOMServer,
                      element: content
 diff --git a/node_modules/next/dist/shared/lib/utils.d.ts b/node_modules/next/dist/shared/lib/utils.d.ts
-index 3a7d95e..d7071e1 100755
+index 799d8ae..a153f6d 100755
 --- a/node_modules/next/dist/shared/lib/utils.d.ts
 +++ b/node_modules/next/dist/shared/lib/utils.d.ts
 @@ -7,6 +7,8 @@ import type { IncomingMessage, ServerResponse } from 'http';

@@ -9,6 +9,7 @@
     "admin": "Адмінка"
   },
   "auth": {
+    "anonymous": "Анонім",
     "login": "Увійти",
     "register": "Реєстрація",
     "logout": "Вийти"

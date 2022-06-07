@@ -20,7 +20,7 @@ export type ThemeContextValue = {
 
 export const ThemeContext = createContext({} as ThemeContextValue);
 
-export default function Theme({ children }: { children: ReactNode }) {
+export default function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<ThemeVariants>('light');
 
   const changeTheme = useCallback((theme: ThemeVariants) => setTheme(theme), []);

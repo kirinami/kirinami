@@ -5,9 +5,9 @@ import Link from 'next/link';
 import styles from './Menu.styles';
 
 export default function Menu() {
-  const router = useRouter();
-
   const { t } = useTranslation();
+
+  const router = useRouter();
 
   return (
     <ul css={styles.menu}>
