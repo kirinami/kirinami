@@ -87,7 +87,7 @@ export default function AdminLayout({ breadcrumbs, actions, children }: AdminLay
               ))}
             </Breadcrumb>
 
-            <div>{actions}</div>
+            <div css={styles.headerActions}>{actions}</div>
           </AntLayout.Header>
 
           <AntLayout.Content css={styles.content}>

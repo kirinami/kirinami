@@ -1,19 +1,10 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  actions: css`
-    > :not([hidden]) ~ :not([hidden]) {
-      margin-left: 1rem;
-    }
-  `,
-  form: css`
-    > :not([hidden]) ~ :not([hidden]) {
-      margin-top: 1rem;
-    }
-  `,
   formGroup: css`
   `,
   formGroupLabel: css`
+    margin-bottom: 4px;
   `,
   formGroupInput: (hasError: boolean) => css`
     width: 100%;

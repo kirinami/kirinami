@@ -42,6 +42,11 @@ const styles = {
     background-color: #ffffff;
     box-shadow: 0 0 4px rgb(0 0 0 / 10%);
   `,
+  headerActions: css`
+    > :not([hidden]) ~ :not([hidden]) {
+      margin-left: 1rem;
+    }
+  `,
   content: css`
     min-height: inherit;
     margin: 1rem 1rem 0 1rem;

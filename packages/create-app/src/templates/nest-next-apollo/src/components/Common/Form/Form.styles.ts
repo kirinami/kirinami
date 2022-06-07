@@ -1,9 +1,9 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  actions: css`
+  form: css`
     > :not([hidden]) ~ :not([hidden]) {
-      margin-left: 1rem;
+      margin-top: 1rem;
     }
   `,
 };
