@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { Todo } from '../todo.entity';
+import { TodoOutput } from './todo.output';
 
 @ObjectType()
 export class TodosPaginationOutput {
-  @Field(() => [Todo])
-  todos!: Todo[];
+  @Field(() => [TodoOutput])
+  todos!: TodoOutput[];
 
   @Field()
   total!: number;

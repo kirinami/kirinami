@@ -78,7 +78,7 @@ export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
 
             cache.modify({
               fields: {
-                retrieveTodos: (ref, { toReference }) => ({
+                findAllTodos: (ref, { toReference }) => ({
                   ...ref,
                   todos: [...ref.todos, toReference(data.createTodo)],
                   total: ref.total + 1,

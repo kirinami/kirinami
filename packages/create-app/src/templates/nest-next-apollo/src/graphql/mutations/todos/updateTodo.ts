@@ -1,15 +1,10 @@
 import { gql } from '@apollo/client';
 
+import type { UpdateTodoArgs } from '@/api/todos/args/update-todo.args';
+
 import { TODO, Todo } from '../../fragments/Todo';
 
-export type UpdateTodoVars = {
-  id: number,
-  input: {
-    userId?: number,
-    title?: string,
-    completed?: boolean,
-  },
-};
+export type UpdateTodoVars = UpdateTodoArgs;
 
 export type UpdateTodoData = {
   updateTodo: Todo,

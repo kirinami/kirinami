@@ -33,7 +33,7 @@ export default function RemoveTodoModal({ open, todo, onClose }: RemoveTodoModal
 
         cache.modify({
           fields: {
-            retrieveTodos: (ref, { readField }) => ({
+            findAllTodos: (ref, { readField }) => ({
               todos: ref.todos.filter((todoRef: Reference) => readField('id', todoRef) !== data.removeTodo.id),
               total: ref.total - 1,
             }),

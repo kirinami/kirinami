@@ -1,10 +1,10 @@
 import { gql } from '@apollo/client';
 
+import type { RemoveTodoArgs } from '@/api/todos/args/remove-todo.args';
+
 import { TODO, Todo } from '../../fragments/Todo';
 
-export type RemoveTodoVars = {
-  id: number,
-};
+export type RemoveTodoVars = RemoveTodoArgs;
 
 export type RemoveTodoData = {
   removeTodo: Todo,

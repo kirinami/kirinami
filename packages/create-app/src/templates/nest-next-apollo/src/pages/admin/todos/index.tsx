@@ -6,22 +6,25 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@apollo/client';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_TODOS, RetrieveTodosData, RetrieveTodosVars } from '@/graphql/queries/todos/retrieveTodos';
+import { FIND_ALL_TODOS, FindAllTodosData, FindAllTodosVars } from '@/graphql/queries/todos/findAllTodos';
+import useRouteChange from '@/hooks/useRouteChange';
 
 export default function AdminTodosIndexPage() {
   const router = useRouter();
   const page = Number(router.query.page) || 1;
   const size = Number(router.query.size) || 10;
 
-  const { loading, data } = useQuery<RetrieveTodosData, RetrieveTodosVars>(RETRIEVE_TODOS, {
+  const { loading, data, refetch } = useQuery<FindAllTodosData, FindAllTodosVars>(FIND_ALL_TODOS, {
     variables: {
       page,
       size,
     },
   });
 
-  const todos = useMemo(() => data?.retrieveTodos.todos || [], [data?.retrieveTodos.todos]);
-  const total = useMemo(() => data?.retrieveTodos.total || 0, [data?.retrieveTodos.total]);
+  const todos = useMemo(() => data?.findAllTodos.todos || [], [data?.findAllTodos.todos]);
+  const total = useMemo(() => data?.findAllTodos.total || 0, [data?.findAllTodos.total]);
+
+  useRouteChange(refetch);
 
   return (
     <AdminLayout

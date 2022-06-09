@@ -1,20 +1,26 @@
-import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { type Todo, type User } from '@prisma/client';
 import { PubSub } from 'graphql-subscriptions';
-import { ForbiddenException } from '@nestjs/common';
+import { omit } from 'lodash';
 
 import { CurrentUser } from '@/api/auth/decorators/current-user.decorator';
 import { JwtAccess } from '@/api/auth/decorators/jwt-access.decorator';
-import { Role, User } from '@/api/users/user.entity';
+import { Role } from '@/api/users/enums/role.enum';
+import { UserOutput } from '@/api/users/outputs/user.output';
 import { UsersService } from '@/api/users/users.service';
 
-import { CreateTodoInput } from './inputs/create-todo.input';
-import { UpdateTodoInput } from './inputs/update-todo.input';
+import { FindAllTodosArgs } from './args/find-all-todos.args';
+import { FindOneTodoArgs } from './args/find-one-todo.args';
+import { CreateTodoArgs } from './args/create-todo.args';
+import { UpdateTodoArgs } from './args/update-todo.args';
+import { RemoveTodoArgs } from './args/remove-todo.args';
+import { TodoOutput } from './outputs/todo.output';
 import { TodosPaginationOutput } from './outputs/todos-pagination.output';
-import { Todo } from './todo.entity';
 import { TodosService } from './todos.service';
 
 @JwtAccess()
-@Resolver(Todo)
+@Resolver(() => TodoOutput)
 export class TodosResolver {
   private readonly pubSub = new PubSub();
 
@@ -25,13 +31,8 @@ export class TodosResolver {
   }
 
   @Query(() => TodosPaginationOutput)
-  async retrieveTodos(
-    @CurrentUser() currentUser: User,
-    @Args('my', { type: () => Boolean, nullable: true, defaultValue: false }) my: boolean,
-    @Args('page', { type: () => Int, nullable: true, defaultValue: 1 }) page: number,
-    @Args('size', { type: () => Int, nullable: true, defaultValue: 10 }) size: number,
-  ) {
-    return this.todosService.finaAll({
+  async findAllTodos(@CurrentUser() currentUser: User, @Args() { my, page, size }: FindAllTodosArgs) {
+    return this.todosService.findAll({
       where: {
         userId: !currentUser.roles.includes(Role.Admin) || my ? currentUser.id : undefined,
       },
@@ -40,65 +41,69 @@ export class TodosResolver {
     });
   }
 
-  @Query(() => Todo)
-  async retrieveTodo(@CurrentUser() currentUser: User, @Args('id', { type: () => Int }) id: number) {
-    return this.todosService.findOne({
+  @Query(() => TodoOutput)
+  async findOneTodo(@CurrentUser() currentUser: User, @Args() { id }: FindOneTodoArgs) {
+    const todo = await this.todosService.findOne({
       where: {
         id,
         userId: !currentUser.roles.includes(Role.Admin) ? currentUser.id : undefined,
       },
     });
+
+    if (!todo) throw new NotFoundException();
+
+    return todo;
   }
 
-  @Mutation(() => Todo)
-  async createTodo(@CurrentUser() currentUser: User, @Args('input') input: CreateTodoInput) {
-    if (!currentUser.roles.includes(Role.Admin)) {
-      if (input.userId && currentUser.id !== input.userId) {
-        throw new ForbiddenException();
-      }
+  @Mutation(() => TodoOutput)
+  async createTodo(@CurrentUser() currentUser: User, @Args() { input }: CreateTodoArgs) {
+    const userId = input.userId || currentUser.id;
+
+    if (!currentUser.roles.includes(Role.Admin) && currentUser.id !== userId) {
+      throw new ForbiddenException();
     }
 
-    input.userId = input.userId || currentUser.id;
-
     return this.todosService.create({
-      input,
+      data: {
+        ...omit(input, ['userId']),
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+      },
     });
   }
 
-  @Mutation(() => Todo)
-  async updateTodo(
-    @CurrentUser() currentUser: User,
-    @Args('id', { type: () => Int }) id: number,
-    @Args('input') input: UpdateTodoInput,
-  ) {
-    if (!currentUser.roles.includes(Role.Admin)) {
-      if (input.userId && currentUser.id !== input.userId) {
-        throw new ForbiddenException();
-      }
+  @Mutation(() => TodoOutput)
+  async updateTodo(@CurrentUser() currentUser: User, @Args() { id, input }: UpdateTodoArgs) {
+    const userId = input.userId || currentUser.id;
 
-      input.userId = currentUser.id;
+    if (!currentUser.roles.includes(Role.Admin) && currentUser.id !== userId) {
+      throw new ForbiddenException();
     }
 
     return this.todosService.update({
-      where: {
-        id,
-        userId: !currentUser.roles.includes(Role.Admin) ? currentUser.id : undefined,
+      where: currentUser.roles.includes(Role.Admin) ? { id } : { id_userId: { id, userId: currentUser.id } },
+      data: {
+        ...omit(input, ['userId']),
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
       },
-      input,
     });
   }
 
-  @Mutation(() => Todo)
-  async removeTodo(@CurrentUser() currentUser: User, @Args('id', { type: () => Int }) id: number) {
+  @Mutation(() => TodoOutput)
+  async removeTodo(@CurrentUser() currentUser: User, @Args() { id }: RemoveTodoArgs) {
     return this.todosService.remove({
-      where: {
-        id,
-        userId: !currentUser.roles.includes(Role.Admin) ? currentUser.id : undefined,
-      },
+      where: currentUser.roles.includes(Role.Admin) ? { id } : { id_userId: { id, userId: currentUser.id } },
     });
   }
 
-  @ResolveField('user', () => User)
+  @ResolveField('user', () => UserOutput)
   async resolveUser(@Parent() parent: Todo) {
     return this.usersService.findOne({
       where: {
@@ -106,14 +111,4 @@ export class TodosResolver {
       },
     });
   }
-
-  // @Subscription(() => Todo, { name: 'todosDeleted' })
-  // async deleted() {
-  //   return this.pubSub.asyncIterator('todosDeleted');
-  // }
-  //
-  // @ResolveField('user', () => User)
-  // async resolveUser(@Parent() parent: Todo) {
-  //   return this.usersService.loadOneById(parent.userId);
-  // }
 }

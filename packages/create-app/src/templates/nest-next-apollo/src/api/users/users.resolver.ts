@@ -1,79 +1,91 @@
-import { ForbiddenException } from '@nestjs/common';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Args, Mutation, Query, registerEnumType, Resolver } from '@nestjs/graphql';
+import { type User } from '@prisma/client';
 import { PubSub } from 'graphql-subscriptions';
 
 import { CurrentUser } from '@/api/auth/decorators/current-user.decorator';
 import { JwtAccess } from '@/api/auth/decorators/jwt-access.decorator';
 import { RolesAccess } from '@/api/auth/decorators/roles-access.decorator';
 
-import { CreateUserInput } from './inputs/create-user.input';
-import { UpdateUserInput } from './inputs/update-user.input';
+import { FindAllUsersArgs } from './args/find-all-users.args';
+import { FindOneUserArgs } from './args/find-one-user.args';
+import { CreateUserArgs } from './args/create-user.args';
+import { UpdateUserArgs } from './args/update-user.args';
+import { RemoveUserArgs } from './args/remove-user.args';
+import { Role } from './enums/role.enum';
+import { UserOutput } from './outputs/user.output';
 import { UsersPaginationOutput } from './outputs/users-pagination.output';
-import { Role, User } from './user.entity';
 import { UsersService } from './users.service';
 
 @JwtAccess()
-@Resolver(User)
+@Resolver(() => UserOutput)
 export class UsersResolver {
   private readonly pubSub = new PubSub();
 
   constructor(private readonly usersService: UsersService) {
-  }
-
-  @RolesAccess([Role.Admin])
-  @Query(() => [User])
-  async searchUsers(@Args('search', { type: () => String, nullable: true, defaultValue: 1 }) search: string) {
-    if (search.length < 3) return [];
-
-    return this.usersService.searchAll(search);
+    registerEnumType(Role, {
+      name: 'Role',
+    });
   }
 
   @RolesAccess([Role.Admin])
   @Query(() => UsersPaginationOutput)
-  async retrieveUsers(
-    @Args('page', { type: () => Int, nullable: true, defaultValue: 1 }) page: number,
-    @Args('size', { type: () => Int, nullable: true, defaultValue: 10 }) size: number,
-  ) {
+  async findAllUsers(@Args() { search, page, size }: FindAllUsersArgs) {
+    if (search && search.length < 3) {
+      return {
+        users: [],
+        total: 0,
+      };
+    }
+
     return this.usersService.findAll({
+      ...search
+        ? {
+          where: {
+            OR: [
+              { email: { contains: search, mode: 'insensitive' } },
+              { firstName: { contains: search, mode: 'insensitive' } },
+              { lastName: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+        }
+        : {},
       page,
       size,
     });
   }
 
-  @Query(() => User)
-  async retrieveUser(
-    @CurrentUser() currentUser: User,
-    @Args('id', { type: () => Int, nullable: true }) id?: number,
-  ) {
-    if (!currentUser.roles.includes(Role.Admin)) {
-      if (id && currentUser.id !== id) {
-        throw new ForbiddenException();
-      }
-    }
-
+  @Query(() => UserOutput)
+  async findOneUser(@CurrentUser() currentUser: User, @Args() { id }: FindOneUserArgs) {
     id = id || currentUser.id;
 
-    return this.usersService.findOne({
+    if (!currentUser.roles.includes(Role.Admin) && currentUser.id !== id) {
+      throw new ForbiddenException();
+    }
+
+    const user = await this.usersService.findOne({
       where: {
         id,
       },
     });
+
+    if (!user) throw new NotFoundException();
+
+    return user;
   }
 
   @RolesAccess([Role.Admin])
-  @Mutation(() => User)
-  async createUser(@Args('input') input: CreateUserInput) {
+  @Mutation(() => UserOutput)
+  async createUser(@Args() { input }: CreateUserArgs) {
     return this.usersService.create({
-      input,
+      data: input,
     });
   }
 
-  @Mutation(() => User)
-  async updateUser(
-    @CurrentUser() currentUser: User,
-    @Args('id', { type: () => Int }) id: number,
-    @Args('input') input: UpdateUserInput,
-  ) {
+  @Mutation(() => UserOutput)
+  async updateUser(@CurrentUser() currentUser: User, @Args() { id, input }: UpdateUserArgs) {
+    id = id || currentUser.id;
+
     if (!currentUser.roles.includes(Role.Admin)) {
       if (currentUser.id !== id) {
         throw new ForbiddenException();
@@ -86,13 +98,13 @@ export class UsersResolver {
       where: {
         id,
       },
-      input,
+      data: input,
     });
   }
 
   @RolesAccess([Role.Admin])
-  @Mutation(() => User)
-  async removeUser(@Args('id', { type: () => Int }) id: number) {
+  @Mutation(() => UserOutput)
+  async removeUser(@Args() { id }: RemoveUserArgs) {
     return this.usersService.remove({
       where: {
         id,

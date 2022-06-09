@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useCallback, useState } from 'react';
+import { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
 import { Global, ThemeProvider as BaseThemeProvider } from '@emotion/react';
 
 import light from './themes/light';
@@ -27,10 +27,12 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
 
   const toggleTheme = useCallback(() => setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light')), []);
 
+  const value = useMemo(() => ({ theme, changeTheme, toggleTheme }), [theme, changeTheme, toggleTheme]);
+
   return (
     <BaseThemeProvider theme={themes[theme]}>
       <Global styles={styles.root} />
-      <ThemeContext.Provider value={{ theme, changeTheme, toggleTheme }}>
+      <ThemeContext.Provider value={value}>
         {children}
       </ThemeContext.Provider>
     </BaseThemeProvider>

@@ -1,17 +1,10 @@
 import { gql } from '@apollo/client';
 
+import type { UpdateUserArgs } from '@/api/users/args/update-user.args';
+
 import { USER, User } from '../../fragments/User';
 
-export type UpdateUserVars = {
-  id: number,
-  input: {
-    firstName?: string,
-    lastName?: string,
-    email?: string,
-    password?: string,
-    roles?: string[],
-  },
-};
+export type UpdateUserVars = UpdateUserArgs;
 
 export type UpdateUserData = {
   updateUser: User,

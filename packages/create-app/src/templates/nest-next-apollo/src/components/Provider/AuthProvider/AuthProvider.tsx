@@ -1,10 +1,10 @@
-import { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
-import { makeVar, useApolloClient, useLazyQuery, useMutation, useReactiveVar } from '@apollo/client';
+import { createContext, ReactNode, useCallback, useMemo } from 'react';
+import { makeVar, useApolloClient, useMutation, useQuery, useReactiveVar } from '@apollo/client';
 
 import { User } from '@/graphql/fragments/User';
-import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/graphql/queries/users/retrieveUser';
 import { LOGIN, LoginData, LoginVars } from '@/graphql/mutations/auth/login';
 import { REGISTER, RegisterData, RegisterVars } from '@/graphql/mutations/auth/register';
+import { FIND_ONE_USER, FindOneUserData, FindOneUserVars } from '@/graphql/queries/users/findOneUser';
 
 const reactiveVar = makeVar({
   isLoginOpen: false,
@@ -31,33 +31,18 @@ export type AuthContextValue = {
 export const AuthContext = createContext({} as AuthContextValue);
 
 export type AuthProviderProps = {
-  user: User | null,
   children: ReactNode,
 };
 
-export default function AuthProvider({ children, ...props }: AuthProviderProps) {
-  const [user, setUser] = useState(props.user);
-
+export default function AuthProvider({ children }: AuthProviderProps) {
   const apolloClient = useApolloClient();
 
-  const [retrieveUserQuery, retrieveUserResult] = useLazyQuery<RetrieveUserData, RetrieveUserVars>(RETRIEVE_USER, {
-    fetchPolicy: 'no-cache',
-  });
+  const { loading, data } = useQuery<FindOneUserData, FindOneUserVars>(FIND_ONE_USER);
 
   const [loginMutation, loginResult] = useMutation<LoginData, LoginVars>(LOGIN);
   const [registerMutation, registerResult] = useMutation<RegisterData, RegisterVars>(REGISTER);
 
-  const retrieveUser = useCallback(async () => {
-    const { error, data } = await retrieveUserQuery();
-
-    if (error) {
-      throw error;
-    }
-
-    setUser(data?.retrieveUser || null);
-
-    await apolloClient.resetStore();
-  }, [setUser, apolloClient, retrieveUserQuery]);
+  const user = useMemo(() => data?.findOneUser || null, [data?.findOneUser]);
 
   const login = useCallback(async (input: LoginVars['input']) => {
     const { data, errors } = await loginMutation({
@@ -75,8 +60,8 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
       document.cookie = `refresh-token=${data.login.refreshToken}; path=/;`;
     }
 
-    await retrieveUser();
-  }, [loginMutation, retrieveUser]);
+    await apolloClient.resetStore();
+  }, [apolloClient, loginMutation]);
 
   const register = useCallback(async (input: RegisterVars['input']) => {
     const { data, errors } = await registerMutation({
@@ -94,17 +79,15 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
       document.cookie = `refresh-token=${data.register.refreshToken}; path=/;`;
     }
 
-    await retrieveUser();
-  }, [registerMutation, retrieveUser]);
+    await apolloClient.resetStore();
+  }, [apolloClient, registerMutation]);
 
   const logout = useCallback(async () => {
     document.cookie = 'access-token=; path=/;';
     document.cookie = 'refresh-token=; path=/;';
 
-    setUser(null);
-
     await apolloClient.resetStore();
-  }, [setUser, apolloClient]);
+  }, [apolloClient]);
 
   const { isLoginOpen, isRegisterOpen } = useReactiveVar(reactiveVar);
 
@@ -116,11 +99,11 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
   const value = useMemo(() => ({
     user,
     login,
-    loginLoading: retrieveUserResult.loading || loginResult.loading,
-    loginError: retrieveUserResult.error || loginResult.error,
+    loginLoading: loading || loginResult.loading,
+    loginError: loginResult.error,
     register,
-    registerLoading: retrieveUserResult.loading || registerResult.loading,
-    registerError: retrieveUserResult.error || registerResult.error,
+    registerLoading: loading || registerResult.loading,
+    registerError: registerResult.error,
     logout,
     isLoginOpen,
     isRegisterOpen,
@@ -130,8 +113,7 @@ export default function AuthProvider({ children, ...props }: AuthProviderProps) 
     closeRegister,
   }), [
     user,
-    retrieveUserResult.loading,
-    retrieveUserResult.error,
+    loading,
     login,
     loginResult.loading,
     loginResult.error,

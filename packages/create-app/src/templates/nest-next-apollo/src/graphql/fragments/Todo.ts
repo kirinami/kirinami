@@ -13,7 +13,7 @@ export type Todo = {
 };
 
 export const TODO = gql`
-  fragment Todo on Todo {
+  fragment Todo on TodoOutput {
     id
     user {
       id

@@ -1,14 +1,10 @@
 import { gql } from '@apollo/client';
 
+import type { CreateTodoArgs } from '@/api/todos/args/create-todo.args';
+
 import { TODO, Todo } from '../../fragments/Todo';
 
-export type CreateTodoVars = {
-  input: {
-    userId?: number,
-    title: string,
-    completed: boolean,
-  },
-};
+export type CreateTodoVars = CreateTodoArgs;
 
 export type CreateTodoData = {
   createTodo: Todo,

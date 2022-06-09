@@ -1,19 +1,13 @@
-import { forwardRef, Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from '@nestjs/common';
 
+import { PrismaModule } from '@/api/prisma/prisma.module';
 import { UsersModule } from '@/api/users/users.module';
 
-import { Todo } from './todo.entity';
 import { TodosResolver } from './todos.resolver';
 import { TodosService } from './todos.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Todo,
-    ]),
-    forwardRef(() => UsersModule),
-  ],
+  imports: [PrismaModule, UsersModule],
   providers: [TodosResolver, TodosService],
   exports: [TodosService],
 })

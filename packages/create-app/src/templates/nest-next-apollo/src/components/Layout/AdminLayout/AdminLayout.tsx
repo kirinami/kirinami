@@ -6,6 +6,7 @@ import en_US from 'antd/lib/locale/en_US';
 import { Breadcrumb, ConfigProvider, Layout as AntLayout, Menu } from 'antd';
 import { BookFilled, ContactsFilled, DashboardFilled, HomeOutlined } from '@ant-design/icons';
 
+import { Role } from '@/api/users/enums/role.enum';
 import logo from '@/assets/logo.svg';
 import useAuth from '@/hooks/useAuth';
 import NotFoundPage from '@/pages/404';
@@ -27,7 +28,7 @@ export default function AdminLayout({ breadcrumbs, actions, children }: AdminLay
 
   const [collapsed, setCollapsed] = useState(true);
 
-  if (router.pathname.startsWith('/admin') && !user?.roles.includes('Admin')) {
+  if (router.pathname.startsWith('/admin') && !user?.roles.includes(Role.Admin)) {
     return <NotFoundPage />;
   }
 

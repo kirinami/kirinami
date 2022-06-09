@@ -1,17 +1,21 @@
 import { gql } from '@apollo/client';
 
+import { RefreshArgs } from '@/api/auth/args/refresh.args';
+
+import { AUTH, Auth } from '../../fragments/Auth';
+
+export type RefreshVars = RefreshArgs;
+
 export type RefreshData = {
-  refresh: {
-    accessToken: string,
-    refreshToken: string,
-  },
+  refresh: Auth,
 };
 
 export const REFRESH = gql`
-  mutation Refresh {
-    refresh {
-      accessToken
-      refreshToken
+  ${AUTH}
+
+  mutation Refresh($token: String!) {
+    refresh(token: $token) {
+      ...Auth
     }
   }
 `;

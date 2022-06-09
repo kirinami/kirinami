@@ -22,8 +22,8 @@ tmp
 # project
 .nest
 .next
-.env*.local
-schema.graphql
+.env
+scheme.graphql
 
 # misc
 .DS_Store

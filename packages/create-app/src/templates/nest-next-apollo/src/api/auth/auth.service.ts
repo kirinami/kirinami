@@ -1,19 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { type User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-import { TokensService } from '@/api/tokens/tokens.service';
-import { User } from '@/api/users/user.entity';
+import { UsersService } from '@/api/users/users.service';
+
+import { LoginInput } from './inputs/login.input';
+import { RegisterInput } from './inputs/register.input';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly tokensService: TokensService,
+    private readonly usersService: UsersService,
   ) {
   }
 
-  async login(user: User) {
+  private async computeTokens(user: User) {
     const payload = {
       id: user.id,
     };
@@ -28,12 +31,68 @@ export class AuthService {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
 
-    await this.tokensService.set(payload.id, 'accessToken', await bcrypt.hash(accessToken, 10));
-    await this.tokensService.set(payload.id, 'refreshToken', await bcrypt.hash(refreshToken, 10));
+    await this.usersService.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        accessToken: bcrypt.hashSync(accessToken, 10),
+        refreshToken: bcrypt.hashSync(refreshToken, 10),
+      },
+    });
 
     return {
       accessToken,
       refreshToken,
     };
+  }
+
+  async login(input: LoginInput) {
+    const user = await this.usersService.findOne({
+      where: {
+        email: input.email,
+      },
+    });
+
+    if (!user) throw new UnauthorizedException();
+
+    const match = await bcrypt.compare(input.password, user.password);
+
+    if (!match) throw new UnauthorizedException();
+
+    return this.computeTokens(user);
+  }
+
+  async register(input: RegisterInput) {
+    const user = await this.usersService.create({
+      data: input,
+    });
+
+    return this.computeTokens(user);
+  }
+
+  async refresh(token: string) {
+    let id: number;
+    try {
+      ({ id } = this.jwtService.verify(token, {
+        secret: process.env.REFRESH_TOKEN_SECRET,
+      }));
+    } catch (err) {
+      throw new UnauthorizedException();
+    }
+
+    const user = await this.usersService.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!user || !user.refreshToken) throw new UnauthorizedException();
+
+    const match = await bcrypt.compare(token, user.refreshToken);
+
+    if (!match) throw new UnauthorizedException();
+
+    return this.computeTokens(user);
   }
 }

@@ -1,12 +1,12 @@
 import { applyDecorators, SetMetadata, UseGuards } from '@nestjs/common';
 
-import { Role } from '@/api/users/user.entity';
+import { Role } from '@/api/users/enums/role.enum';
 
 import { RolesGuard } from '../guards/roles.guard';
 
 export function RolesAccess(roles: Role[]) {
   return applyDecorators(
-    UseGuards(RolesGuard),
     SetMetadata('roles', roles),
+    UseGuards(RolesGuard),
   );
 }

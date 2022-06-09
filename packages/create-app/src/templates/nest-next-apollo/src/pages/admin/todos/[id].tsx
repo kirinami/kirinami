@@ -11,12 +11,12 @@ import * as yup from 'yup';
 import Form from '@/components/Common/Form/Form';
 import FormGroup from '@/components/Common/FormGroup/FormGroup';
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_TODOS } from '@/graphql/queries/todos/retrieveTodos';
-import { RETRIEVE_TODO, RetrieveTodoData, RetrieveTodoVars } from '@/graphql/queries/todos/retrieveTodo';
+import { FIND_ALL_USERS, FindAllUsersData, FindAllUsersVars } from '@/graphql/queries/users/findAllUsers';
+import { FIND_ALL_TODOS } from '@/graphql/queries/todos/findAllTodos';
+import { FIND_ONE_TODO, FindOneTodoData, FindOneTodoVars } from '@/graphql/queries/todos/findOneTodo';
 import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/graphql/mutations/todos/createTodo';
 import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
 import { REMOVE_TODO, RemoveTodoData, RemoveTodoVars } from '@/graphql/mutations/todos/removeTodo';
-import { SEARCH_USERS, SearchUsersData, SearchUsersVars } from '@/graphql/queries/users/searchUsers';
 
 type FormData = {
   user: {
@@ -33,22 +33,23 @@ export default function AdminTodosEditPage() {
   const router = useRouter();
   const id = Number(router.query.id);
 
-  const { loading, data } = useQuery<RetrieveTodoData, RetrieveTodoVars>(RETRIEVE_TODO, {
+  const { loading, data } = useQuery<FindOneTodoData, FindOneTodoVars>(FIND_ONE_TODO, {
     variables: {
       id,
     },
     skip: Number.isNaN(id),
   });
+
   const [createTodo, { loading: createLoading }] = useMutation<CreateTodoData, CreateTodoVars>(CREATE_TODO);
   const [updateTodo, { loading: updateLoading }] = useMutation<UpdateTodoData, UpdateTodoVars>(UPDATE_TODO);
   const [removeTodo, { loading: removeLoading }] = useMutation<RemoveTodoData, RemoveTodoVars>(REMOVE_TODO);
 
-  const [searchUsers, {
-    loading: searchLoading,
-    data: searchData,
-  }] = useLazyQuery<SearchUsersData, SearchUsersVars>(SEARCH_USERS);
+  const [searchUsers, searchUsersResult] = useLazyQuery<FindAllUsersData, FindAllUsersVars>(FIND_ALL_USERS, {
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'ignore',
+  });
 
-  const todo = useMemo(() => data?.retrieveTodo || null, [data?.retrieveTodo]);
+  const todo = useMemo(() => data?.findOneTodo || null, [data?.findOneTodo]);
 
   const form = useForm<FormData>({
     resolver: yupResolver(yup.object({
@@ -104,7 +105,7 @@ export default function AdminTodosEditPage() {
 
         cache.modify({
           fields: {
-            retrieveTodos: (ref, { toReference }) => ({
+            findAllTodos: (ref, { toReference }) => ({
               ...ref,
               todos: [...ref.todos, toReference(data.createTodo)],
               total: ref.total + 1,
@@ -138,7 +139,7 @@ export default function AdminTodosEditPage() {
           },
           refetchQueries: [
             {
-              query: RETRIEVE_TODOS,
+              query: FIND_ALL_TODOS,
               variables: {
                 page: 1,
                 size: 10,
@@ -217,13 +218,13 @@ export default function AdminTodosEditPage() {
                 labelInValue
                 showSearch
                 filterOption={false}
-                notFoundContent={searchLoading ? <Spin size="small" /> : null}
+                notFoundContent={searchUsersResult.loading ? <Spin size="small" /> : null}
                 value={user && {
                   user,
                   value: user.id,
                   label: `${user.firstName} ${user.lastName} (${user.email})`,
                 }}
-                options={searchData?.searchUsers.map((user) => ({
+                options={searchUsersResult.data?.findAllUsers.users.map((user) => ({
                   user,
                   value: user.id,
                   label: `${user.firstName} ${user.lastName} (${user.email})`,

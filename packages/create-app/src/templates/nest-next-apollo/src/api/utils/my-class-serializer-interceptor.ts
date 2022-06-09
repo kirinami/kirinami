@@ -6,6 +6,7 @@ export class MyClassSerializerInterceptor extends ClassSerializerInterceptor {
   intercept(context: ExecutionContext, next: CallHandler) {
     if (context.getType<GqlContextType>() === 'graphql') {
       const operation = context.getArgByIndex(3).operation.operation;
+
       if (operation === 'subscription') {
         return next.handle();
       }

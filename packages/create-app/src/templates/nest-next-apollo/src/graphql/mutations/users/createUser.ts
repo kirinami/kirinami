@@ -1,16 +1,10 @@
 import { gql } from '@apollo/client';
 
+import type { CreateUserArgs } from '@/api/users/args/create-user.args';
+
 import { USER, User } from '../../fragments/User';
 
-export type CreateUserVars = {
-  input: {
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    roles?: string[],
-  },
-};
+export type CreateUserVars = CreateUserArgs;
 
 export type CreateUserData = {
   createUser: User,

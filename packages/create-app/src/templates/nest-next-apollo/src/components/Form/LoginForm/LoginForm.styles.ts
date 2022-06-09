@@ -24,7 +24,7 @@ const styles = {
     font-size: 12px;
     line-height: 18px;
     padding: 12px 20px;
-    
+
     &:focus-visible {
       outline-color: #884cb2;
     }
@@ -36,6 +36,7 @@ const styles = {
   `,
   actions: css`
     display: flex;
+    flex-direction: row;
     align-items: center;
 
     > :not([hidden]) ~ :not([hidden]) {

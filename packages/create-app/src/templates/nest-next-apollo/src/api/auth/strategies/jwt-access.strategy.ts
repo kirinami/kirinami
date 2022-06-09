@@ -3,15 +3,11 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 
-import { TokensService } from '@/api/tokens/tokens.service';
 import { UsersService } from '@/api/users/users.service';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') {
-  constructor(
-    private readonly tokensService: TokensService,
-    private readonly usersService: UsersService,
-  ) {
+  constructor(private readonly usersService: UsersService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: process.env.ACCESS_TOKEN_SECRET,
@@ -29,6 +25,7 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
         id: payload.id,
       },
     });
+
     if (!user) throw new UnauthorizedException();
 
     return user;

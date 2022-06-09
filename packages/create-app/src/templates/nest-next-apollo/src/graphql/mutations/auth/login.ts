@@ -1,24 +1,21 @@
 import { gql } from '@apollo/client';
 
-export type LoginVars = {
-  input: {
-    email: string,
-    password: string,
-  },
-};
+import type { LoginArgs } from '@/api/auth/args/login.args';
+
+import { AUTH, Auth } from '../../fragments/Auth';
+
+export type LoginVars = LoginArgs;
 
 export type LoginData = {
-  login: {
-    accessToken: string,
-    refreshToken: string,
-  },
+  login: Auth,
 };
 
 export const LOGIN = gql`
+  ${AUTH}
+
   mutation Login($input: LoginInput!) {
     login(input: $input) {
-      accessToken
-      refreshToken
+      ...Auth
     }
   }
 `;

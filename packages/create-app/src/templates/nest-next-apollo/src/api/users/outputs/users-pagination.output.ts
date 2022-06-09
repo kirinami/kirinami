@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { User } from '../user.entity';
+import { UserOutput } from './user.output';
 
 @ObjectType()
 export class UsersPaginationOutput {
-  @Field(() => [User])
-  users!: User[];
+  @Field(() => [UserOutput])
+  users!: UserOutput[];
 
   @Field()
   total!: number;

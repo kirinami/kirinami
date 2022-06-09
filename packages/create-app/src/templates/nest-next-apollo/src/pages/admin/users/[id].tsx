@@ -7,38 +7,40 @@ import { useMutation, useQuery } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
+import { Role } from '@/api/users/enums/role.enum';
 import Form from '@/components/Common/Form/Form';
 import FormGroup from '@/components/Common/FormGroup/FormGroup';
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/graphql/queries/users/retrieveUser';
+import { FIND_ALL_USERS } from '@/graphql/queries/users/findAllUsers';
+import { FIND_ONE_USER, FindOneUserData, FindOneUserVars } from '@/graphql/queries/users/findOneUser';
 import { CREATE_USER, CreateUserData, CreateUserVars } from '@/graphql/mutations/users/createUser';
 import { UPDATE_USER, UpdateUserData, UpdateUserVars } from '@/graphql/mutations/users/updateUser';
 import { REMOVE_USER, RemoveUserData, RemoveUserVars } from '@/graphql/mutations/users/removeUser';
-import { RETRIEVE_USERS } from '@/graphql/queries/users/retrieveUsers';
 
 type FormData = {
   firstName: string,
   lastName: string,
   email: string,
   password: string,
-  roles: string[],
+  roles: Role[],
 };
 
 export default function AdminUsersEditPage() {
   const router = useRouter();
   const id = Number(router.query.id);
 
-  const { loading, data } = useQuery<RetrieveUserData, RetrieveUserVars>(RETRIEVE_USER, {
+  const { loading, data } = useQuery<FindOneUserData, FindOneUserVars>(FIND_ONE_USER, {
     variables: {
       id,
     },
     skip: Number.isNaN(id),
   });
+
   const [createUser, { loading: createLoading }] = useMutation<CreateUserData, CreateUserVars>(CREATE_USER);
   const [updateUser, { loading: updateLoading }] = useMutation<UpdateUserData, UpdateUserVars>(UPDATE_USER);
   const [removeUser, { loading: removeLoading }] = useMutation<RemoveUserData, RemoveUserVars>(REMOVE_USER);
 
-  const user = useMemo(() => data?.retrieveUser || null, [data?.retrieveUser]);
+  const user = useMemo(() => data?.findOneUser || null, [data?.findOneUser]);
 
   const form = useForm<FormData>({
     resolver: yupResolver(yup.object({
@@ -53,7 +55,7 @@ export default function AdminUsersEditPage() {
       lastName: user?.lastName || '',
       email: user?.email || '',
       password: '',
-      roles: user?.roles || ['User'],
+      roles: user?.roles || [Role.User],
     },
   });
   const formErrors = form.formState.errors;
@@ -79,7 +81,7 @@ export default function AdminUsersEditPage() {
 
         cache.modify({
           fields: {
-            retrieveUsers: (ref, { toReference }) => ({
+            findAllUsers: (ref, { toReference }) => ({
               ...ref,
               users: [...ref.users, toReference(data.createUser)],
               total: ref.total + 1,
@@ -113,7 +115,7 @@ export default function AdminUsersEditPage() {
           },
           refetchQueries: [
             {
-              query: RETRIEVE_USERS,
+              query: FIND_ALL_USERS,
               variables: {
                 page: 1,
                 size: 10,
@@ -140,7 +142,7 @@ export default function AdminUsersEditPage() {
       lastName: user?.lastName || '',
       email: user?.email || '',
       password: '',
-      roles: user?.roles || ['User'],
+      roles: user?.roles || [Role.User],
     });
   }, [user, form]);
 
@@ -226,8 +228,8 @@ export default function AdminUsersEditPage() {
             // @ts-ignore
             <FormGroup label="Roles:" error={formErrors.roles?.message}>
               <Select mode="multiple" {...field}>
-                <Select.Option value="User">User</Select.Option>
-                <Select.Option value="Admin">Admin</Select.Option>
+                <Select.Option value="user">User</Select.Option>
+                <Select.Option value="admin">Admin</Select.Option>
               </Select>
             </FormGroup>
           )}

@@ -1,5 +1,4 @@
-import '../env.config';
-
+import 'dotenv/config';
 import 'reflect-metadata';
 
 import path from 'path';
@@ -8,6 +7,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import next from 'next';
 
+import { PrismaService } from './api/prisma/prisma.service';
 import { MyClassSerializerInterceptor } from './api/utils/my-class-serializer-interceptor';
 import { AppExceptionFilter } from './api/app.exception';
 import { AppModule } from './api/app.module';
@@ -32,18 +32,16 @@ async function main() {
 
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
-    // whitelist: true,
     transformOptions: {
       enableImplicitConversion: true,
-    },
-    exceptionFactory: (errors) => {
-      console.log(errors);
     },
   }));
 
   app.useGlobalFilters(new AppExceptionFilter(handler, app.get(HttpAdapterHost).httpAdapter));
 
   app.useGlobalInterceptors(new MyClassSerializerInterceptor(app.get(Reflector)));
+
+  await app.get(PrismaService).enableShutdownHooks(app);
 
   await app.listen(3000, '0.0.0.0');
 }

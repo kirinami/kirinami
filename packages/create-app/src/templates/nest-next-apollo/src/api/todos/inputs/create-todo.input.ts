@@ -1,4 +1,4 @@
-import { Int, Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
 import { Length } from 'class-validator';
 

@@ -1,36 +1,28 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { omit } from 'lodash';
 import bcrypt from 'bcryptjs';
 
-import { User } from './user.entity';
+import { PrismaService } from '@/api/prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {
+  constructor(private readonly prismaService: PrismaService) {
   }
 
-  async searchAll(search: string) {
-    return this.usersRepository.createQueryBuilder('user')
-      .where('CONCAT(user.firstName, \' \', user.lastName, \' \', user.email) ILIKE :search', {
-        search: `%${search}%`,
-      })
-      .orderBy('user.id', 'ASC')
-      .limit(10)
-      .getMany();
-  }
-
-  async findAll({ page = 1, size = 10, ...options }: { page?: number, size?: number } & Pick<FindManyOptions<User>, 'where'>) {
+  async findAll({ page = 1, size = 10, ...args }: { page?: number, size?: number } & Prisma.UserFindManyArgs) {
     const [users, total] = await Promise.all([
-      this.usersRepository.find({
-        order: {
-          id: 'ASC',
+      this.prismaService.user.findMany({
+        orderBy: {
+          id: 'desc',
         },
-        ...options,
         skip: Math.abs(size * (page - 1)),
         take: Math.abs(size),
+        ...args,
       }),
-      this.usersRepository.count(options),
+      this.prismaService.user.count({
+        ...omit(args, ['select', 'include']),
+      }),
     ]);
 
     return {
@@ -39,50 +31,62 @@ export class UsersService {
     };
   }
 
-  async findOne(options: Pick<FindOneOptions<User>, 'where'>) {
-    return this.usersRepository.findOne(options);
+  async findOne(args: Prisma.UserFindFirstArgs) {
+    return this.prismaService.user.findFirst(args);
   }
 
-  async create({ input }: { input: DeepPartial<Omit<User, 'id'>> & Pick<User, 'password'> }) {
-    const password = await bcrypt.hash(input.password, 10);
+  async create({ data, ...args }: Prisma.UserCreateArgs) {
+    try {
+      const password = await bcrypt.hash(data.password, 10);
+      const roles = data.roles || ['user'];
 
-    return this.usersRepository.save(this.usersRepository.create({ ...input, password }))
-      .catch<User>((err) => {
-        if (/(email)[\s\S]+(already exists)/.test(err.detail)) {
-          throw new BadRequestException(['email already exists']);
-        }
-
-        return err;
+      return await this.prismaService.user.create({
+        data: { ...data, password, roles },
+        ...args,
       });
-  }
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          throw new BadRequestException(['Cannot be created with this email']);
+        }
+      }
 
-  async update({ input, ...options }: { input: DeepPartial<Omit<User, 'id'>> } & Pick<FindOneOptions<User>, 'where'>) {
-    const user = await this.findOne(options);
-    if (!user) return null;
-
-    let password;
-    if (input.password) {
-      password = await bcrypt.hash(input.password, 10);
+      throw err;
     }
-
-    return this.usersRepository.save(this.usersRepository.merge(user, { ...input, password }))
-      .catch<User>((err) => {
-        if (/(email)[\s\S]+(already exists)/.test(err.detail)) {
-          throw new BadRequestException(['email already exists']);
-        }
-
-        return err;
-      });
   }
 
-  async remove(options: Pick<FindOneOptions<User>, 'where'>) {
-    const user = await this.findOne(options);
-    if (!user) return null;
+  async update({ data, ...args }: Prisma.UserUpdateArgs) {
+    try {
+      const password = typeof data.password === 'string' ? await bcrypt.hash(data.password, 10) : undefined;
 
-    await this.usersRepository.delete({
-      id: user.id,
-    });
+      return await this.prismaService.user.update({
+        data: { ...data, password },
+        ...args,
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          throw new BadRequestException(['Cannot be created with this email']);
+        } else if (err.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
 
-    return user;
+      throw err;
+    }
+  }
+
+  async remove(args: Prisma.UserDeleteArgs) {
+    try {
+      return await this.prismaService.user.delete(args);
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
+
+      throw err;
+    }
   }
 }

@@ -11,7 +11,7 @@ import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
 import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
 import { Todo } from '@/graphql/fragments/Todo';
-import { RETRIEVE_TODOS, RetrieveTodosData, RetrieveTodosVars } from '@/graphql/queries/todos/retrieveTodos';
+import { FIND_ALL_TODOS, FindAllTodosData, FindAllTodosVars } from '@/graphql/queries/todos/findAllTodos';
 import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
 import useAuth from '@/hooks/useAuth';
 
@@ -20,7 +20,7 @@ export default function TodosPage() {
 
   const { user, openLogin } = useAuth();
 
-  const { data } = useQuery<RetrieveTodosData, RetrieveTodosVars>(RETRIEVE_TODOS, {
+  const { data } = useQuery<FindAllTodosData, FindAllTodosVars>(FIND_ALL_TODOS, {
     skip: !user,
     variables: {
       my: true,
@@ -28,7 +28,7 @@ export default function TodosPage() {
   });
   const [updateTodo] = useMutation<UpdateTodoData, UpdateTodoVars>(UPDATE_TODO);
 
-  const todos = useMemo(() => data?.retrieveTodos.todos || [], [data?.retrieveTodos.todos]);
+  const todos = useMemo(() => data?.findAllTodos.todos || [], [data?.findAllTodos.todos]);
   const completedTodos = useMemo(() => todos.filter((todo) => todo.completed), [todos]);
 
   const [editTodoModalOpen, setEditTodoModalOpen] = useState(false);

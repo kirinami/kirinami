@@ -1,15 +1,14 @@
-import { IncomingHttpHeaders } from 'http';
 import { NextPageContext } from 'next';
 import { ApolloClient, ApolloLink, from, fromPromise, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
 import { GraphQLErrors } from '@apollo/client/errors';
 import { onError } from '@apollo/client/link/error';
 
-import { REFRESH, RefreshData } from '@/graphql/mutations/auth/refresh';
+import { REFRESH, RefreshData, RefreshVars } from '@/graphql/mutations/auth/refresh';
 import parseCookie from '@/utils/parseCookie';
 
-let apolloClientMemo: ReturnType<typeof createApolloClient> | undefined;
-
 const isServer = typeof window === 'undefined';
+
+let apolloClientMemo: ReturnType<typeof createApolloClient> | undefined;
 
 const createCache = () => new InMemoryCache();
 
@@ -34,13 +33,18 @@ const createAuthLink = (ctx?: NextPageContext | null) => {
     if (unauthorizedError) {
       const cookies = parseCookie(isServer ? ctx?.req?.headers?.cookie || '' : document.cookie);
 
+      if (!cookies['refresh-token']) {
+        return undefined;
+      }
+
       return fromPromise(
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        createApolloClient({
-          'refresh-token': cookies['refresh-token'],
-        })
-          .mutate<RefreshData>({
+        createApolloClient()
+          .mutate<RefreshData, RefreshVars>({
             mutation: REFRESH,
+            variables: {
+              token: cookies['refresh-token'],
+            },
             fetchPolicy: 'no-cache',
             errorPolicy: 'ignore',
           }),
@@ -75,25 +79,25 @@ const createAuthLink = (ctx?: NextPageContext | null) => {
   return from([authLink, refreshLink]);
 };
 
-const createHttpLink = (headers?: IncomingHttpHeaders) => new HttpLink({
+const createHttpLink = () => new HttpLink({
   uri: process.env.NEXT_PUBLIC_GRAPHQL_URL,
   credentials: 'same-origin',
-  headers,
 });
 
-const createApolloClient = (headers?: IncomingHttpHeaders) => new ApolloClient({
+const createApolloClient = () => new ApolloClient({
   ssrMode: isServer,
   ssrForceFetchDelay: isServer ? 100 : undefined,
-  link: createHttpLink(headers),
+  link: createHttpLink(),
   cache: createCache(),
   defaultOptions: {
+    watchQuery: {
+      errorPolicy: 'all',
+    },
     query: {
-      fetchPolicy: 'network-only',
-      errorPolicy: 'none',
+      errorPolicy: 'all',
     },
     mutate: {
-      fetchPolicy: 'network-only',
-      errorPolicy: 'none',
+      errorPolicy: 'all',
     },
   },
 });

@@ -1,10 +1,8 @@
 import path from 'path';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApolloDriver } from '@nestjs/apollo';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request } from 'express';
-import { DataSource } from 'typeorm';
 
 import { AuthModule } from './auth/auth.module';
 import { TodosModule } from './todos/todos.module';
@@ -12,21 +10,12 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: Number(process.env.POSTGRES_PORT),
-      database: process.env.POSTGRES_USER,
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      autoLoadEntities: true,
-      synchronize: false,
-      logging: ['warn', 'error'],
-    }),
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       subscriptions: {
         'graphql-ws': {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           context: (context: { connectionParams: Record<string, string> | null, extra: { request: Request } }) => {
             context.extra.request.headers = Object.fromEntries(Object.entries(context?.connectionParams || {})
               .map(([key, value]) => [key.toLowerCase(), value]));
@@ -51,10 +40,6 @@ import { UsersModule } from './users/users.module';
     TodosModule,
     UsersModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {
-  constructor(private readonly dataSource: DataSource) {
-  }
 }

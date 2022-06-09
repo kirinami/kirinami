@@ -26,6 +26,8 @@ tmp
 # project
 .nest
 .next
+.env
+scheme.graphql
 
 # misc
 .DS_Store

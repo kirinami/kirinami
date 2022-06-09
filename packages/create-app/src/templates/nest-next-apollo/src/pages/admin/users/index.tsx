@@ -6,22 +6,28 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useQuery } from '@apollo/client';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { RETRIEVE_USERS, RetrieveUsersData, RetrieveUsersVars } from '@/graphql/queries/users/retrieveUsers';
+import { FIND_ALL_USERS, FindAllUsersData, FindAllUsersVars } from '@/graphql/queries/users/findAllUsers';
+import useIsReady from '@/hooks/useIsReady';
+import useRouteChange from '@/hooks/useRouteChange';
 
 export default function AdminUsersIndexPage() {
   const router = useRouter();
   const page = Number(router.query.page) || 1;
   const size = Number(router.query.size) || 10;
 
-  const { loading, data } = useQuery<RetrieveUsersData, RetrieveUsersVars>(RETRIEVE_USERS, {
+  const isReady = useIsReady();
+
+  const { loading, data, refetch } = useQuery<FindAllUsersData, FindAllUsersVars>(FIND_ALL_USERS, {
     variables: {
       page,
       size,
     },
   });
 
-  const users = useMemo(() => data?.retrieveUsers.users || [], [data?.retrieveUsers.users]);
-  const total = useMemo(() => data?.retrieveUsers.total || 0, [data?.retrieveUsers.total]);
+  const users = useMemo(() => data?.findAllUsers.users || [], [data?.findAllUsers.users]);
+  const total = useMemo(() => data?.findAllUsers.total || 0, [data?.findAllUsers.total]);
+
+  useRouteChange(refetch);
 
   return (
     <AdminLayout
@@ -67,8 +73,8 @@ export default function AdminUsersIndexPage() {
             width: 160,
             render: (roles) => (
               <>
-                {roles?.includes('Admin') && <Tag color="success">Admin</Tag>}
-                {roles?.includes('User') && <Tag color="processing">User</Tag>}
+                {roles?.includes('admin') && <Tag color="success">Admin</Tag>}
+                {roles?.includes('user') && <Tag color="processing">User</Tag>}
               </>
             ),
           },
@@ -81,7 +87,7 @@ export default function AdminUsersIndexPage() {
             ),
           },
         ]}
-        loading={loading}
+        loading={isReady && loading}
         dataSource={users}
         pagination={{
           current: page,

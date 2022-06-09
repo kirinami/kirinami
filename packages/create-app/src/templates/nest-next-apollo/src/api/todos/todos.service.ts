@@ -1,25 +1,27 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { omit } from 'lodash';
 
-import { Todo } from './todo.entity';
+import { PrismaService } from '@/api/prisma/prisma.service';
 
 @Injectable()
 export class TodosService {
-  constructor(@InjectRepository(Todo) private readonly todosRepository: Repository<Todo>) {
+  constructor(private readonly prismaService: PrismaService) {
   }
 
-  async finaAll({ page = 1, size = 10, ...options }: { page?: number, size?: number } & Pick<FindManyOptions, 'where'>) {
+  async findAll({ page = 1, size = 10, ...args }: { page?: number, size?: number } & Prisma.TodoFindManyArgs) {
     const [todos, total] = await Promise.all([
-      this.todosRepository.find({
-        order: {
-          id: 'ASC',
+      this.prismaService.todo.findMany({
+        orderBy: {
+          id: 'desc',
         },
-        ...options,
         skip: Math.abs(size * (page - 1)),
         take: Math.abs(size),
+        ...args,
       }),
-      this.todosRepository.count(options),
+      this.prismaService.todo.count({
+        ...omit(args, ['select', 'include']),
+      }),
     ]);
 
     return {
@@ -28,29 +30,39 @@ export class TodosService {
     };
   }
 
-  async findOne(options: Pick<FindOneOptions, 'where'>) {
-    return this.todosRepository.findOne(options);
+  async findOne(args: Prisma.TodoFindFirstArgs) {
+    return this.prismaService.todo.findFirst(args);
   }
 
-  async create({ input }: { input: DeepPartial<Omit<Todo, 'id'>> }) {
-    return this.todosRepository.save(this.todosRepository.create(input));
+  async create(args: Prisma.TodoCreateArgs) {
+    return this.prismaService.todo.create(args);
   }
 
-  async update({ input, ...options }: { input: DeepPartial<Omit<Todo, 'id'>> } & Pick<FindOneOptions, 'where'>) {
-    const todo = await this.findOne(options);
-    if (!todo) return null;
+  async update(args: Prisma.TodoUpdateArgs) {
+    try {
+      return await this.prismaService.todo.update(args);
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
 
-    return this.todosRepository.save(this.todosRepository.merge(todo, input));
+      throw err;
+    }
   }
 
-  async remove(options: Pick<FindOneOptions, 'where'>) {
-    const todo = await this.findOne(options);
-    if (!todo) return null;
+  async remove(args: Prisma.TodoDeleteArgs) {
+    try {
+      return await this.prismaService.todo.delete(args);
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw new NotFoundException();
+        }
+      }
 
-    await this.todosRepository.delete({
-      id: todo.id,
-    });
-
-    return todo;
+      throw err;
+    }
   }
 }
