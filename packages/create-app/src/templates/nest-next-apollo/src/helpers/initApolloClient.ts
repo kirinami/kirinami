@@ -92,12 +92,17 @@ const createApolloClient = () => new ApolloClient({
   defaultOptions: {
     watchQuery: {
       errorPolicy: 'all',
+      fetchPolicy: 'cache-first',
+      notifyOnNetworkStatusChange: true,
     },
     query: {
       errorPolicy: 'all',
+      fetchPolicy: 'cache-first',
+      notifyOnNetworkStatusChange: true,
     },
     mutate: {
       errorPolicy: 'all',
+      fetchPolicy: 'network-only',
     },
   },
 });

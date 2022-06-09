@@ -11,7 +11,6 @@ import { Role } from '@/api/users/enums/role.enum';
 import Form from '@/components/Common/Form/Form';
 import FormGroup from '@/components/Common/FormGroup/FormGroup';
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { FIND_ALL_USERS } from '@/graphql/queries/users/findAllUsers';
 import { FIND_ONE_USER, FindOneUserData, FindOneUserVars } from '@/graphql/queries/users/findOneUser';
 import { CREATE_USER, CreateUserData, CreateUserVars } from '@/graphql/mutations/users/createUser';
 import { UPDATE_USER, UpdateUserData, UpdateUserVars } from '@/graphql/mutations/users/updateUser';
@@ -76,19 +75,6 @@ export default function AdminUsersEditPage() {
       variables: {
         input: formData,
       },
-      update(cache, { data }) {
-        if (!data) return;
-
-        cache.modify({
-          fields: {
-            findAllUsers: (ref, { toReference }) => ({
-              ...ref,
-              users: [...ref.users, toReference(data.createUser)],
-              total: ref.total + 1,
-            }),
-          },
-        });
-      },
     });
     if (!data) return;
 
@@ -113,25 +99,9 @@ export default function AdminUsersEditPage() {
           variables: {
             id: user.id,
           },
-          refetchQueries: [
-            {
-              query: FIND_ALL_USERS,
-              variables: {
-                page: 1,
-                size: 10,
-              },
-            },
-          ],
-          awaitRefetchQueries: true,
         });
 
-        await router.replace({
-          pathname: '/admin/users',
-          query: {
-            page: 1,
-            size: 10,
-          },
-        });
+        await router.replace('/admin/users');
       },
     });
   }, [router, removeUser, user?.id]);

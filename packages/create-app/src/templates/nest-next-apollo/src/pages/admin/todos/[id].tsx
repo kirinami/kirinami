@@ -12,7 +12,6 @@ import Form from '@/components/Common/Form/Form';
 import FormGroup from '@/components/Common/FormGroup/FormGroup';
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
 import { FIND_ALL_USERS, FindAllUsersData, FindAllUsersVars } from '@/graphql/queries/users/findAllUsers';
-import { FIND_ALL_TODOS } from '@/graphql/queries/todos/findAllTodos';
 import { FIND_ONE_TODO, FindOneTodoData, FindOneTodoVars } from '@/graphql/queries/todos/findOneTodo';
 import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/graphql/mutations/todos/createTodo';
 import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
@@ -100,19 +99,6 @@ export default function AdminTodosEditPage() {
           userId: formData.user.id,
         },
       },
-      update(cache, { data }) {
-        if (!data) return;
-
-        cache.modify({
-          fields: {
-            findAllTodos: (ref, { toReference }) => ({
-              ...ref,
-              todos: [...ref.todos, toReference(data.createTodo)],
-              total: ref.total + 1,
-            }),
-          },
-        });
-      },
     });
     if (!data) return;
 
@@ -137,25 +123,9 @@ export default function AdminTodosEditPage() {
           variables: {
             id: todo.id,
           },
-          refetchQueries: [
-            {
-              query: FIND_ALL_TODOS,
-              variables: {
-                page: 1,
-                size: 10,
-              },
-            },
-          ],
-          awaitRefetchQueries: true,
         });
 
-        await router.replace({
-          pathname: '/admin/todos',
-          query: {
-            page: 1,
-            size: 10,
-          },
-        });
+        await router.replace('/admin/todos');
       },
     });
   }, [router, removeTodo, todo?.id]);
