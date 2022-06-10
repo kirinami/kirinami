@@ -4,6 +4,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { Request } from 'express';
 
+import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { TodosModule } from './todos/todos.module';
 import { UsersModule } from './users/users.module';
@@ -36,6 +37,7 @@ import { UsersModule } from './users/users.module';
       playground: true,
       autoSchemaFile: path.resolve('scheme.graphql'),
     }),
+    PrismaModule,
     AuthModule,
     TodosModule,
     UsersModule,

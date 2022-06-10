@@ -52,13 +52,10 @@ services:
     env_file:
       - .env
     image: postgres:13.2-alpine
-    ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "${POSTGRES_USER}", "-U", "${POSTGRES_USER}" ]
+      test: pg_isready -q -d ${POSTGRES_USER} -U ${POSTGRES_USER}
+      start_period: 5s
       interval: 5s
-      timeout: 2s
-      retries: 5
     restart: unless-stopped
 
   app:
