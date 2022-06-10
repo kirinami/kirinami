@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { omit } from 'lodash';
 
+import { Prisma } from '@/api/prisma/prisma.client';
 import { PrismaService } from '@/api/prisma/prisma.service';
 
 @Injectable()

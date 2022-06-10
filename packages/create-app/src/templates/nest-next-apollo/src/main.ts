@@ -12,12 +12,11 @@ import { MyClassSerializerInterceptor } from './api/utils/my-class-serializer-in
 import { AppExceptionFilter } from './api/app.exception';
 import { AppModule } from './api/app.module';
 
-const server = next({
-  dev: process.env.NODE_ENV !== 'production',
-});
-const handler = server.getRequestHandler();
-
 async function main() {
+  const server = next({
+    dev: process.env.NODE_ENV !== 'production',
+  });
+
   await server.prepare();
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -37,11 +36,11 @@ async function main() {
     },
   }));
 
-  app.useGlobalFilters(new AppExceptionFilter(handler, app.get(HttpAdapterHost).httpAdapter));
+  app.useGlobalFilters(new AppExceptionFilter(server.getRequestHandler(), app.get(HttpAdapterHost).httpAdapter));
 
   app.useGlobalInterceptors(new MyClassSerializerInterceptor(app.get(Reflector)));
 
-  await app.get(PrismaService).enableShutdownHooks(app);
+  await app.get(PrismaService).enableShutdownHooks(server, app);
 
   await app.listen(3000, '0.0.0.0');
 }

@@ -1,5 +1,8 @@
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { NextServer } from 'next/dist/server/next';
+
+import { PrismaClient } from './prisma.client';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -13,8 +16,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 
-  async enableShutdownHooks(app: INestApplication) {
+  async enableShutdownHooks(server: NextServer, app: NestExpressApplication) {
     this.$on('beforeExit', async () => {
+      await server.close();
       await app.close();
     });
   }

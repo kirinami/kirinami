@@ -1,9 +1,9 @@
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Args, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { type Todo, type User } from '@prisma/client';
 import { PubSub } from 'graphql-subscriptions';
 import { omit } from 'lodash';
 
+import { type Todo, type User } from '@/api/prisma/prisma.client';
 import { CurrentUser } from '@/api/auth/decorators/current-user.decorator';
 import { JwtAccess } from '@/api/auth/decorators/jwt-access.decorator';
 import { Role } from '@/api/users/enums/role.enum';

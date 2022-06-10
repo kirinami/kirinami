@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { omit } from 'lodash';
 import bcrypt from 'bcryptjs';
 
+import { Prisma } from '@/api/prisma/prisma.client';
 import { PrismaService } from '@/api/prisma/prisma.service';
 
 @Injectable()
