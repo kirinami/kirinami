@@ -36,7 +36,7 @@ const defs = gql`
 
   type Query {
     findAllUsers(search: String, page: Int = 1, size: Int = 10): UserPagination!
-    findOneUser(id: Int!): User
+    findOneUser(id: Int): User
   }
 
   type Mutation {
