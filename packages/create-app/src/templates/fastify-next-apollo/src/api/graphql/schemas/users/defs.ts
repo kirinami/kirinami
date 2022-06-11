@@ -29,9 +29,14 @@ const defs = gql`
     updatedAt: DateTime!
   }
 
+  type UserPagination {
+    users: [User!]!
+    total: Int
+  }
+  
   type Query {
-    getUsers: [User!]!
-    getUserBy(id: Int!): User
+    getUsers(search: String, page: Int = 1, size: Int = 10): UserPagination!
+    getUserById(id: Int!): User
   }
 
   type Mutation {

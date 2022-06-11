@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import getApolloServer from '@/graphql/helpers/getApolloServer';
+import getApolloServer from '@/helpers/getApolloServer';
 
 const apolloHandler = getApolloServer().then((apolloServer) => apolloServer.createHandler({
   path: '/api/graphql',

@@ -1,12 +1,12 @@
 import { gql } from 'apollo-server-micro';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
-import authDefs from './auth/defs';
-import usersDefs from './users/defs';
-import todosDefs from './todos/defs';
-import authResolvers from './auth/resolvers';
-import usersResolvers from './users/resolvers';
-import todosResolvers from './todos/resolvers';
+import authDefs from './schemas/auth/defs';
+import usersDefs from './schemas/users/defs';
+import todosDefs from './schemas/todos/defs';
+import authResolvers from './schemas/auth/resolvers';
+import usersResolvers from './schemas/users/resolvers';
+import todosResolvers from './schemas/todos/resolvers';
 
 export default makeExecutableSchema({
   typeDefs: [

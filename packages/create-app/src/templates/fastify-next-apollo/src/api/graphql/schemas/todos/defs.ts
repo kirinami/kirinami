@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-micro';
 
 const defs = gql`
   input CreateTodoInput {
-    userId: Int!
+    userId: Int
     title: String!
     completed: Boolean!
   }
@@ -23,9 +23,14 @@ const defs = gql`
     updatedAt: DateTime!
   }
 
+  type TodoPagination {
+    todos: [Todo!]!
+    total: Int
+  }
+
   type Query {
-    getTodos: [Todo!]!
-    getTodoBy(id: Int!): Todo
+    getTodos(my: Boolean, page: Int = 1, size: Int = 10): TodoPagination!
+    getTodoById(id: Int!): Todo
   }
 
   type Mutation {

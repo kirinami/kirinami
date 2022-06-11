@@ -1,5 +1,7 @@
 export type GetUsersArgs = {
   search?: string,
+  page?: number,
+  size?: number,
 };
 
 export type GetUserByArgs = {
@@ -12,7 +14,7 @@ export type CreateUserArgs = {
     password: string,
     firstName: string,
     lastName: string,
-    roles: string[],
+    roles?: string[],
   }
 }
 

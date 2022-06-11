@@ -1,5 +1,7 @@
 export type GetTodosArgs = {
   my?: boolean,
+  page?: number,
+  size?: number,
 }
 
 export type GetTodoByArgs = {
@@ -8,7 +10,7 @@ export type GetTodoByArgs = {
 
 export type CreateTodoArgs = {
   input: {
-    userId: number,
+    userId?: number,
     title: string,
     completed: boolean,
   }

@@ -3,7 +3,11 @@ import jwt from 'jsonwebtoken';
 
 import prisma, { User } from '@/prisma/client';
 
-export default async function context({ req }: { req: IncomingMessage }) {
+export type Context = {
+  currentUser: User | null,
+}
+
+export default async function context({ req }: { req: IncomingMessage }): Promise<Context> {
   let id: number | undefined;
 
   try {
@@ -13,6 +17,7 @@ export default async function context({ req }: { req: IncomingMessage }) {
 
     id = typeof payload === 'string' ? undefined : payload.id;
   } catch (err) {
+    //
   }
 
   let currentUser: User | null = null;
@@ -23,8 +28,6 @@ export default async function context({ req }: { req: IncomingMessage }) {
         id,
       },
     });
-
-    if (!currentUser) throw new Error('Unauthorized');
   }
 
   return {

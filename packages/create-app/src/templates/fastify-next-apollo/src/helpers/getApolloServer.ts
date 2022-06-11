@@ -1,8 +1,8 @@
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-micro';
 
-import context from '../schemas/context';
-import schema from '../schemas/schema';
+import context from '@/api/graphql/context';
+import schema from '@/api/graphql/schema';
 
 declare global {
   var apolloServer: ApolloServer | undefined;
