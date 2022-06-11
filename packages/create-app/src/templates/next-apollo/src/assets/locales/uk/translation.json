@@ -1,18 +1,21 @@
 {
   "meta": {
-    "title": "Next.js Starter створено в KIRINAMI",
-    "description": "Next.js Starter створено в KIRINAMI"
+    "title": "Nest.js + Next.js Starter створено в KIRINAMI",
+    "description": "Nest.js + Next.js Starter створено в KIRINAMI"
   },
   "menu": {
     "home": "Головна",
-    "not_found": "404"
+    "todos": "Завдання",
+    "admin": "Адмінка"
   },
   "auth": {
+    "anonymous": "Анонім",
     "login": "Увійти",
     "register": "Реєстрація",
     "logout": "Вийти"
   },
   "common": {
+    "all": "Всі",
     "completed": "Завершено",
     "pending": "В очікуванні",
     "inactive": "Неактивний",
@@ -52,7 +55,7 @@
           "min": "Ім'я має містити не менше {{count}} символів"
         },
         "completed": {
-          "required": "Обов'язкове полем"
+          "required": "Завершено є обов'язковим полем"
         }
       },
       "title": "Заголовок"
@@ -76,6 +79,9 @@
   },
   "pages": {
     "home": {
+      "title": "Вітаємо <0>{{name}}</0>"
+    },
+    "todos": {
       "title": "Сьогодні у вас <0>{{count}} завдань</0>",
       "title_one": "Сьогодні у вас <0>{{count}} завдання</0>",
       "title_few": "Сьогодні у вас <0>{{count}} завдання</0>",

@@ -5,20 +5,25 @@ import Link from 'next/link';
 import styles from './Menu.styles';
 
 export default function Menu() {
-  const router = useRouter();
-
   const { t } = useTranslation();
+
+  const router = useRouter();
 
   return (
     <ul css={styles.menu}>
       <li css={styles.item}>
         <Link href="/" passHref>
-          <a css={styles.itemLink(router.pathname === '/')}><small>{t('menu.home')}</small></a>
+          <a css={styles.itemLink(router.pathname === '/')}>{t('menu.home')}</a>
         </Link>
       </li>
       <li css={styles.item}>
-        <Link href="/404" passHref>
-          <a css={styles.itemLink(router.pathname === '/404')}><small>{t('menu.not_found')}</small></a>
+        <Link href="/todos" passHref>
+          <a css={styles.itemLink(router.pathname === '/todos')}>{t('menu.todos')}</a>
+        </Link>
+      </li>
+      <li css={styles.item}>
+        <Link href="/admin" passHref>
+          <a css={styles.itemLink()}>{t('menu.admin')}</a>
         </Link>
       </li>
     </ul>

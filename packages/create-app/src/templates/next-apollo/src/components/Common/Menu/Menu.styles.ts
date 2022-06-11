@@ -4,6 +4,9 @@ const styles = {
   menu: css`
     display: flex;
     flex-direction: row;
+    margin: 0;
+    padding: 0;
+    list-style: none;
     
     > :not([hidden]) ~ :not([hidden]) {
       margin-left: 16px;
@@ -29,9 +32,18 @@ const styles = {
       }
     }
   `,
-  itemLink: (active: boolean) => css`
+  itemLink: (active = false) => css`
     font-weight: ${active ? 'bold' : 'normal'};
+    padding: 0;
+    border: 0;
     color: #884cb2;
+    background-color: transparent;
+    cursor: pointer;
+
+    &:hover {
+      color: #884cb2;
+      opacity: 0.8;
+    }
   `,
 };
 

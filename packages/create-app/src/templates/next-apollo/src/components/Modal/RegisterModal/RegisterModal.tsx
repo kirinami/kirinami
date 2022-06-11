@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import Modal from '@/components/Common/Modal/Modal';
 import RegisterForm from '@/components/Form/RegisterForm/RegisterForm';
-import useAuth from '@/stores/actions/useAuth';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './RegisterModal.styles';
 
@@ -14,7 +14,7 @@ export default function RegisterModal() {
   return (
     <Modal isOpen={isRegisterOpen} onRequestClose={closeRegister}>
       <div css={styles.content}>
-        <h3 css={styles.heading}>{t('modals.login.title')}</h3>
+        <h3 css={styles.heading}>{t('modals.register.title')}</h3>
         <RegisterForm onAfterSubmit={closeRegister} />
       </div>
     </Modal>

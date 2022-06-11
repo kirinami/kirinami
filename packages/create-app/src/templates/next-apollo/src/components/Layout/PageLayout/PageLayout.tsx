@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
-import Auth from '@/components/Common/Auth/Auth';
 import Menu from '@/components/Common/Menu/Menu';
 import Language from '@/components/Common/Language/Language';
+import Auth from '@/components/Common/Auth/Auth';
 import LoginModal from '@/components/Modal/LoginModal/LoginModal';
 import RegisterModal from '@/components/Modal/RegisterModal/RegisterModal';
 

@@ -1,11 +1,13 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Reference, useMutation } from '@apollo/client';
 
 import Modal from '@/components/Common/Modal/Modal';
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useTodos from '@/stores/actions/useTodos';
-import { Todo } from '@/stores/fragments/Todo';
+import { Todo } from '@/graphql/fragments/Todo';
+
+import { DELETE_TODO, DeleteTodoData, DeleteTodoVars } from '../../../../graphql/mutations/todos/deleteTodo';
 
 import styles from './RemoveTodoModal.styles';
 
@@ -18,17 +20,30 @@ export type RemoveTodoModalProps = {
 export default function RemoveTodoModal({ open, todo, onClose }: RemoveTodoModalProps) {
   const { t } = useTranslation();
 
-  const { deleteTodo, deleteTodoLoading, deleteTodoError } = useTodos();
-
-  const loading = deleteTodoLoading;
-  const error = deleteTodoError;
+  const [removeTodo, { loading, error }] = useMutation<DeleteTodoData, DeleteTodoVars>(DELETE_TODO);
 
   const handleSubmit = useCallback(async () => {
     if (!todo) return;
 
-    await deleteTodo(todo?.id);
+    await removeTodo({
+      variables: {
+        id: todo.id,
+      },
+      update(cache, { data }) {
+        if (!data) return;
+
+        cache.modify({
+          fields: {
+            findAllTodos: (ref, { readField }) => ({
+              todos: ref.todos.filter((todoRef: Reference) => readField('id', todoRef) !== data.deleteTodo.id),
+              total: ref.total - 1,
+            }),
+          },
+        });
+      },
+    });
     onClose();
-  }, [todo, onClose, deleteTodo]);
+  }, [todo, onClose, removeTodo]);
 
   return (
     <Modal isOpen={open} onRequestClose={onClose}>

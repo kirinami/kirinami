@@ -4,26 +4,52 @@ import { ApolloProvider } from '@apollo/client';
 import { CacheProvider } from '@emotion/react';
 
 import Meta from '@/components/Common/Meta/Meta';
+import AuthProvider from '@/components/Provider/AuthProvider/AuthProvider';
 import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
 import initApolloClient from '@/helpers/initApolloClient';
 import initEmotionCache from '@/helpers/initEmotionCache';
 import initTranslations from '@/helpers/initTranslations';
 
-function MyApp({ Component, pageProps: { apolloClient, apolloState, emotionCache, translations, ...pageProps } }: AppProps) {
+function MyApp({
+  pageProps: { i18n, apolloClient, apolloState, emotionCache, ...pageProps },
+  Component,
+}: AppProps) {
   return (
     <ApolloProvider client={apolloClient || initApolloClient(null, apolloState)}>
       <CacheProvider value={emotionCache || initEmotionCache()}>
-        <I18nextProvider i18n={translations || initTranslations()}>
-          <ThemeProvider>
-            <Meta />
-            <Component {...pageProps} />
-          </ThemeProvider>
+        <I18nextProvider i18n={i18n || initTranslations()}>
+          <AuthProvider>
+            <ThemeProvider>
+              <Meta />
+              <Component {...pageProps} />
+            </ThemeProvider>
+          </AuthProvider>
         </I18nextProvider>
       </CacheProvider>
     </ApolloProvider>
   );
 }
 
-MyApp.getInitialProps = async (appContext: AppContext) => App.getInitialProps(appContext);
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  const { ctx } = appContext;
+
+  const initialProps = await App.getInitialProps(appContext);
+
+  const apolloClient = initApolloClient(ctx);
+  const emotionCache = initEmotionCache();
+  const i18n = initTranslations(ctx);
+
+  Object.assign(initialProps.pageProps, {
+    i18n,
+    apolloClient,
+    emotionCache,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (ctx.req) ctx.req.pageProps = initialProps.pageProps;
+
+  return initialProps;
+};
 
 export default MyApp;

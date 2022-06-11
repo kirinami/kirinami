@@ -13,6 +13,7 @@ module.exports = {
     'no-console': 'warn',
     'no-param-reassign': 'off',
     'no-restricted-exports': 'off',
+    'no-empty-pattern': 'off',
     'max-len': ['error', 128, 2, {
       ignoreUrls: true,
       ignoreRegExpLiterals: true,
@@ -26,6 +27,7 @@ module.exports = {
       consistent: true,
       multiline: true,
     }],
+    'implicit-arrow-linebreak': 'off',
 
     'import/no-cycle': 'off',
     'import/no-named-as-default': 'off',
@@ -45,7 +47,6 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/jsx-one-expression-per-line': 'off',
-    'react/jsx-no-constructed-context-values': 'off',
     'react/destructuring-assignment': 'off',
     'react/require-default-props': 'off',
 

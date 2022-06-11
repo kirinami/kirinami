@@ -5,7 +5,7 @@ import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useAuth from '@/stores/actions/useAuth';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './LoginForm.styles';
 
@@ -46,7 +46,7 @@ export default function LoginForm({ onAfterSubmit }: LoginFormProps) {
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
-      await login(formData.email, formData.password);
+      await login(formData);
 
       onAfterSubmit?.();
     } catch (err) {

@@ -43,10 +43,13 @@ const styles = {
     align-items: center;
     width: 22px;
     height: 22px;
+    padding: 0;
+    border: none;
     border-radius: 50%;
     color: #bebbbb;
     background: #f2f2f2;
-    
+    cursor: pointer;
+
     &:hover {
       opacity: 0.8;
     }

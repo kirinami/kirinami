@@ -1,42 +1,69 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next-Apollo Starter
 
-## Getting Started
+This project was bootstrapped with [Next.js](https://nextjs.org/), [Apollo GraphQL](https://www.apollographql.com/)
+and [Prisma](https://www.prisma.io/).
 
-First, run the development server:
+## Available Scripts
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+In the project directory, you can run:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### `yarn prisma migrate reset`
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Drops all tables in the database on your default connection.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### `yarn prisma migrate deploy`
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+Runs all pending migrations.
+
+### `yarn prisma migrate dev`
+
+Generates a new migration file with sql needs to be executed to update schema.
+
+### `yarn dev`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `yarn build`
+
+Builds the app for production to the `.next` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+You can learn more in the [Next.js Documentation](https://nextjs.org/docs/), [Apollo GraphQL Documentation](https://www.apollographql.com/docs/)
+and [Prisma Documentation](https://www.prisma.io/docs/).
 
 ## Deploy via Docker
 
 docker-compose.yml
+
 ```yaml
-version: '3.7'
+version: "3.8"
 
 services:
-  app:
+  postgres:
     env_file:
-      - .env.local
+      - .env
+    image: postgres:13.2-alpine
+    healthcheck:
+      test: pg_isready -q -d ${POSTGRES_USER} -U ${POSTGRES_USER}
+      start_period: 5s
+      interval: 5s
+    restart: unless-stopped
+
+  app:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
     build: .
     ports:
       - 3000:3000

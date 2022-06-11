@@ -14,14 +14,18 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/prisma/client": ["prisma/client"],
+      "@/*": ["src/*"]
     },
     "jsxImportSource": "@emotion/react"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "next-env.d.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "types/**/*.d.ts",
+    "next-env.d.ts"
+  ],
   "exclude": ["node_modules"]
 }

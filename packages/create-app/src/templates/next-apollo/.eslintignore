@@ -25,11 +25,11 @@ tmp
 
 # project
 .next
+.env*
 
 # misc
 .DS_Store
 *.pem
-
-# javascript
 *.js
 *.jsx
+*.d.ts

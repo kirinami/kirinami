@@ -5,7 +5,7 @@ import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import useAuth from '@/stores/actions/useAuth';
+import useAuth from '@/hooks/useAuth';
 
 import styles from './RegisterForm.styles';
 
@@ -54,7 +54,7 @@ export default function RegisterForm({ onAfterSubmit }: RegisterFormProps) {
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     try {
-      await register(formData.firstName, formData.lastName, formData.email, formData.password);
+      await register(formData);
 
       onAfterSubmit?.();
     } catch (err) {

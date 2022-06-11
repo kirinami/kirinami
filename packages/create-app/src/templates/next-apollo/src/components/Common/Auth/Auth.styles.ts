@@ -11,7 +11,11 @@ const styles = {
   `,
   button: css`
     position: relative;
+    padding: 0;
+    border: 0;
     color: #884cb2;
+    background-color: transparent;
+    cursor: pointer;
 
     &:after {
       content: '';

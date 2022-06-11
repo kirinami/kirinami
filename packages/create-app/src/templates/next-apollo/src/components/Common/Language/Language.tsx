@@ -21,7 +21,7 @@ export default function Language() {
             type="button"
             onClick={handleChangeLanguage(language)}
           >
-            <small>{language.toUpperCase()}</small>
+            {language.toUpperCase()}
           </button>
         </li>
       ))}

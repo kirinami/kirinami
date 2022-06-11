@@ -1,18 +1,21 @@
 {
   "meta": {
-    "title": "Next.js Starter powered by KIRINAMI",
-    "description": "Next.js Starter powered by KIRINAMI"
+    "title": "Nest.js + Next.js Starter created by KIRINAMI",
+    "description": "Nest.js + Next.js Starter created by KIRINAMI"
   },
   "menu": {
     "home": "Home",
-    "not_found": "404"
+    "todos": "Todos",
+    "admin": "Admin"
   },
   "auth": {
+    "anonymous": "Anonymous",
     "login": "Login",
     "register": "Register",
     "logout": "Logout"
   },
   "common": {
+    "all": "All",
     "completed": "Completed",
     "pending": "Pending",
     "inactive": "Inactive",
@@ -52,7 +55,7 @@
           "min": "Title must be at least {{count}} characters"
         },
         "completed": {
-          "required": "Обов'язкове полем"
+          "required": "Completed is a required field"
         }
       },
       "title": "Title"
@@ -76,6 +79,9 @@
   },
   "pages": {
     "home": {
+      "title": "Welcome, <0>{{name}}</0>"
+    },
+    "todos": {
       "title": "You’ve got <0>{{count}} tasks</0> today",
       "title_one": "You’ve got <0>{{count}} task</0> today",
       "add_new": "Add new"
