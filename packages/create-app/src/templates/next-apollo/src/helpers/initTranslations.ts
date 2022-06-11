@@ -4,8 +4,7 @@ import { NextPageContext } from 'next';
 
 import en from '@/assets/locales/en/translation.json';
 import uk from '@/assets/locales/uk/translation.json';
-
-import { parseCookie } from '../utils/cookie';
+import { parseCookie } from '@/utils/cookie';
 
 const i18n = createInstance()
   .use(initReactI18next);

@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import minimist from 'minimist';
 import prompts from 'prompts';
-import { blue, green, lightRed, magenta, red, reset, yellow } from 'kolorist';
+import { blue, green, lightRed, magenta, red, reset } from 'kolorist';
 
 const argv = minimist(process.argv.slice(2), { string: ['_'] });
 const cwd = process.cwd();
@@ -26,20 +26,6 @@ const frameworks = [
     ],
   },
   {
-    name: 'nest-next',
-    color: blue,
-    variants: [
-      {
-        name: 'nest-next',
-        color: blue,
-      },
-      {
-        name: 'nest-next-apollo',
-        color: magenta,
-      },
-    ],
-  },
-  {
     name: 'next',
     color: green,
     variants: [
@@ -53,7 +39,7 @@ const frameworks = [
       },
       {
         name: 'next-redux',
-        color: yellow,
+        color: blue,
       },
     ],
   },
