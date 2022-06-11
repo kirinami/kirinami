@@ -73,8 +73,8 @@ export default function AdminUsersIndexPage() {
             width: 160,
             render: (roles) => (
               <>
-                {roles?.includes('admin') && <Tag color="success">Admin</Tag>}
-                {roles?.includes('user') && <Tag color="processing">User</Tag>}
+                {roles?.includes('Admin') && <Tag color="success">Admin</Tag>}
+                {roles?.includes('User') && <Tag color="processing">User</Tag>}
               </>
             ),
           },

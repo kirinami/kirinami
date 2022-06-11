@@ -79,7 +79,7 @@ const createAuthLink = (ctx?: NextPageContext | null) => {
 };
 
 const createHttpLink = () => new HttpLink({
-  uri: '/api/graphql',
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL,
   credentials: 'same-origin',
 });
 
