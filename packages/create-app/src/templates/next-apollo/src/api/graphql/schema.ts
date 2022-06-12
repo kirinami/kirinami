@@ -12,6 +12,10 @@ export default makeExecutableSchema({
   typeDefs: [
     gql`
       scalar DateTime
+
+      type Query
+      type Mutation
+      type Subscription
     `,
     authDefs,
     usersDefs,

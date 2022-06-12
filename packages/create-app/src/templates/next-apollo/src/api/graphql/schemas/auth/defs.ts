@@ -18,7 +18,7 @@ const defs = gql`
     refreshToken: String
   }
 
-  type Mutation {
+  extend type Mutation {
     login(input: LoginInput!): Auth!
     register(input: RegisterInput!): Auth!
     refresh(token: String!): Auth!

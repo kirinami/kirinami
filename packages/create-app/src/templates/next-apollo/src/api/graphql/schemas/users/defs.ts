@@ -34,12 +34,12 @@ const defs = gql`
     total: Int
   }
 
-  type Query {
+  extend type Query {
     findAllUsers(search: String, page: Int = 1, size: Int = 10): UserPagination!
     findOneUser(id: Int): User
   }
 
-  type Mutation {
+  extend type Mutation {
     createUser(input: CreateUserInput!): User!
     updateUser(id: Int!, input: UpdateUserInput!): User!
     deleteUser(id: Int!): User!

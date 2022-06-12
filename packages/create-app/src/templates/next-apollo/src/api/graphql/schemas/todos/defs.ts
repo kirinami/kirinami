@@ -28,18 +28,18 @@ const defs = gql`
     total: Int
   }
 
-  type Query {
+  extend type Query {
     findAllTodos(my: Boolean, page: Int = 1, size: Int = 10): TodoPagination!
     findOneTodo(id: Int!): Todo
   }
 
-  type Mutation {
+  extend type Mutation {
     createTodo(input: CreateTodoInput!): Todo!
     updateTodo(id: Int!, input: UpdateTodoInput!): Todo!
     deleteTodo(id: Int!): Todo!
   }
-  
-  type Subscription {
+
+  extend type Subscription {
     todoCreated: Todo!
   }
 `;
