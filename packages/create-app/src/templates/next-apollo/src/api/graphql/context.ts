@@ -1,5 +1,5 @@
-import { IncomingMessage } from 'http';
 import jwt from 'jsonwebtoken';
+import mapKeys from 'lodash/mapKeys';
 
 import prisma, { User } from '@/prisma/client';
 
@@ -7,11 +7,13 @@ export type Context = {
   currentUser: User | null,
 };
 
-export default async function context({ req }: { req: IncomingMessage }): Promise<Context> {
+export default async function context(req: { headers: Record<string, unknown> }): Promise<Context> {
+  const headers = mapKeys(req.headers, (_, key) => key.toLowerCase());
+
   let id: number | undefined;
 
   try {
-    const [, token] = req.headers.authorization?.split(' ') || [];
+    const [, token] = typeof headers.authorization === 'string' ? headers.authorization.split(' ') : [];
 
     const payload = jwt.verify(token, String(process.env.ACCESS_TOKEN_SECRET));
 

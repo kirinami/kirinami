@@ -1,3 +1,5 @@
+import { PubSub } from 'graphql-subscriptions';
+
 import prisma, { Todo } from '@/prisma/client';
 import isAuthenticated from '@/api/graphql/guards/isAuthenticated';
 import resolver from '@/api/graphql/resolver';
@@ -10,6 +12,8 @@ import {
 } from '@/api/services/todos';
 
 import { CreateTodoArgs, DeleteTodoArgs, FindAllTodosArgs, FindOneTodoArgs, UpdateTodoArgs } from './types';
+
+const pubSub = new PubSub();
 
 const resolvers = {
   Todo: {
@@ -33,7 +37,15 @@ const resolvers = {
   Mutation: {
     createTodo: resolver(
       [isAuthenticated()],
-      (_, { input }: CreateTodoArgs, { currentUser }) => createTodoForUser(currentUser!, input),
+      async (_, { input }: CreateTodoArgs, { currentUser }) => {
+        const todo = await createTodoForUser(currentUser!, input);
+
+        await pubSub.publish('TODO_CREATED', {
+          todoCreated: todo,
+        });
+
+        return todo;
+      },
     ),
     updateTodo: resolver(
       [isAuthenticated()],
@@ -43,6 +55,11 @@ const resolvers = {
       [isAuthenticated()],
       (_, { id }: DeleteTodoArgs, { currentUser }) => deleteTodoForUser(currentUser!, id),
     ),
+  },
+  Subscription: {
+    todoCreated: {
+      subscribe: resolver([isAuthenticated()], async () => pubSub.asyncIterator('TODO_CREATED')),
+    },
   },
 };
 

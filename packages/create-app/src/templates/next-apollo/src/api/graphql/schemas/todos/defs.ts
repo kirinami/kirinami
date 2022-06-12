@@ -38,6 +38,10 @@ const defs = gql`
     updateTodo(id: Int!, input: UpdateTodoInput!): Todo!
     deleteTodo(id: Int!): Todo!
   }
+  
+  type Subscription {
+    todoCreated: Todo!
+  }
 `;
 
 export default defs;
