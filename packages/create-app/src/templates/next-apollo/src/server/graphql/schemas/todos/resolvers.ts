@@ -1,15 +1,16 @@
 import { PubSub } from 'graphql-subscriptions';
 
-import prisma, { Todo } from '@/prisma/client';
-import isAuthenticated from '@/api/graphql/guards/isAuthenticated';
-import resolver from '@/api/graphql/resolver';
+import prisma, { Todo } from '@/server/prisma/client';
 import {
   createTodoForUser,
   deleteTodoForUser,
   findAllTodosForUserWithPagination,
   findOneTodoByIdForUser,
   updateTodoForUser,
-} from '@/api/services/todos';
+} from '@/server/services/todos';
+
+import isAuthenticated from '../../guards/isAuthenticated';
+import resolver from '../../resolver';
 
 import { CreateTodoArgs, DeleteTodoArgs, FindAllTodosArgs, FindOneTodoArgs, UpdateTodoArgs } from './types';
 

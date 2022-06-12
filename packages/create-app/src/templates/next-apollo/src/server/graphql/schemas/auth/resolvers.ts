@@ -1,5 +1,6 @@
-import resolver from '@/api/graphql/resolver';
-import { login, refresh, register } from '@/api/services/auth';
+import { login, refresh, register } from '@/server/services/auth';
+
+import resolver from '../../resolver';
 
 import { LoginArgs, RefreshArgs, RegisterArgs } from './types';
 

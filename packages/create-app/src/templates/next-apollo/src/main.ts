@@ -6,8 +6,8 @@ import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQL
 import { ApolloServer } from 'apollo-server-micro';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
-import context from './api/graphql/context';
-import schema from './api/graphql/schema';
+import context from './server/graphql/context';
+import schema from './server/graphql/schema';
 
 async function main() {
   const urls = {

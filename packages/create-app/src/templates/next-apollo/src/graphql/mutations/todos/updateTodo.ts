@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { UpdateTodoArgs } from '@/api/graphql/schemas/todos/types';
+import { UpdateTodoArgs } from '@/server/graphql/schemas/todos/types';
 
 import { TODO, Todo } from '../../fragments/Todo';
 
