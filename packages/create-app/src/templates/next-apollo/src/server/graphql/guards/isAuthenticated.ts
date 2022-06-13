@@ -13,7 +13,11 @@ export default function isAuthenticated(role?: string) {
   return async (_: unknown, args: unknown, ctx: Context) => {
     const headers = mapKeys(ctx.headers, (_, key) => key.toLowerCase());
 
-    const [, token] = headers.authorization.split(' ');
+    const token = headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
 
     const payload = jwt.verify(token, String(process.env.ACCESS_TOKEN_SECRET));
     const id = typeof payload === 'string' ? undefined : payload.id;
