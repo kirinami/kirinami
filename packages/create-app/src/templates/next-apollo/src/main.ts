@@ -1,11 +1,12 @@
-import url from 'url';
+import http from 'http';
 import next from 'next';
-import micro, { send } from 'micro';
-import cors from 'micro-cors';
-import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
-import { ApolloServer } from 'apollo-server-micro';
+import Koa from 'koa';
+import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
+import { ApolloServer } from 'apollo-server-koa';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
+import { graphqlUploadKoa } from 'graphql-upload';
+import { mapKeys } from 'lodash';
 
 import schema from './server/graphql/schema';
 
@@ -14,27 +15,16 @@ async function main() {
     graphql: '/graphql',
   };
 
-  const app = next({
+  const nextApp = next({
     dev: process.env.NODE_ENV !== 'production',
+    customServer: true,
     hostname: '0.0.0.0',
     port: 3000,
   });
-  const handler = app.getRequestHandler();
+  const nextHandler = nextApp.getRequestHandler();
+  await nextApp.prepare();
 
-  await app.prepare();
-
-  const httpServer = micro(cors()((req, res) => {
-    if (req.method === 'OPTIONS') {
-      return send(res, 204);
-    }
-
-    if (req.url === urls.graphql) {
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return apolloHandler(req, res);
-    }
-
-    return handler(req, res, url.parse(req.url!, true));
-  }));
+  const httpServer = http.createServer();
 
   const wsServer = new WebSocketServer({
     server: httpServer,
@@ -43,15 +33,15 @@ async function main() {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const serverCleanup = useServer({
-    context: ({ connectionParams }) => ({ headers: connectionParams || {} }),
+    context: ({ connectionParams }) => ({ headers: mapKeys(connectionParams || {}, (_, key) => key.toLowerCase()) }),
     schema,
   }, wsServer);
 
   const apolloServer = new ApolloServer({
-    context: ({ req }) => ({ headers: req.headers || {} }),
+    context: ({ ctx }) => ({ headers: ctx.req.headers }),
     schema,
     csrfPrevention: true,
-    introspection: true,
+    introspection: process.env.NODE_ENV !== 'production',
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
@@ -67,12 +57,24 @@ async function main() {
   });
   await apolloServer.start();
 
-  const apolloHandler = apolloServer.createHandler({
+  const koaApp = new Koa();
+
+  koaApp.use(graphqlUploadKoa());
+
+  apolloServer.applyMiddleware({
+    app: koaApp,
     path: urls.graphql,
   });
 
-  httpServer.listen(app.port, app.hostname, () => {
-    console.log(`🚀 Server ready at http://localhost:${app.port}`);
+  koaApp.use(async (ctx) => {
+    ctx.respond = false;
+    await nextHandler(ctx.req, ctx.res);
+  });
+
+  httpServer.on('request', koaApp.callback());
+
+  httpServer.listen(nextApp.port, nextApp.hostname, () => {
+    console.log(`🚀 Server ready at http://localhost:${nextApp.port}`);
   });
 }
 

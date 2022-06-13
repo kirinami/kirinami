@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import mapKeys from 'lodash/mapKeys';
 
 import prisma, { User } from '@prisma/client';
 
@@ -11,9 +10,7 @@ export type AuthenticatedContext = Context & {
 
 export default function isAuthenticated(role?: string) {
   return async (_: unknown, args: unknown, ctx: Context) => {
-    const headers = mapKeys(ctx.headers, (_, key) => key.toLowerCase());
-
-    const token = headers.authorization?.split(' ')[1];
+    const token = ctx.headers.authorization?.split(' ')[1];
 
     if (!token) {
       throw new Error('Not authenticated');

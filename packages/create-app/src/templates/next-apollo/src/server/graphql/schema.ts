@@ -1,12 +1,10 @@
-import { gql } from 'apollo-server-micro';
+import { gql } from 'apollo-server-core';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 
-import authDefs from './schemas/auth/defs';
-import usersDefs from './schemas/users/defs';
-import todosDefs from './schemas/todos/defs';
-import authResolvers from './schemas/auth/resolvers';
-import usersResolvers from './schemas/users/resolvers';
-import todosResolvers from './schemas/todos/resolvers';
+import authSchema from './schemas/auth/schema';
+import usersSchema from './schemas/users/schema';
+import todosSchema from './schemas/todos/schema';
+import uploadsSchema from './schemas/uploads/schema';
 
 export default makeExecutableSchema({
   typeDefs: [
@@ -17,13 +15,15 @@ export default makeExecutableSchema({
       type Mutation
       type Subscription
     `,
-    authDefs,
-    usersDefs,
-    todosDefs,
+    authSchema.typeDefs,
+    usersSchema.typeDefs,
+    todosSchema.typeDefs,
+    uploadsSchema.typeDefs,
   ],
   resolvers: [
-    authResolvers,
-    usersResolvers,
-    todosResolvers,
+    authSchema.resolvers,
+    usersSchema.resolvers,
+    todosSchema.resolvers,
+    uploadsSchema.resolvers,
   ],
 });
