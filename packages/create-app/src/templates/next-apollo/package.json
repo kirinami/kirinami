@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "postinstall": "patch-package",
-    "dev": "prisma migrate dev && ts-node -P tsconfig.server.json -r tsconfig-paths/register src/main",
-    "build": "prisma generate && next build && tsc -P tsconfig.server.json && tsconfig-replace-paths -p tsconfig.server.json",
+    "dev": "prisma migrate dev && ts-node -P tsconfig.server.json -r tsconfig-paths/register src/main.ts",
+    "build": "yarn -s lint --quiet && next build --no-lint && tsc -P tsconfig.server.json && tsconfig-replace-paths -p tsconfig.server.json",
     "start": "prisma migrate deploy && node .next/custom/src/main.js",
-    "lint": "tsc --noEmit && eslint src",
+    "lint": "prisma generate && eslint prisma src",
     "test": "exit 0"
   },
   "dependencies": {
