@@ -6,9 +6,9 @@ import { LoginArgs, RefreshArgs, RegisterArgs } from './types';
 
 const resolvers = {
   Mutation: {
-    login: resolver((_, { input }: LoginArgs) => login(input)),
-    register: resolver((_, { input }: RegisterArgs) => register(input)),
-    refresh: resolver((_, { token }: RefreshArgs) => refresh(token)),
+    login: resolver<unknown, LoginArgs>((_, { input }) => login(input)),
+    register: resolver<unknown, RegisterArgs>((_, { input }) => register(input)),
+    refresh: resolver<unknown, RefreshArgs>((_, { token }) => refresh(token)),
   },
 };
 

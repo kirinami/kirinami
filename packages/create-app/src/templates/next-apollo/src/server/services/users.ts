@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 
-import prisma, { Prisma, User } from '@/server/prisma/client';
+import prisma, { Prisma, User } from '@prisma/client';
 
 import { CreateUserArgs, UpdateUserArgs } from '../graphql/schemas/users/types';
 

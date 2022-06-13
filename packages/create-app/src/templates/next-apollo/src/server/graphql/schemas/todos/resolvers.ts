@@ -1,6 +1,6 @@
 import { PubSub } from 'graphql-subscriptions';
 
-import prisma, { Todo } from '@/server/prisma/client';
+import prisma, { Todo } from '@prisma/client';
 import {
   createTodoForUser,
   deleteTodoForUser,
@@ -9,7 +9,7 @@ import {
   updateTodoForUser,
 } from '@/server/services/todos';
 
-import isAuthenticated from '../../guards/isAuthenticated';
+import isAuthenticated, { AuthenticatedContext } from '../../guards/isAuthenticated';
 import resolver from '../../resolver';
 
 import { CreateTodoArgs, DeleteTodoArgs, FindAllTodosArgs, FindOneTodoArgs, UpdateTodoArgs } from './types';
@@ -18,28 +18,27 @@ const pubSub = new PubSub();
 
 const resolvers = {
   Todo: {
-    user: resolver((parent: Todo) => prisma.user.findUnique({
+    user: resolver<Todo>((parent) => prisma.user.findUnique({
       where: {
         id: parent.userId,
       },
     })),
   },
   Query: {
-    findAllTodos: resolver(
-      [isAuthenticated()],
-      (_, { my, page = 1, size = 10 }: FindAllTodosArgs, { currentUser }) =>
-        findAllTodosForUserWithPagination(currentUser!, my, page, size),
+    findAllTodos: resolver<unknown, AuthenticatedContext, FindAllTodosArgs>(
+      isAuthenticated(),
+      (_, { my, page = 1, size = 10 }, { currentUser }) => findAllTodosForUserWithPagination(currentUser, my, page, size),
     ),
-    findOneTodo: resolver(
-      [isAuthenticated()],
-      (_, { id }: FindOneTodoArgs, { currentUser }) => findOneTodoByIdForUser(currentUser!, id),
+    findOneTodo: resolver<unknown, AuthenticatedContext, FindOneTodoArgs>(
+      isAuthenticated(),
+      (_, { id }: FindOneTodoArgs, { currentUser }) => findOneTodoByIdForUser(currentUser, id),
     ),
   },
   Mutation: {
-    createTodo: resolver(
-      [isAuthenticated()],
-      async (_, { input }: CreateTodoArgs, { currentUser }) => {
-        const todo = await createTodoForUser(currentUser!, input);
+    createTodo: resolver<unknown, AuthenticatedContext, CreateTodoArgs>(
+      isAuthenticated(),
+      async (_, { input }, { currentUser }) => {
+        const todo = await createTodoForUser(currentUser, input);
 
         await pubSub.publish('TODO_CREATED', {
           todoCreated: todo,
@@ -48,18 +47,18 @@ const resolvers = {
         return todo;
       },
     ),
-    updateTodo: resolver(
-      [isAuthenticated()],
-      (_, { id, input }: UpdateTodoArgs, { currentUser }) => updateTodoForUser(currentUser!, id, input),
+    updateTodo: resolver<unknown, AuthenticatedContext, UpdateTodoArgs>(
+      isAuthenticated(),
+      (_, { id, input }, { currentUser }) => updateTodoForUser(currentUser, id, input),
     ),
-    deleteTodo: resolver(
-      [isAuthenticated()],
-      (_, { id }: DeleteTodoArgs, { currentUser }) => deleteTodoForUser(currentUser!, id),
+    deleteTodo: resolver<unknown, AuthenticatedContext, DeleteTodoArgs>(
+      isAuthenticated(),
+      (_, { id }, { currentUser }) => deleteTodoForUser(currentUser, id),
     ),
   },
   Subscription: {
     todoCreated: {
-      subscribe: resolver([isAuthenticated()], async () => pubSub.asyncIterator('TODO_CREATED')),
+      subscribe: resolver(isAuthenticated(), () => pubSub.asyncIterator('TODO_CREATED')),
     },
   },
 };

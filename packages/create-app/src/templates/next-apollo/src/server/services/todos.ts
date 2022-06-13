@@ -1,6 +1,6 @@
 import omit from 'lodash/omit';
 
-import prisma, { Prisma, User } from '@/server/prisma/client';
+import prisma, { Prisma, User } from '@prisma/client';
 
 import { CreateTodoArgs, UpdateTodoArgs } from '../graphql/schemas/todos/types';
 

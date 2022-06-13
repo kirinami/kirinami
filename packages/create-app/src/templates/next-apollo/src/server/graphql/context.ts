@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import mapKeys from 'lodash/mapKeys';
 
-import prisma, { User } from '@/server/prisma/client';
+import prisma, { User } from '@prisma/client';
 
 export type Context = {
   currentUser: User | null,

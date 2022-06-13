@@ -1,9 +1,10 @@
 import url from 'url';
 import next from 'next';
-import micro from 'micro';
-import { WebSocketServer } from 'ws';
-import { ApolloServerPluginDrainHttpServer, ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import micro, { send } from 'micro';
+import cors from 'micro-cors';
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-micro';
+import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
 import context from './server/graphql/context';
@@ -23,19 +24,9 @@ async function main() {
 
   await app.prepare();
 
-  const httpServer = micro(async (req, res) => {
-    if (process.env.NODE_ENV !== 'production') {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-      if (req.method === 'OPTIONS') {
-        res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, PATCH, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Access-Control-Allow-Origin, Content-Type, Authorization, Accept');
-        res.setHeader('Access-Control-Max-Age', '86400');
-        res.end();
-
-        return;
-      }
+  const httpServer = micro(cors()((req, res) => {
+    if (req.method === 'OPTIONS') {
+      return send(res, 204);
     }
 
     if (req.url === urls.graphql) {
@@ -44,7 +35,7 @@ async function main() {
     }
 
     return handler(req, res, url.parse(req.url!, true));
-  });
+  }));
 
   const wsServer = new WebSocketServer({
     server: httpServer,
@@ -63,7 +54,6 @@ async function main() {
     csrfPrevention: true,
     introspection: true,
     plugins: [
-      ApolloServerPluginLandingPageGraphQLPlayground(),
       ApolloServerPluginDrainHttpServer({ httpServer }),
       {
         async serverWillStart() {

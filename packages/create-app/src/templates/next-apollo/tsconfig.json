@@ -16,6 +16,7 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
+      "@prisma/client": ["prisma/client"],
       "@/*": ["src/*"]
     },
     "jsxImportSource": "@emotion/react"

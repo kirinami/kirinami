@@ -1,12 +1,18 @@
-import { Guard } from '../resolver';
+import { User } from '@prisma/client';
 
-export default function isAuthenticated(role?: string): Guard {
-  return async (root, args, ctx) => {
-    if (!ctx.currentUser) {
+import { Context } from '../context';
+
+export type AuthenticatedContext = Context & {
+  currentUser: User,
+};
+
+export default function isAuthenticated(role?: string) {
+  return async (source: unknown, args: unknown, { currentUser }: Context) => {
+    if (!currentUser) {
       throw new Error('Not authenticated');
     }
 
-    if (role && !ctx.currentUser.roles.includes(role)) {
+    if (role && !currentUser.roles.includes(role)) {
       throw new Error('Not authorized');
     }
   };
