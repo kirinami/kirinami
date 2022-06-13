@@ -1,6 +1,11 @@
 import { GraphQLFieldResolver, GraphQLResolveInfo } from 'graphql';
 
-import { Context } from './context';
+import { User } from '@prisma/client';
+
+export type Context = {
+  headers: Record<string, string>,
+  currentUser?: User,
+};
 
 export type Resolver<S, C, A, R> = GraphQLFieldResolver<S, C, A, R | Promise<R>>;
 

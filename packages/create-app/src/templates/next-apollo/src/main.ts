@@ -7,7 +7,6 @@ import { ApolloServer } from 'apollo-server-micro';
 import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
-import context from './server/graphql/context';
 import schema from './server/graphql/schema';
 
 async function main() {
@@ -44,12 +43,12 @@ async function main() {
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const serverCleanup = useServer({
-    context: ({ connectionParams }) => context({ headers: connectionParams || {} }),
+    context: ({ connectionParams }) => ({ headers: connectionParams || {} }),
     schema,
   }, wsServer);
 
   const apolloServer = new ApolloServer({
-    context: ({ req }) => context({ headers: req.headers }),
+    context: ({ req }) => ({ headers: req.headers || {} }),
     schema,
     csrfPrevention: true,
     introspection: true,
