@@ -13,8 +13,7 @@ import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
 import { FIND_ONE_USER, FindOneUserData, FindOneUserVars } from '@/graphql/queries/users/findOneUser';
 import { CREATE_USER, CreateUserData, CreateUserVars } from '@/graphql/mutations/users/createUser';
 import { UPDATE_USER, UpdateUserData, UpdateUserVars } from '@/graphql/mutations/users/updateUser';
-
-import { DELETE_USER, DeleteUserData, DeleteUserVars } from '../../../graphql/mutations/users/deleteUser';
+import { DELETE_USER, DeleteUserData, DeleteUserVars } from '@/graphql/mutations/users/deleteUser';
 
 type FormData = {
   firstName: string,

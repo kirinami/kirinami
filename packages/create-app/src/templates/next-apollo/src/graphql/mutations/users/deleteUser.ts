@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { DeleteUserArgs } from '@/server/graphql/schemas/users/types';
+import { DeleteUserArgs } from '@/api/graphql/schemas/users/types';
 
 import { USER, User } from '../../fragments/User';
 

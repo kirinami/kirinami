@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { LoginArgs } from '@/server/graphql/schemas/auth/types';
+import { LoginArgs } from '@/api/graphql/schemas/auth/types';
 
 import { AUTH, Auth } from '../../fragments/Auth';
 

@@ -1,4 +1,4 @@
-import { login, refresh, register } from '@/server/services/auth';
+import { login, refresh, register } from '@/api/services/auth';
 
 import resolver from '../../resolver';
 

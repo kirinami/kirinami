@@ -6,8 +6,7 @@ import Modal from '@/components/Common/Modal/Modal';
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
 import { Todo } from '@/graphql/fragments/Todo';
-
-import { DELETE_TODO, DeleteTodoData, DeleteTodoVars } from '../../../../graphql/mutations/todos/deleteTodo';
+import { DELETE_TODO, DeleteTodoData, DeleteTodoVars } from '@/graphql/mutations/todos/deleteTodo';
 
 import styles from './RemoveTodoModal.styles';
 

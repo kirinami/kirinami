@@ -15,8 +15,7 @@ import { FIND_ALL_USERS, FindAllUsersData, FindAllUsersVars } from '@/graphql/qu
 import { FIND_ONE_TODO, FindOneTodoData, FindOneTodoVars } from '@/graphql/queries/todos/findOneTodo';
 import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/graphql/mutations/todos/createTodo';
 import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
-
-import { DELETE_TODO, DeleteTodoData, DeleteTodoVars } from '../../../graphql/mutations/todos/deleteTodo';
+import { DELETE_TODO, DeleteTodoData, DeleteTodoVars } from '@/graphql/mutations/todos/deleteTodo';
 
 type FormData = {
   user: {

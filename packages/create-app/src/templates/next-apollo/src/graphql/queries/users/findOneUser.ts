@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { FindOneUserArgs } from '@/server/graphql/schemas/users/types';
+import { FindOneUserArgs } from '@/api/graphql/schemas/users/types';
 
 import { USER, User } from '../../fragments/User';
 

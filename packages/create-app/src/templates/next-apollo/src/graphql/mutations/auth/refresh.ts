@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { RefreshArgs } from '@/server/graphql/schemas/auth/types';
+import { RefreshArgs } from '@/api/graphql/schemas/auth/types';
 
 import { AUTH, Auth } from '../../fragments/Auth';
 

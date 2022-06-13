@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-import prisma, { User } from '@prisma/client';
+import prisma, { User } from '@/prisma/client';
 
 import { Auth, LoginArgs, RefreshArgs, RegisterArgs } from '../graphql/schemas/auth/types';
 

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import prisma, { User } from '@prisma/client';
+import prisma, { User } from '@/prisma/client';
 
 import { Context } from '../resolver';
 

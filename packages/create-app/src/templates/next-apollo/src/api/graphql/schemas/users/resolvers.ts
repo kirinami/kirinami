@@ -4,7 +4,7 @@ import {
   findAllUsersWithPagination,
   fineOneUserByIdForUser,
   updateUserByUser,
-} from '@/server/services/users';
+} from '@/api/services/users';
 
 import isAuthenticated, { AuthenticatedContext } from '../../guards/isAuthenticated';
 import resolver from '../../resolver';

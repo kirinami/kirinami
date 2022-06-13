@@ -1,5 +1,0 @@
-{
-  "watch": ["prisma/**/*.ts", "src/server/**/*.ts", "src/main.ts"],
-  "exec": "ts-node -P tsconfig.server.json -r tsconfig-paths/register src/main.ts",
-  "ext": "*"
-}

@@ -1,13 +1,13 @@
 import { PubSub } from 'graphql-subscriptions';
 
-import prisma, { Todo } from '@prisma/client';
+import prisma, { Todo } from '@/prisma/client';
 import {
   createTodoForUser,
   deleteTodoForUser,
   findAllTodosForUserWithPagination,
   findOneTodoByIdForUser,
   updateTodoForUser,
-} from '@/server/services/todos';
+} from '@/api/services/todos';
 
 import isAuthenticated, { AuthenticatedContext } from '../../guards/isAuthenticated';
 import resolver from '../../resolver';
