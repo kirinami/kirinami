@@ -1,12 +1,12 @@
 import { gql } from 'apollo-server-core';
-import { makeExecutableSchema } from '@graphql-tools/schema';
+import { IExecutableSchemaDefinition, makeExecutableSchema } from '@graphql-tools/schema';
 
 import authSchema from './schemas/auth/schema';
 import usersSchema from './schemas/users/schema';
 import todosSchema from './schemas/todos/schema';
 import uploadsSchema from './schemas/uploads/schema';
 
-export default makeExecutableSchema({
+const defaultSchema: IExecutableSchemaDefinition = {
   typeDefs: [
     gql`
       scalar DateTime
@@ -15,15 +15,18 @@ export default makeExecutableSchema({
       type Mutation
       type Subscription
     `,
-    authSchema.typeDefs,
-    usersSchema.typeDefs,
-    todosSchema.typeDefs,
-    uploadsSchema.typeDefs,
   ],
-  resolvers: [
-    authSchema.resolvers,
-    usersSchema.resolvers,
-    todosSchema.resolvers,
-    uploadsSchema.resolvers,
-  ],
-});
+  resolvers: [],
+};
+
+export default makeExecutableSchema([
+  authSchema,
+  usersSchema,
+  todosSchema,
+  uploadsSchema,
+].reduce((definition, schema) => {
+  if (Array.isArray(definition.typeDefs) && 'typeDefs' in schema) definition.typeDefs.push(schema.typeDefs);
+  if (Array.isArray(definition.resolvers) && 'resolvers' in schema) definition.resolvers.push(schema.resolvers);
+
+  return definition;
+}, defaultSchema));

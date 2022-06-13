@@ -21,6 +21,7 @@ tmp
 
 # project
 .next
+public/uploads
 .env*
 !.env.example
 
