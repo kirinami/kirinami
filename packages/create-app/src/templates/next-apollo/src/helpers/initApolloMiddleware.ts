@@ -27,10 +27,11 @@ declare global {
   var handleUpgrade: (req: IncomingMessage, socket: Duplex, head: Buffer) => void;
 }
 
-async function initWebSocketServer() {
+async function createWebSocketServer(path: string) {
   global.webSocketServer?.close();
 
   const webSocketServer = new WebSocketServer({
+    path,
     noServer: true,
   });
 
@@ -41,7 +42,7 @@ async function initWebSocketServer() {
   return webSocketServer;
 }
 
-async function initSubscriptionServer(webSocketServer: WebSocketServer) {
+async function createSubscriptionServer(webSocketServer: WebSocketServer) {
   await global.subscriptionServer?.dispose();
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -62,7 +63,7 @@ async function initSubscriptionServer(webSocketServer: WebSocketServer) {
   return subscriptionServer;
 }
 
-async function initApolloServer() {
+async function createApolloServer() {
   await global.apolloServer?.stop();
 
   const apolloServer = new ApolloServer({
@@ -82,17 +83,19 @@ async function initApolloServer() {
 }
 
 export default async function initApolloMiddleware({ path }: { path: string }) {
-  const webSocketServer = await initWebSocketServer();
-  const subscriptionServer = await initSubscriptionServer(webSocketServer);
-  const apolloServer = await initApolloServer();
+  const webSocketServer = await createWebSocketServer(path);
+  const subscriptionServer = await createSubscriptionServer(webSocketServer);
+  const apolloServer = await createApolloServer();
 
   global.httpServer?.off('upgrade', global.handleUpgrade);
   global.httpServer = undefined;
 
   const handleUpgrade = (req: IncomingMessage, socket: Duplex, head: Buffer) => {
-    webSocketServer.handleUpgrade(req, socket, head, (ws) => {
-      webSocketServer.emit('connection', ws, req);
-    });
+    if (req.url === path) {
+      webSocketServer.handleUpgrade(req, socket, head, (ws) => {
+        webSocketServer.emit('connection', ws, req);
+      });
+    }
   };
 
   if (process.env.NODE_ENV !== 'production') {
@@ -101,22 +104,25 @@ export default async function initApolloMiddleware({ path }: { path: string }) {
 
   const app = new Koa()
     .use(async (ctx, next) => {
-      if (ctx.path === path) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const httpServer = ctx.socket.server as http.Server;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const httpServer = ctx.socket.server as http.Server;
 
-        if (httpServer !== global.httpServer) {
-          global.httpServer = httpServer.on('upgrade', handleUpgrade);
-        }
+      if (httpServer !== global.httpServer) {
+        global.httpServer = httpServer.on('upgrade', handleUpgrade);
+      }
 
+      if (ctx.url === path) {
         return graphqlUploadKoa()(ctx, next);
       }
 
       await next();
     });
 
-  apolloServer.applyMiddleware({ app, path });
+  apolloServer.applyMiddleware({
+    path,
+    app,
+  });
 
   return app.callback();
 }
