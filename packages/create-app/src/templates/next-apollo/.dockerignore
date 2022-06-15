@@ -26,6 +26,7 @@ tmp
 # project
 .next
 public/uploads
+docker-compose*.yml
 
 # misc
 .DS_Store

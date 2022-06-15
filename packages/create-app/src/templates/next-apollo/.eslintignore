@@ -26,10 +26,13 @@ tmp
 # project
 .next
 public/uploads
+docker-compose*.yml
 
 # misc
 .DS_Store
 *.pem
+
+# files
 *.js
 *.jsx
 *.d.ts

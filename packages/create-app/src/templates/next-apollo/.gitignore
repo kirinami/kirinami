@@ -24,6 +24,7 @@ tmp
 public/uploads
 .env*
 !.env.example
+docker-compose*.yml
 
 # misc
 .DS_Store
