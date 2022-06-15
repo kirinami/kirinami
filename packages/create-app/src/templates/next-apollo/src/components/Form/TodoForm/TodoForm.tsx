@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { useMutation } from '@apollo/client';
+import { Reference, useMutation } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { omit } from 'lodash';
 import * as yup from 'yup';
@@ -78,11 +78,17 @@ export default function TodoForm({ todo, onAfterSubmit }: TodoFormProps) {
 
             cache.modify({
               fields: {
-                findAllTodos: (ref, { toReference }) => ({
-                  ...ref,
-                  todos: [...ref.todos, toReference(data.createTodo)],
-                  total: ref.total + 1,
-                }),
+                findAllTodos: (ref, { toReference, readField }) => {
+                  if (ref.todos.some((todo: Reference) => readField('id', todo) === data.createTodo.id)) {
+                    return ref;
+                  }
+
+                  return {
+                    ...ref,
+                    todos: [toReference(data.createTodo), ...ref.todos],
+                    total: ref.total + 1,
+                  };
+                },
               },
             });
           },

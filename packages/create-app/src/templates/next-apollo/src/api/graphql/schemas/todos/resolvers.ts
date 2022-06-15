@@ -1,4 +1,4 @@
-import { PubSub } from 'graphql-subscriptions';
+import { PubSub, withFilter } from 'graphql-subscriptions';
 
 import prisma, { Todo } from '@/prisma/client';
 import {
@@ -40,8 +40,8 @@ const resolvers = {
       async (_, { input }, { currentUser }) => {
         const todo = await createTodoForUser(currentUser, input);
 
-        await pubSub.publish('TODO_CREATED', {
-          todoCreated: todo,
+        await pubSub.publish('onCreateTodo', {
+          onCreateTodo: todo,
         });
 
         return todo;
@@ -49,16 +49,56 @@ const resolvers = {
     ),
     updateTodo: resolver<unknown, AuthenticatedContext, UpdateTodoArgs>(
       isAuthenticated(),
-      (_, { id, input }, { currentUser }) => updateTodoForUser(currentUser, id, input),
+      async (_, { id, input }, { currentUser }) => {
+        const todo = await updateTodoForUser(currentUser, id, input);
+
+        await pubSub.publish('onUpdateTodo', {
+          onUpdateTodo: todo,
+        });
+
+        return todo;
+      },
     ),
     deleteTodo: resolver<unknown, AuthenticatedContext, DeleteTodoArgs>(
       isAuthenticated(),
-      (_, { id }, { currentUser }) => deleteTodoForUser(currentUser, id),
+      async (_, { id }, { currentUser }) => {
+        const todo = await deleteTodoForUser(currentUser, id);
+
+        await pubSub.publish('onDeleteTodo', {
+          onDeleteTodo: todo,
+        });
+
+        return todo;
+      },
     ),
   },
   Subscription: {
-    todoCreated: {
-      subscribe: resolver(isAuthenticated(), () => pubSub.asyncIterator('TODO_CREATED')),
+    onCreateTodo: {
+      subscribe: resolver(
+        isAuthenticated(),
+        withFilter(
+          () => pubSub.asyncIterator('onCreateTodo'),
+          ({ onCreateTodo }, args, { currentUser }) => onCreateTodo.userId === currentUser.id,
+        ),
+      ),
+    },
+    onUpdateTodo: {
+      subscribe: resolver(
+        isAuthenticated(),
+        withFilter(
+          () => pubSub.asyncIterator('onUpdateTodo'),
+          ({ onUpdateTodo }, args, { currentUser }) => onUpdateTodo.userId === currentUser.id,
+        ),
+      ),
+    },
+    onDeleteTodo: {
+      subscribe: resolver(
+        isAuthenticated(),
+        withFilter(
+          () => pubSub.asyncIterator('onDeleteTodo'),
+          ({ onDeleteTodo }, args, { currentUser }) => onDeleteTodo.userId === currentUser.id,
+        ),
+      ),
     },
   },
 };

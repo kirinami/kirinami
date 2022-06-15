@@ -40,7 +40,9 @@ const defs = gql`
   }
 
   extend type Subscription {
-    todoCreated: Todo!
+    onCreateTodo: Todo!
+    onUpdateTodo: Todo!
+    onDeleteTodo: Todo!
   }
 `;
 

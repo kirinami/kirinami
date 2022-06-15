@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import immer from 'immer';
 
 import Title from '@/components/Common/Title/Title';
 import Badge from '@/components/Common/Badge/Badge';
@@ -10,17 +11,18 @@ import TodoList from '@/components/Common/TodoList/TodoList';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
 import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
-import { Todo } from '@/graphql/fragments/Todo';
+import { TODO, Todo } from '@/graphql/fragments/Todo';
 import { FIND_ALL_TODOS, FindAllTodosData, FindAllTodosVars } from '@/graphql/queries/todos/findAllTodos';
 import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
 import useAuth from '@/hooks/useAuth';
+import useRouteChange from '@/hooks/useRouteChange';
 
 export default function TodosPage() {
   const { t } = useTranslation();
 
   const { user, openLogin } = useAuth();
 
-  const { data } = useQuery<FindAllTodosData, FindAllTodosVars>(FIND_ALL_TODOS, {
+  const { data, refetch, subscribeToMore } = useQuery<FindAllTodosData, FindAllTodosVars>(FIND_ALL_TODOS, {
     skip: !user,
     variables: {
       my: true,
@@ -71,6 +73,95 @@ export default function TodosPage() {
     setEditTodoModalOpen(false);
     setRemoveTodoModalOpen(false);
   }, []);
+
+  useEffect(() => {
+    const onCreateTodoUnsubscribe = subscribeToMore<any>({
+      document: gql`
+        ${TODO}
+
+        subscription OnCreateTodo {
+          onCreateTodo {
+            ...Todo
+          }
+        }
+      `,
+      updateQuery: (previousData, { subscriptionData }) => {
+        if (!previousData || !subscriptionData.data) {
+          return previousData;
+        }
+
+        return immer(previousData, (draft) => {
+          const createdTodo = subscriptionData.data.onCreateTodo;
+
+          if (!draft.findAllTodos.todos.some((todo) => todo.id === createdTodo.id)) {
+            draft.findAllTodos.todos.unshift(createdTodo);
+            draft.findAllTodos.total += 1;
+          }
+        });
+      },
+      onError: () => null,
+    });
+
+    const onUpdateTodoUnsubscribe = subscribeToMore<any>({
+      document: gql`
+        ${TODO}
+
+        subscription OnUpdateTodo {
+          onUpdateTodo {
+            ...Todo
+          }
+        }
+      `,
+      updateQuery: (previousData, { subscriptionData }) => {
+        if (!previousData || !subscriptionData.data) {
+          return previousData;
+        }
+
+        return immer(previousData, (draft) => {
+          const updatedTodo = subscriptionData.data.onUpdateTodo;
+
+          const todoIndex = draft.findAllTodos.todos.findIndex((todo) => todo.id === updatedTodo.id);
+
+          if (todoIndex !== -1) {
+            draft.findAllTodos.todos[todoIndex] = subscriptionData.data.onUpdateTodo;
+          }
+        });
+      },
+      onError: () => null,
+    });
+
+    const onDeleteTodoUnsubscribe = subscribeToMore<any>({
+      document: gql`
+        ${TODO}
+
+        subscription OnDeleteTodo {
+          onDeleteTodo {
+            ...Todo
+          }
+        }
+      `,
+      updateQuery: (previousData, { subscriptionData }) => {
+        if (!previousData || !subscriptionData.data) {
+          return previousData;
+        }
+
+        return immer(previousData, (draft) => {
+          const deletedTodo = subscriptionData.data.onDeleteTodo;
+
+          draft.findAllTodos.todos = draft.findAllTodos.todos.filter((todo) => todo.id !== deletedTodo.id);
+        });
+      },
+      onError: () => null,
+    });
+
+    return () => {
+      onCreateTodoUnsubscribe();
+      onUpdateTodoUnsubscribe();
+      onDeleteTodoUnsubscribe();
+    };
+  }, [user, subscribeToMore]);
+
+  useRouteChange(refetch);
 
   return (
     <PageLayout>

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import App, { AppContext, AppProps } from 'next/app';
 import { ApolloProvider } from '@apollo/client';
@@ -15,9 +16,9 @@ function MyApp({
   Component,
 }: AppProps) {
   return (
-    <ApolloProvider client={apolloClient || initApolloClient(null, apolloState)}>
-      <CacheProvider value={emotionCache || initEmotionCache()}>
-        <I18nextProvider i18n={i18n || initTranslations()}>
+    <ApolloProvider client={useMemo(() => apolloClient || initApolloClient(null, apolloState), [apolloClient, apolloState])}>
+      <CacheProvider value={useMemo(() => emotionCache || initEmotionCache(), [emotionCache])}>
+        <I18nextProvider i18n={useMemo(() => i18n || initTranslations(), [i18n])}>
           <AuthProvider>
             <ThemeProvider>
               <Meta />
