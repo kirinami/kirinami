@@ -8,7 +8,7 @@ import {
   useFindOneUserQuery,
   useLoginMutation,
   useRegisterMutation,
-} from '@/graphql/schema';
+} from '@/graphql/client';
 
 const reactiveVar = makeVar({
   isLoginOpen: false,

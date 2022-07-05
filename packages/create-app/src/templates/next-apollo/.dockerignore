@@ -25,6 +25,7 @@ tmp
 
 # project
 .next
+.swc
 public/uploads
 docker-compose*.yml
 

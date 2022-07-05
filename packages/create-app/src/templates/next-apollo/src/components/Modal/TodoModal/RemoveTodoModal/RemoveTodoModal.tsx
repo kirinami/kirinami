@@ -5,7 +5,7 @@ import { Reference } from '@apollo/client';
 import Modal from '@/components/Common/Modal/Modal';
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import { FindAllTodosQuery, useDeleteTodoMutation } from '@/graphql/schema';
+import { FindAllTodosQuery, useDeleteTodoMutation } from '@/graphql/client';
 
 import styles from './RemoveTodoModal.styles';
 

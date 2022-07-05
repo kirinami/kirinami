@@ -8,7 +8,7 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import { graphqlUploadKoa } from 'graphql-upload';
 import { mapKeys } from 'lodash';
 
-import schema from '@/graphql/resolvers/schema';
+import schema from '@/graphql/schemas/schema';
 
 declare global {
   // eslint-disable-next-line no-var,vars-on-top

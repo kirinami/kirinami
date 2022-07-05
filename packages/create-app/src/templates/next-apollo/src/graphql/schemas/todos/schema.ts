@@ -1,6 +1,10 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { PubSub, withFilter } from 'graphql-subscriptions';
 
 import authenticateUser from '@/helpers/authenticateUser';
+import { Resolvers } from '@/graphql/client';
 import {
   createTodoForUser,
   deleteTodoForUser,
@@ -8,8 +12,6 @@ import {
   findOneTodoByIdForUser,
   updateTodoForUser,
 } from '@/services/todos';
-
-import { Resolvers } from '../../schema';
 
 const pubSub = new PubSub();
 
@@ -90,4 +92,7 @@ const resolvers: Resolvers = {
   },
 };
 
-export default resolvers;
+export default {
+  typeDefs: fs.readFileSync(path.resolve(fileURLToPath(import.meta.url), '..', './schema.graphql'), 'utf-8'),
+  resolvers,
+};

@@ -7,7 +7,7 @@ import * as yup from 'yup';
 
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import { FindAllTodosQuery, Todo, useCreateTodoMutation, useUpdateTodoMutation } from '@/graphql/schema';
+import { FindAllTodosQuery, Todo, useCreateTodoMutation, useUpdateTodoMutation } from '@/graphql/client';
 import useAuth from '@/hooks/useAuth';
 
 import styles from './TodoForm.styles';

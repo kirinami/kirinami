@@ -1,8 +1,7 @@
 import { omit } from 'lodash';
 
 import prisma, { Prisma, User } from '@/prisma/client';
-
-import { CreateTodoInput, UpdateTodoInput } from '../graphql/schema';
+import { CreateTodoInput, UpdateTodoInput } from '@/graphql/client';
 
 export async function findAllTodosForUserWithPagination(user: User, my = true, page = 1, size = 10) {
   const where = {

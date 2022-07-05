@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import Modal from '@/components/Common/Modal/Modal';
 import TodoForm from '@/components/Form/TodoForm/TodoForm';
-import { FindAllTodosQuery } from '@/graphql/schema';
+import { FindAllTodosQuery } from '@/graphql/client';
 
 import styles from './EditTodoModal.styles';
 

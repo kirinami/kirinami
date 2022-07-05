@@ -20,7 +20,7 @@ import {
   OnUpdateTodoSubscription,
   useFindAllTodosQuery,
   useUpdateTodoMutation,
-} from '@/graphql/schema';
+} from '@/graphql/client';
 import useAuth from '@/hooks/useAuth';
 import useRouteChange from '@/hooks/useRouteChange';
 

@@ -1,10 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
+import { fileURLToPath } from 'url';
+import { randomUUID } from 'crypto';
 import { finished } from 'stream/promises';
 import { GraphQLUpload } from 'graphql-upload';
 
-import { Resolvers } from '../../schema';
+import { Resolvers } from '@/graphql/client';
 
 const uploadsDir = path.resolve('public/uploads');
 
@@ -19,7 +20,7 @@ const resolvers: Resolvers = {
       const upload = await file;
 
       const extname = path.extname(upload.filename);
-      const filename = `${crypto.randomUUID()}${extname}`;
+      const filename = `${randomUUID()}${extname}`;
 
       const writeStream = fs.createWriteStream(path.join(uploadsDir, filename));
 
@@ -37,4 +38,7 @@ const resolvers: Resolvers = {
   },
 };
 
-export default resolvers;
+export default {
+  typeDefs: fs.readFileSync(path.resolve(fileURLToPath(import.meta.url), '..', './schema.graphql'), 'utf-8'),
+  resolvers,
+};

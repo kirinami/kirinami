@@ -25,8 +25,10 @@ tmp
 
 # project
 .next
+.swc
 public/uploads
-src/graphql/schema.ts
+src/prisma/client
+src/graphql/client
 docker-compose*.yml
 
 # misc

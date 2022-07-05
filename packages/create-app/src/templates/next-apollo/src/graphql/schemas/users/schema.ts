@@ -1,7 +1,10 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import { Resolvers } from '@/graphql/client';
 import authenticateUser from '@/helpers/authenticateUser';
 import { createUser, deleteUser, findAllUsersWithPagination, fineOneUserByIdForUser, updateUserByUser } from '@/services/users';
-
-import { Resolvers } from '../../schema';
 
 const resolvers: Resolvers = {
   Query: {
@@ -30,4 +33,7 @@ const resolvers: Resolvers = {
   },
 };
 
-export default resolvers;
+export default {
+  typeDefs: fs.readFileSync(path.resolve(fileURLToPath(import.meta.url), '..', './schema.graphql'), 'utf-8'),
+  resolvers,
+};

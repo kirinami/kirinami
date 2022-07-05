@@ -1,8 +1,7 @@
 import bcrypt from 'bcryptjs';
 
 import prisma, { Prisma, User } from '@/prisma/client';
-
-import { CreateUserInput, UpdateUserInput } from '../graphql/schema';
+import { CreateUserInput, UpdateUserInput } from '@/graphql/client';
 
 export async function findAllUsersWithPagination(search?: string, page = 1, size = 10) {
   if (search && search.length < 3) {

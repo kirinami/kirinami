@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "patch-package": "patch-package --exclude '^$'",
-    "postinstall": "yarn patch-package",
     "generate": "graphql-codegen && prisma generate",
-    "dev": "yarn -s generate && prisma migrate dev && next dev",
+    "dev": "graphql-codegen && prisma migrate dev && next dev",
     "build": "yarn -s generate && yarn -s lint --quiet && next build --no-lint",
     "start": "prisma migrate deploy && next start",
-    "lint": "eslint prisma src",
-    "test": "exit 0"
+    "lint": "eslint src",
+    "test": "exit 0",
+    "postinstall": "yarn -s patch-package"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",

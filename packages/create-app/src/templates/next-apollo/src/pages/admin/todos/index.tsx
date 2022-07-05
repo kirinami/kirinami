@@ -5,7 +5,7 @@ import { Button, Table, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { useFindAllTodosQuery } from '@/graphql/schema';
+import { useFindAllTodosQuery } from '@/graphql/client';
 import useRouteChange from '@/hooks/useRouteChange';
 
 export default function AdminTodosIndexPage() {

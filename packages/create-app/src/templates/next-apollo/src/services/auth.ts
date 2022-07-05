@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 import prisma, { User } from '@/prisma/client';
-import { Auth, LoginInput, RegisterInput } from '@/graphql/schema';
+import { Auth, LoginInput, RegisterInput } from '@/graphql/client';
 
 import { createUser } from './users';
 

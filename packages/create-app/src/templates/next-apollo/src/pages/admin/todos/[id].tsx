@@ -16,7 +16,7 @@ import {
   useFindAllUsersLazyQuery,
   useFindOneTodoQuery,
   useUpdateTodoMutation,
-} from '@/graphql/schema';
+} from '@/graphql/client';
 
 type FormData = {
   user: {

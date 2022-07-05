@@ -9,7 +9,7 @@ import * as yup from 'yup';
 import Form from '@/components/Common/Form/Form';
 import FormGroup from '@/components/Common/FormGroup/FormGroup';
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { useCreateUserMutation, useDeleteUserMutation, useFindOneUserQuery, useUpdateUserMutation } from '@/graphql/schema';
+import { useCreateUserMutation, useDeleteUserMutation, useFindOneUserQuery, useUpdateUserMutation } from '@/graphql/client';
 
 type FormData = {
   firstName: string;

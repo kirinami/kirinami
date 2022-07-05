@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import Icon from '@/components/Common/Icon/Icon';
 import Badge from '@/components/Common/Badge/Badge';
-import { FindAllTodosQuery } from '@/graphql/schema';
+import { FindAllTodosQuery } from '@/graphql/client';
 
 import styles from './TodoList.styles';
 

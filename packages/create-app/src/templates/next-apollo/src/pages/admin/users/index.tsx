@@ -5,7 +5,7 @@ import { Button, Table, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { useFindAllUsersQuery } from '@/graphql/schema';
+import { useFindAllUsersQuery } from '@/graphql/client';
 import useIsReady from '@/hooks/useIsReady';
 import useRouteChange from '@/hooks/useRouteChange';
 

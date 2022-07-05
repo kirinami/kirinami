@@ -16,7 +16,7 @@ import { onError } from '@apollo/client/link/error';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 
-import { RefreshDocument, RefreshMutation, RefreshMutationVariables } from '@/graphql/schema';
+import { RefreshDocument, RefreshMutation, RefreshMutationVariables } from '@/graphql/client';
 import { parseCookie } from '@/utils/cookie';
 import { isServer } from '@/utils/ssr';
 
@@ -176,6 +176,10 @@ export default function initApolloClient(ctx?: NextPageContext | null, initialSt
     apolloClient.restore({
       ...existingCache,
       ...initialState,
+      ROOT_QUERY: {
+        ...(existingCache.ROOT_QUERY || {}),
+        ...(initialState.ROOT_QUERY || {}),
+      },
     });
   }
 
