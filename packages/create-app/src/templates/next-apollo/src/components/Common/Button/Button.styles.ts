@@ -13,12 +13,14 @@ const styles = {
     font-size: 14px;
     transition: opacity ease 300ms;
 
-    ${variant === 'primary' && css`
+    ${variant === 'primary' &&
+    css`
       color: #ffffff;
       background: #884cb2;
     `};
 
-    ${variant === 'secondary' && css`
+    ${variant === 'secondary' &&
+    css`
       color: #2f2f2f;
       background: #f2f2f2;
     `};

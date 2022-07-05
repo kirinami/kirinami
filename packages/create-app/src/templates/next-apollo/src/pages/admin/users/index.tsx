@@ -3,10 +3,9 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Button, Table, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { useQuery } from '@apollo/client';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { FIND_ALL_USERS, FindAllUsersData, FindAllUsersVars } from '@/graphql/queries/users/findAllUsers';
+import { useFindAllUsersQuery } from '@/graphql/schema';
 import useIsReady from '@/hooks/useIsReady';
 import useRouteChange from '@/hooks/useRouteChange';
 
@@ -17,7 +16,7 @@ export default function AdminUsersIndexPage() {
 
   const isReady = useIsReady();
 
-  const { loading, data, refetch } = useQuery<FindAllUsersData, FindAllUsersVars>(FIND_ALL_USERS, {
+  const { loading, data, refetch } = useFindAllUsersQuery({
     variables: {
       page,
       size,
@@ -35,7 +34,7 @@ export default function AdminUsersIndexPage() {
         { href: '/admin', label: 'Home' },
         { href: '/admin/users', label: 'Users' },
       ]}
-      actions={(
+      actions={
         <Link href="/admin/users/new">
           <a>
             <Button type="primary">
@@ -43,7 +42,7 @@ export default function AdminUsersIndexPage() {
             </Button>
           </a>
         </Link>
-      )}
+      }
     >
       <Table
         rowKey="id"
@@ -63,7 +62,9 @@ export default function AdminUsersIndexPage() {
             key: 'name',
             title: 'Name',
             render: (user) => (
-              <div>{user.firstName} {user.lastName}</div>
+              <div>
+                {user.firstName} {user.lastName}
+              </div>
             ),
           },
           {
@@ -82,9 +83,7 @@ export default function AdminUsersIndexPage() {
             key: 'operations',
             title: 'Operations',
             width: 120,
-            render: (user) => (
-              <Link href={`/admin/users/${user.id}`}>Edit</Link>
-            ),
+            render: (user) => <Link href={`/admin/users/${user.id}`}>Edit</Link>,
           },
         ]}
         loading={isReady && loading}
@@ -95,12 +94,13 @@ export default function AdminUsersIndexPage() {
           total,
           pageSizeOptions: ['10', '20', '50', '100'],
           showSizeChanger: true,
-          onChange: (page, size) => router.push({
-            query: {
-              page,
-              size,
-            },
-          }),
+          onChange: (page, size) =>
+            router.push({
+              query: {
+                page,
+                size,
+              },
+            }),
         }}
       />
     </AdminLayout>

@@ -9,14 +9,12 @@ export default function AdminIndexPage() {
 
   return (
     <AdminLayout
-      breadcrumbs={[
-        { href: '/admin', label: 'Home' },
-      ]}
-      actions={(
+      breadcrumbs={[{ href: '/admin', label: 'Home' }]}
+      actions={
         <Button type="primary" danger onClick={logout}>
           <LogoutOutlined /> Logout
         </Button>
-      )}
+      }
     >
       Admin Index
     </AdminLayout>

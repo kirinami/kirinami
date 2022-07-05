@@ -13,9 +13,9 @@ const themes = {
 export type ThemeVariants = keyof typeof themes;
 
 export type ThemeContextValue = {
-  theme: ThemeVariants,
-  changeTheme: (theme: ThemeVariants) => void,
-  toggleTheme: () => void,
+  theme: ThemeVariants;
+  changeTheme: (theme: ThemeVariants) => void;
+  toggleTheme: () => void;
 };
 
 export const ThemeContext = createContext({} as ThemeContextValue);
@@ -32,9 +32,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <BaseThemeProvider theme={themes[theme]}>
       <Global styles={styles.root} />
-      <ThemeContext.Provider value={value}>
-        {children}
-      </ThemeContext.Provider>
+      <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
     </BaseThemeProvider>
   );
 }
@@ -42,6 +40,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
 declare module '@emotion/react' {
   type BaseTheme = typeof light;
 
-  export interface Theme extends BaseTheme {
-  }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  export type Theme = BaseTheme;
 }

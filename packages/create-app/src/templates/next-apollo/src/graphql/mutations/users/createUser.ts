@@ -1,14 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { CreateUserArgs } from '@/api/graphql/schemas/users/types';
-
-import { USER, User } from '../../fragments/User';
-
-export type CreateUserVars = CreateUserArgs;
-
-export type CreateUserData = {
-  createUser: User,
-};
+import { USER } from '../../fragments/User';
 
 export const CREATE_USER = gql`
   ${USER}

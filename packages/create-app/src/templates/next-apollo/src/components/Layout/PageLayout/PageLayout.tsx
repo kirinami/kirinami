@@ -10,7 +10,7 @@ import RegisterModal from '@/components/Modal/RegisterModal/RegisterModal';
 import styles from './PageLayout.styles';
 
 export type PageLayoutProps = {
-  children: ReactNode,
+  children: ReactNode;
 };
 
 export default function PageLayout({ children }: PageLayoutProps) {
@@ -25,13 +25,11 @@ export default function PageLayout({ children }: PageLayoutProps) {
           <Auth />
         </div>
 
-        <main css={styles.content}>
-          {children}
-        </main>
+        <main css={styles.content}>{children}</main>
 
         <footer css={styles.footer}>
           <a href="https://kirinami.com" target="_blank" rel="noopener noreferrer">
-            <Trans t={t} i18nKey="common.created_by" components={[<strong />]} />
+            <Trans t={t} i18nKey="common.created_by" components={[<strong key="0" />]} />
           </a>
         </footer>
       </div>

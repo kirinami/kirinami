@@ -30,7 +30,7 @@ const styles = {
   `,
   container: (collapsed: boolean) => css`
     margin-left: ${collapsed ? '64px' : '200px'};
-    transition: margin-left .2s;
+    transition: margin-left 0.2s;
     overflow: auto;
   `,
   header: css`

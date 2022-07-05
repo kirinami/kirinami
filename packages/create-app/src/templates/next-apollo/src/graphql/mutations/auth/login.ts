@@ -1,14 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { LoginArgs } from '@/api/graphql/schemas/auth/types';
-
-import { AUTH, Auth } from '../../fragments/Auth';
-
-export type LoginVars = LoginArgs;
-
-export type LoginData = {
-  login: Auth,
-};
+import { AUTH } from '../../fragments/Auth';
 
 export const LOGIN = gql`
   ${AUTH}

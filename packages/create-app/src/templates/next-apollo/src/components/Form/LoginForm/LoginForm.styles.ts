@@ -5,7 +5,8 @@ const styles = {
     display: flex;
     flex-direction: column;
 
-    ${loading && css`
+    ${loading &&
+    css`
       pointer-events: none;
       filter: grayscale(50%);
     `};
@@ -14,8 +15,7 @@ const styles = {
       margin-top: 8px;
     }
   `,
-  group: css`
-  `,
+  group: css``,
   input: css`
     width: 100%;
     border: 1px solid #c4c4c4;

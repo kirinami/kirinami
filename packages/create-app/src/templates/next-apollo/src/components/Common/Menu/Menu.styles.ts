@@ -7,7 +7,7 @@ const styles = {
     margin: 0;
     padding: 0;
     list-style: none;
-    
+
     > :not([hidden]) ~ :not([hidden]) {
       margin-left: 16px;
     }

@@ -1,14 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { RefreshArgs } from '@/api/graphql/schemas/auth/types';
-
-import { AUTH, Auth } from '../../fragments/Auth';
-
-export type RefreshVars = RefreshArgs;
-
-export type RefreshData = {
-  refresh: Auth,
-};
+import { AUTH } from '../../fragments/Auth';
 
 export const REFRESH = gql`
   ${AUTH}

@@ -16,7 +16,7 @@ import { onError } from '@apollo/client/link/error';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 
-import { REFRESH, RefreshData, RefreshVars } from '@/graphql/mutations/auth/refresh';
+import { RefreshDocument, RefreshMutation, RefreshMutationVariables } from '@/graphql/schema';
 import { parseCookie } from '@/utils/cookie';
 import { isServer } from '@/utils/ssr';
 
@@ -29,7 +29,7 @@ function createAuthLink(ctx?: NextPageContext | null) {
     operation.setContext((ctx: Context) => ({
       ...ctx,
       headers: {
-        ...ctx.headers || {},
+        ...(ctx.headers || {}),
         authorization: cookies['access-token'] ? `Bearer ${cookies['access-token']}` : '',
       },
     }));
@@ -50,15 +50,14 @@ function createAuthLink(ctx?: NextPageContext | null) {
 
       return fromPromise(
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        createApolloClient()
-          .mutate<RefreshData, RefreshVars>({
-            mutation: REFRESH,
-            variables: {
-              token: cookies['refresh-token'],
-            },
-            fetchPolicy: 'no-cache',
-            errorPolicy: 'ignore',
-          }),
+        createApolloClient().mutate<RefreshMutation, RefreshMutationVariables>({
+          mutation: RefreshDocument,
+          variables: {
+            token: cookies['refresh-token'],
+          },
+          fetchPolicy: 'no-cache',
+          errorPolicy: 'ignore',
+        })
       ).flatMap((response) => {
         cookies['access-token'] = response?.data?.refresh.accessToken || '';
         cookies['refresh-token'] = response?.data?.refresh.refreshToken || '';
@@ -66,7 +65,7 @@ function createAuthLink(ctx?: NextPageContext | null) {
         operation.setContext((ctx: Context) => ({
           ...ctx,
           headers: {
-            ...ctx.headers || {},
+            ...(ctx.headers || {}),
             authorization: cookies['access-token'] ? `Bearer ${cookies['access-token']}` : '',
           },
         }));
@@ -130,35 +129,34 @@ function createApolloClient() {
 }
 
 function createWebSocketLink(ctx?: NextPageContext | null) {
-  return new GraphQLWsLink(createClient({
-    url: String(process.env.NEXT_PUBLIC_GRAPHQL_WS_URL),
-    connectionParams: async () => {
-      const cookies = parseCookie(isServer ? ctx?.req?.headers?.cookie || '' : document.cookie);
+  return new GraphQLWsLink(
+    createClient({
+      url: String(process.env.NEXT_PUBLIC_GRAPHQL_WS_URL),
+      connectionParams: async () => {
+        const cookies = parseCookie(isServer ? ctx?.req?.headers?.cookie || '' : document.cookie);
 
-      return {
-        authorization: cookies['access-token'] ? `Bearer ${cookies['access-token']}` : '',
-      };
-    },
-  }));
+        return {
+          authorization: cookies['access-token'] ? `Bearer ${cookies['access-token']}` : '',
+        };
+      },
+    })
+  );
 }
 
 function createApolloLink(ctx?: NextPageContext | null) {
-  const baseLink = from([
-    createAuthLink(ctx),
-    createHttpLink(),
-  ]);
+  const baseLink = from([createAuthLink(ctx), createHttpLink()]);
 
   return isServer
     ? baseLink
     : split(
-      ({ query }) => {
-        const definition = getMainDefinition(query);
+        ({ query }) => {
+          const definition = getMainDefinition(query);
 
-        return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
-      },
-      createWebSocketLink(ctx),
-      baseLink,
-    );
+          return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+        },
+        createWebSocketLink(ctx),
+        baseLink
+      );
 }
 
 export default function initApolloClient(ctx?: NextPageContext | null, initialState?: NormalizedCacheObject) {

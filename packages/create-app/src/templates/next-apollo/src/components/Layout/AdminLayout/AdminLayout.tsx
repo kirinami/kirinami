@@ -13,9 +13,9 @@ import NotFoundPage from '@/pages/404';
 import styles from './AdminLayout.styles';
 
 export type AdminLayoutProps = {
-  breadcrumbs?: { href: string, label: string }[],
-  actions?: ReactNode,
-  children: ReactNode,
+  breadcrumbs?: { href: string; label: string }[];
+  actions?: ReactNode;
+  children: ReactNode;
 };
 
 export default function AdminLayout({ breadcrumbs, actions, children }: AdminLayoutProps) {
@@ -45,9 +45,7 @@ export default function AdminLayout({ breadcrumbs, actions, children }: AdminLay
           <Link href="/admin">
             <a css={styles.logoLink}>
               <img css={styles.logoLinkImage} src={logo.src} alt="" />
-              {!collapsed && (
-                <h1 css={styles.logoLinkTitle}>Admin Panel</h1>
-              )}
+              {!collapsed && <h1 css={styles.logoLinkTitle}>Admin Panel</h1>}
             </a>
           </Link>
 
@@ -81,7 +79,9 @@ export default function AdminLayout({ breadcrumbs, actions, children }: AdminLay
               {breadcrumbs?.map((breadcrumb, i) => (
                 <Breadcrumb.Item key={breadcrumb.href}>
                   <Link href={breadcrumb.href}>
-                    <a>{i === 0 && <HomeOutlined />} {breadcrumb.label}</a>
+                    <a>
+                      {i === 0 && <HomeOutlined />} {breadcrumb.label}
+                    </a>
                   </Link>
                 </Breadcrumb.Item>
               ))}
@@ -91,14 +91,12 @@ export default function AdminLayout({ breadcrumbs, actions, children }: AdminLay
           </AntLayout.Header>
 
           <AntLayout.Content css={styles.content}>
-            <div css={styles.children}>
-              {children}
-            </div>
+            <div css={styles.children}>{children}</div>
           </AntLayout.Content>
 
           <AntLayout.Footer css={styles.footer}>
             <a href="https://kirinami.com" target="_blank" rel="noopener noreferrer">
-              <Trans t={t} i18nKey="common.created_by" components={[<strong />]} />
+              <Trans t={t} i18nKey="common.created_by" components={[<strong key="0" />]} />
             </a>
           </AntLayout.Footer>
         </AntLayout>

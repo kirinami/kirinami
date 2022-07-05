@@ -1,0 +1,55 @@
+{
+  "extends": [
+    "airbnb",
+    "airbnb/hooks",
+    "airbnb-typescript",
+    "plugin:@next/next/recommended",
+    "plugin:@next/next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true
+      }
+    }
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-param-reassign": "off",
+    "consistent-return": "warn",
+    "import/no-named-as-default": "off",
+    "import/prefer-default-export": "off",
+    "import/order": [
+      "error", {
+        "groups": [["builtin", "external"], "internal", "parent", "sibling", "index", "object", "type"],
+        "pathGroups": [
+          {
+            "pattern": "@/**",
+            "group": "internal"
+          }
+        ],
+        "newlines-between": "always"
+      }
+    ],
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/anchor-is-valid": [
+      "error", {
+      "components": ["a"],
+      "aspects": ["invalidHref", "preferButton"]
+    }],
+    "jsx-a11y/label-has-associated-control": ["error", {
+      "assert": "nesting"
+    }],
+    "react/react-in-jsx-scope": "off",
+    "react/require-default-props": "off",
+    "react/jsx-props-no-spreading": "off",
+    "@typescript-eslint/no-shadow": "warn",
+    "@typescript-eslint/no-empty-interface": "off"
+  }
+}

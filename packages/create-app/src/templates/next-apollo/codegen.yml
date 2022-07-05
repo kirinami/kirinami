@@ -1,0 +1,15 @@
+overwrite: true
+schema: './src/graphql/**/schema.graphql'
+generates:
+  src/graphql/schema.ts:
+    documents:
+      - './src/graphql/**/*.ts'
+      - '!./src/graphql/schema.ts'
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-resolvers
+      - typescript-react-apollo
+    config:
+      preResolveTypes: false
+      withHooks: true

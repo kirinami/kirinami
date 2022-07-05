@@ -1,14 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { UpdateUserArgs } from '@/api/graphql/schemas/users/types';
-
-import { USER, User } from '../../fragments/User';
-
-export type UpdateUserVars = UpdateUserArgs;
-
-export type UpdateUserData = {
-  updateUser: User,
-};
+import { USER } from '../../fragments/User';
 
 export const UPDATE_USER = gql`
   ${USER}

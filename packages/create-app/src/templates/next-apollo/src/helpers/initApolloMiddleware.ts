@@ -8,7 +8,7 @@ import { useServer } from 'graphql-ws/lib/use/ws';
 import { graphqlUploadKoa } from 'graphql-upload';
 import { mapKeys } from 'lodash';
 
-import schema from '@/api/graphql/schema';
+import schema from '@/graphql/resolvers/schema';
 
 declare global {
   // eslint-disable-next-line no-var,vars-on-top
@@ -53,7 +53,7 @@ async function createSubscriptionServer(webSocketServer: WebSocketServer) {
       }),
       schema,
     },
-    webSocketServer,
+    webSocketServer
   );
 
   if (process.env.NODE_ENV !== 'production') {
@@ -102,22 +102,21 @@ export default async function initApolloMiddleware({ path }: { path: string }) {
     global.handleUpgrade = handleUpgrade;
   }
 
-  const app = new Koa()
-    .use(async (ctx, next) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const httpServer = ctx.socket.server as http.Server;
+  const app = new Koa().use(async (ctx, next) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const httpServer = ctx.socket.server as http.Server;
 
-      if (httpServer !== global.httpServer) {
-        global.httpServer = httpServer.on('upgrade', handleUpgrade);
-      }
+    if (httpServer !== global.httpServer) {
+      global.httpServer = httpServer.on('upgrade', handleUpgrade);
+    }
 
-      if (ctx.url === path) {
-        return graphqlUploadKoa()(ctx, next);
-      }
+    if (ctx.url === path) {
+      return graphqlUploadKoa()(ctx, next);
+    }
 
-      await next();
-    });
+    await next();
+  });
 
   apolloServer.applyMiddleware({
     path,

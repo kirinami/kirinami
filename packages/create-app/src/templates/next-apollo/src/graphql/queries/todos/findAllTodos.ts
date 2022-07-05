@@ -1,17 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { FindAllTodosArgs } from '@/api/graphql/schemas/todos/types';
-
-import { TODO, Todo } from '../../fragments/Todo';
-
-export type FindAllTodosVars = FindAllTodosArgs;
-
-export type FindAllTodosData = {
-  findAllTodos: {
-    todos: Todo[],
-    total: number,
-  },
-};
+import { TODO } from '../../fragments/Todo';
 
 export const FIND_ALL_TODOS = gql`
   ${TODO}

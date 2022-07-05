@@ -10,12 +10,12 @@ import useAuth from '@/hooks/useAuth';
 import styles from './LoginForm.styles';
 
 export type LoginFormData = {
-  email: string,
-  password: string,
+  email: string;
+  password: string;
 };
 
 export type LoginFormProps = {
-  onAfterSubmit?: () => void,
+  onAfterSubmit?: () => void;
 };
 
 export default function LoginForm({ onAfterSubmit }: LoginFormProps) {
@@ -27,16 +27,20 @@ export default function LoginForm({ onAfterSubmit }: LoginFormProps) {
   const error = loginError;
 
   const form = useForm<LoginFormData>({
-    resolver: yupResolver(yup.object({
-      email: yup.string()
-        .required(t('forms.auth.validation.email.required'))
-        .email(t('forms.auth.validation.email.email')),
-      password: yup.string()
-        .required(t('forms.auth.validation.password.required'))
-        .min(8, t('forms.auth.validation.password.min', {
-          count: 8,
-        })),
-    })),
+    resolver: yupResolver(
+      yup.object({
+        email: yup.string().required(t('forms.auth.validation.email.required')).email(t('forms.auth.validation.email.email')),
+        password: yup
+          .string()
+          .required(t('forms.auth.validation.password.required'))
+          .min(
+            8,
+            t('forms.auth.validation.password.min', {
+              count: 8,
+            })
+          ),
+      })
+    ),
     defaultValues: {
       email: '',
       password: '',
@@ -67,7 +71,7 @@ export default function LoginForm({ onAfterSubmit }: LoginFormProps) {
       </div>
       <div css={styles.actions}>
         <Button css={styles.actionsButton} type="submit">
-          {loading && (<Spinner variant="light" size={16} />)}
+          {loading && <Spinner variant="light" size={16} />}
           <span>{t('common.submit')}</span>
         </Button>
         <small css={styles.actionsMessage}>{error?.message}</small>

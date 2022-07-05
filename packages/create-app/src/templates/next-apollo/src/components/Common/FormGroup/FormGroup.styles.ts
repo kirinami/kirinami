@@ -1,15 +1,15 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  formGroup: css`
-  `,
+  formGroup: css``,
   formGroupLabel: css`
     margin-bottom: 4px;
   `,
   formGroupInput: (hasError: boolean) => css`
     width: 100%;
 
-    ${hasError && css`
+    ${hasError &&
+    css`
       border-color: #ff4d4f !important;
     `};
   `,

@@ -3,10 +3,9 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Button, Table, Tag } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { useQuery } from '@apollo/client';
 
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { FIND_ALL_TODOS, FindAllTodosData, FindAllTodosVars } from '@/graphql/queries/todos/findAllTodos';
+import { useFindAllTodosQuery } from '@/graphql/schema';
 import useRouteChange from '@/hooks/useRouteChange';
 
 export default function AdminTodosIndexPage() {
@@ -14,7 +13,7 @@ export default function AdminTodosIndexPage() {
   const page = Number(router.query.page) || 1;
   const size = Number(router.query.size) || 10;
 
-  const { loading, data, refetch } = useQuery<FindAllTodosData, FindAllTodosVars>(FIND_ALL_TODOS, {
+  const { loading, data, refetch } = useFindAllTodosQuery({
     variables: {
       page,
       size,
@@ -32,7 +31,7 @@ export default function AdminTodosIndexPage() {
         { href: '/admin', label: 'Home' },
         { href: '/admin/todos', label: 'Todos' },
       ]}
-      actions={(
+      actions={
         <Link href="/admin/todos/new">
           <a>
             <Button type="primary">
@@ -40,7 +39,7 @@ export default function AdminTodosIndexPage() {
             </Button>
           </a>
         </Link>
-      )}
+      }
     >
       <Table
         rowKey="id"
@@ -56,7 +55,13 @@ export default function AdminTodosIndexPage() {
             title: 'User',
             dataIndex: 'user',
             width: 240,
-            render: (user) => <Link href={`/admin/users/${user.id}`}><a>{user.firstName} {user.lastName}</a></Link>,
+            render: (user) => (
+              <Link href={`/admin/users/${user.id}`}>
+                <a>
+                  {user.firstName} {user.lastName}
+                </a>
+              </Link>
+            ),
           },
           {
             key: 'title',
@@ -79,9 +84,7 @@ export default function AdminTodosIndexPage() {
             key: 'operations',
             title: 'Operations',
             width: 120,
-            render: (todo) => (
-              <Link href={`/admin/todos/${todo.id}`}>Edit</Link>
-            ),
+            render: (todo) => <Link href={`/admin/todos/${todo.id}`}>Edit</Link>,
           },
         ]}
         loading={loading}
@@ -92,12 +95,13 @@ export default function AdminTodosIndexPage() {
           total,
           pageSizeOptions: ['10', '20', '50', '100'],
           showSizeChanger: true,
-          onChange: (page, size) => router.push({
-            query: {
-              page,
-              size,
-            },
-          }),
+          onChange: (page, size) =>
+            router.push({
+              query: {
+                page,
+                size,
+              },
+            }),
         }}
       />
     </AdminLayout>

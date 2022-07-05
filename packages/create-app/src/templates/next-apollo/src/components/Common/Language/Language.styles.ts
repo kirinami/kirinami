@@ -39,11 +39,11 @@ const styles = {
     color: #884cb2;
     background-color: transparent;
     cursor: pointer;
-    
+
     &:hover {
       color: #884cb2;
       opacity: 0.8;
-    }  
+    }
   `,
 };
 

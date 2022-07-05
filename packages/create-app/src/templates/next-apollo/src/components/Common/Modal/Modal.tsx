@@ -7,8 +7,10 @@ import styles from './Modal.styles';
 
 BaseModal.setAppElement('#__next');
 
-export type ModalProps = Omit<BaseModal.Props, 'className' | 'overlayClassName' | 'portalClassName' | 'htmlOpenClassName'
-| 'bodyOpenClassName' | 'closeTimeoutMS'>;
+export type ModalProps = Omit<
+  BaseModal.Props,
+  'className' | 'overlayClassName' | 'portalClassName' | 'htmlOpenClassName' | 'bodyOpenClassName' | 'closeTimeoutMS'
+>;
 
 export default function Modal({ children, onRequestClose, ...props }: ModalProps) {
   return (

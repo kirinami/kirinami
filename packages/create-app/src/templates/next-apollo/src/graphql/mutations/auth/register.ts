@@ -1,14 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { RegisterArgs } from '@/api/graphql/schemas/auth/types';
-
-import { AUTH, Auth } from '../../fragments/Auth';
-
-export type RegisterVars = RegisterArgs;
-
-export type RegisterData = {
-  register: Auth,
-};
+import { AUTH } from '../../fragments/Auth';
 
 export const REGISTER = gql`
   ${AUTH}

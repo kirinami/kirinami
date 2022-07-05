@@ -1,25 +1,24 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Reference, useMutation } from '@apollo/client';
+import { Reference } from '@apollo/client';
 
 import Modal from '@/components/Common/Modal/Modal';
 import Button from '@/components/Common/Button/Button';
 import Spinner from '@/components/Common/Spinner/Spinner';
-import { Todo } from '@/graphql/fragments/Todo';
-import { DELETE_TODO, DeleteTodoData, DeleteTodoVars } from '@/graphql/mutations/todos/deleteTodo';
+import { FindAllTodosQuery, useDeleteTodoMutation } from '@/graphql/schema';
 
 import styles from './RemoveTodoModal.styles';
 
 export type RemoveTodoModalProps = {
-  open: boolean,
-  todo?: Todo,
-  onClose: () => void,
+  open: boolean;
+  todo?: FindAllTodosQuery['findAllTodos']['todos'][0];
+  onClose: () => void;
 };
 
 export default function RemoveTodoModal({ open, todo, onClose }: RemoveTodoModalProps) {
   const { t } = useTranslation();
 
-  const [removeTodo, { loading, error }] = useMutation<DeleteTodoData, DeleteTodoVars>(DELETE_TODO);
+  const [removeTodo, { loading, error }] = useDeleteTodoMutation();
 
   const handleSubmit = useCallback(async () => {
     if (!todo) return;
@@ -51,7 +50,7 @@ export default function RemoveTodoModal({ open, todo, onClose }: RemoveTodoModal
         <p css={styles.description}>{t('modals.remove_todo.description')}</p>
         <div css={styles.actions}>
           <Button css={styles.actionsButton} onClick={handleSubmit}>
-            {loading && (<Spinner variant="light" size={16} />)}
+            {loading && <Spinner variant="light" size={16} />}
             <span>{t('common.submit')}</span>
           </Button>
           <Button css={styles.actionsButton} variant="secondary" onClick={onClose}>

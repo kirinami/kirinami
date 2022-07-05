@@ -4,7 +4,8 @@ import { css } from '@emotion/react';
 
 export const styles = {
   root: css`
-    html, body {
+    html,
+    body {
       height: 100%;
       min-height: 100%;
     }

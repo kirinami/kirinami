@@ -1,14 +1,6 @@
 import { gql } from '@apollo/client';
 
-import { UpdateTodoArgs } from '@/api/graphql/schemas/todos/types';
-
-import { TODO, Todo } from '../../fragments/Todo';
-
-export type UpdateTodoVars = UpdateTodoArgs;
-
-export type UpdateTodoData = {
-  updateTodo: Todo,
-};
+import { TODO } from '../../fragments/Todo';
 
 export const UPDATE_TODO = gql`
   ${TODO}

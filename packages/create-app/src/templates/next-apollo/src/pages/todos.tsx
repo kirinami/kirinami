@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { gql, useMutation, useQuery } from '@apollo/client';
 import immer from 'immer';
 
 import Title from '@/components/Common/Title/Title';
@@ -11,9 +10,17 @@ import TodoList from '@/components/Common/TodoList/TodoList';
 import PageLayout from '@/components/Layout/PageLayout/PageLayout';
 import EditTodoModal from '@/components/Modal/TodoModal/EditTodoModal/EditTodoModal';
 import RemoveTodoModal from '@/components/Modal/TodoModal/RemoveTodoModal/RemoveTodoModal';
-import { TODO, Todo } from '@/graphql/fragments/Todo';
-import { FIND_ALL_TODOS, FindAllTodosData, FindAllTodosVars } from '@/graphql/queries/todos/findAllTodos';
-import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
+import {
+  FindAllTodosQuery,
+  OnCreateTodoDocument,
+  OnCreateTodoSubscription,
+  OnDeleteTodoDocument,
+  OnDeleteTodoSubscription,
+  OnUpdateTodoDocument,
+  OnUpdateTodoSubscription,
+  useFindAllTodosQuery,
+  useUpdateTodoMutation,
+} from '@/graphql/schema';
 import useAuth from '@/hooks/useAuth';
 import useRouteChange from '@/hooks/useRouteChange';
 
@@ -22,22 +29,23 @@ export default function TodosPage() {
 
   const { user, openLogin } = useAuth();
 
-  const { data, refetch, subscribeToMore } = useQuery<FindAllTodosData, FindAllTodosVars>(FIND_ALL_TODOS, {
+  const { data, refetch, subscribeToMore } = useFindAllTodosQuery({
     skip: !user,
     variables: {
       my: true,
     },
   });
-  const [updateTodo] = useMutation<UpdateTodoData, UpdateTodoVars>(UPDATE_TODO);
+
+  const [updateTodo] = useUpdateTodoMutation();
 
   const todos = useMemo(() => data?.findAllTodos.todos || [], [data?.findAllTodos.todos]);
   const completedTodos = useMemo(() => todos.filter((todo) => todo.completed), [todos]);
 
   const [editTodoModalOpen, setEditTodoModalOpen] = useState(false);
-  const [editTodoModalTodo, setEditTodoModalTodo] = useState<Todo>();
+  const [editTodoModalTodo, setEditTodoModalTodo] = useState<FindAllTodosQuery['findAllTodos']['todos'][0]>();
 
   const [removeTodoModalOpen, setRemoveTodoModalOpen] = useState(false);
-  const [removeTodoModalTodo, setRemoveTodoModalTodo] = useState<Todo>();
+  const [removeTodoModalTodo, setRemoveTodoModalTodo] = useState<FindAllTodosQuery['findAllTodos']['todos'][0]>();
 
   const handleAdd = useCallback(() => {
     if (user) {
@@ -48,23 +56,26 @@ export default function TodosPage() {
     }
   }, [user, openLogin]);
 
-  const handleClick = useCallback((todo: Todo) => {
-    updateTodo({
-      variables: {
-        id: todo.id,
-        input: {
-          completed: !todo.completed,
+  const handleClick = useCallback(
+    (todo: FindAllTodosQuery['findAllTodos']['todos'][0]) => {
+      updateTodo({
+        variables: {
+          id: todo.id,
+          input: {
+            completed: !todo.completed,
+          },
         },
-      },
-    });
-  }, [updateTodo]);
+      });
+    },
+    [updateTodo]
+  );
 
-  const handleEdit = useCallback((todo: Todo) => {
+  const handleEdit = useCallback((todo: FindAllTodosQuery['findAllTodos']['todos'][0]) => {
     setEditTodoModalOpen(true);
     setEditTodoModalTodo(todo);
   }, []);
 
-  const handleRemove = useCallback((todo: Todo) => {
+  const handleRemove = useCallback((todo: FindAllTodosQuery['findAllTodos']['todos'][0]) => {
     setRemoveTodoModalOpen(true);
     setRemoveTodoModalTodo(todo);
   }, []);
@@ -75,16 +86,8 @@ export default function TodosPage() {
   }, []);
 
   useEffect(() => {
-    const onCreateTodoUnsubscribe = subscribeToMore<any>({
-      document: gql`
-        ${TODO}
-
-        subscription OnCreateTodo {
-          onCreateTodo {
-            ...Todo
-          }
-        }
-      `,
+    const onCreateTodoUnsubscribe = subscribeToMore<OnCreateTodoSubscription>({
+      document: OnCreateTodoDocument,
       updateQuery: (previousData, { subscriptionData }) => {
         if (!previousData || !subscriptionData.data) {
           return previousData;
@@ -102,16 +105,8 @@ export default function TodosPage() {
       onError: () => null,
     });
 
-    const onUpdateTodoUnsubscribe = subscribeToMore<any>({
-      document: gql`
-        ${TODO}
-
-        subscription OnUpdateTodo {
-          onUpdateTodo {
-            ...Todo
-          }
-        }
-      `,
+    const onUpdateTodoUnsubscribe = subscribeToMore<OnUpdateTodoSubscription>({
+      document: OnUpdateTodoDocument,
       updateQuery: (previousData, { subscriptionData }) => {
         if (!previousData || !subscriptionData.data) {
           return previousData;
@@ -130,16 +125,8 @@ export default function TodosPage() {
       onError: () => null,
     });
 
-    const onDeleteTodoUnsubscribe = subscribeToMore<any>({
-      document: gql`
-        ${TODO}
-
-        subscription OnDeleteTodo {
-          onDeleteTodo {
-            ...Todo
-          }
-        }
-      `,
+    const onDeleteTodoUnsubscribe = subscribeToMore<OnDeleteTodoSubscription>({
+      document: OnDeleteTodoDocument,
       updateQuery: (previousData, { subscriptionData }) => {
         if (!previousData || !subscriptionData.data) {
           return previousData;
@@ -148,7 +135,18 @@ export default function TodosPage() {
         return immer(previousData, (draft) => {
           const deletedTodo = subscriptionData.data.onDeleteTodo;
 
-          draft.findAllTodos.todos = draft.findAllTodos.todos.filter((todo) => todo.id !== deletedTodo.id);
+          let affected = 0;
+
+          draft.findAllTodos.todos = draft.findAllTodos.todos.filter((todo) => {
+            const isSkip = todo.id !== deletedTodo.id;
+
+            if (!isSkip) {
+              affected += 1;
+            }
+
+            return isSkip;
+          });
+          draft.findAllTodos.total -= affected;
         });
       },
       onError: () => null,
@@ -165,11 +163,7 @@ export default function TodosPage() {
 
   return (
     <PageLayout>
-      <Title
-        actions={(
-          <Button onClick={handleAdd}>{t('pages.todos.add_new')}</Button>
-        )}
-      >
+      <Title actions={<Button onClick={handleAdd}>{t('pages.todos.add_new')}</Button>}>
         <Trans
           t={t}
           i18nKey="pages.todos.title"
@@ -186,12 +180,12 @@ export default function TodosPage() {
 
       {completedTodos.length > 0 && (
         <Section
-          title={(
+          title={
             <>
               <span>{t('common.completed')}</span>
               <Badge variant="danger">{t('common.inactive')}</Badge>
             </>
-          )}
+          }
         >
           <TodoList readonly todos={completedTodos} />
         </Section>

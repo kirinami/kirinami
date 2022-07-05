@@ -2,16 +2,16 @@ import { useTranslation } from 'react-i18next';
 
 import Icon from '@/components/Common/Icon/Icon';
 import Badge from '@/components/Common/Badge/Badge';
-import { Todo } from '@/graphql/fragments/Todo';
+import { FindAllTodosQuery } from '@/graphql/schema';
 
 import styles from './TodoList.styles';
 
 export type TodoListProps = {
-  readonly?: boolean,
-  todos: Todo[],
-  onClick?: (todo: Todo) => void,
-  onEdit?: (todo: Todo) => void,
-  onRemove?: (todo: Todo) => void,
+  readonly?: boolean;
+  todos: FindAllTodosQuery['findAllTodos']['todos'];
+  onClick?: (todo: FindAllTodosQuery['findAllTodos']['todos'][0]) => void;
+  onEdit?: (todo: FindAllTodosQuery['findAllTodos']['todos'][0]) => void;
+  onRemove?: (todo: FindAllTodosQuery['findAllTodos']['todos'][0]) => void;
 };
 
 export default function TodoList({ readonly, todos, onClick, onEdit, onRemove }: TodoListProps) {

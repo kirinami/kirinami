@@ -4,9 +4,9 @@ import { jsx } from '@emotion/react';
 import styles from './FormGroup.styles';
 
 export type FormGroupProps = {
-  label?: string,
-  error?: string,
-  children: ReactElement,
+  label?: string;
+  error?: string;
+  children: ReactElement;
 };
 
 export default function FormGroup({ label, error, children }: FormGroupProps) {

@@ -5,7 +5,8 @@ const styles = {
     display: flex;
     flex-direction: column;
 
-    ${loading && css`
+    ${loading &&
+    css`
       pointer-events: none;
       filter: grayscale(50%);
     `};
@@ -14,8 +15,7 @@ const styles = {
       margin-top: 8px;
     }
   `,
-  group: css`
-  `,
+  group: css``,
   input: css`
     width: 100%;
     border: 1px solid #c4c4c4;
@@ -41,7 +41,7 @@ const styles = {
       margin-left: 8px;
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       width: 24px;
       height: 24px;
       border-radius: 6px;

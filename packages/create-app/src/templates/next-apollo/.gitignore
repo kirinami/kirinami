@@ -22,6 +22,7 @@ tmp
 # project
 .next
 public/uploads
+src/graphql/schema.ts
 .env*
 !.env.example
 docker-compose*.yml

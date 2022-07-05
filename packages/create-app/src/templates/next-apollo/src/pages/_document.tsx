@@ -21,35 +21,39 @@ function MyDocument() {
 }
 
 MyDocument.getInitialProps = async (ctx: DocumentContext) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const { req: { pageProps }, renderPage } = ctx;
+  const {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    req: { pageProps },
+    renderPage,
+  } = ctx;
 
-  ctx.renderPage = () => renderPage({
-    enhanceRenderShell: async (Tree, { renderToReadableStream }) => {
-      let stream: ReadableStream;
+  ctx.renderPage = () =>
+    renderPage({
+      enhanceRenderShell: async (Tree, { renderToReadableStream }) => {
+        let stream: ReadableStream;
 
-      const html = await getMarkupFromTree({
-        tree: Tree,
-        renderFunction: async (Tree) => {
-          stream = await renderToReadableStream(Tree);
+        const html = await getMarkupFromTree({
+          tree: Tree,
+          renderFunction: async (Tree) => {
+            stream = await renderToReadableStream(Tree);
 
-          return streamToString(stream.tee()[1]);
-        },
-      });
+            return streamToString(stream.tee()[1]);
+          },
+        });
 
-      return {
-        stream: stream!,
-        html,
-        pageProps: {
-          i18n: undefined,
-          apolloClient: undefined,
-          apolloState: pageProps.apolloClient.extract(),
-          emotionCache: undefined,
-        },
-      };
-    },
-  });
+        return {
+          stream: stream!,
+          html,
+          pageProps: {
+            i18n: undefined,
+            apolloClient: undefined,
+            apolloState: pageProps.apolloClient.extract(),
+            emotionCache: undefined,
+          },
+        };
+      },
+    });
 
   const emotionServer = createEmotionServer(pageProps.emotionCache);
 

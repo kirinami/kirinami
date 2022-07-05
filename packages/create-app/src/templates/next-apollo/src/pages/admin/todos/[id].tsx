@@ -3,7 +3,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { Button, Checkbox, Input, Modal, Select, Spin } from 'antd';
 import { DeleteFilled, ExclamationCircleOutlined, SaveFilled } from '@ant-design/icons';
-import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { debounce, omit } from 'lodash';
 import * as yup from 'yup';
@@ -11,39 +10,41 @@ import * as yup from 'yup';
 import Form from '@/components/Common/Form/Form';
 import FormGroup from '@/components/Common/FormGroup/FormGroup';
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { FIND_ALL_USERS, FindAllUsersData, FindAllUsersVars } from '@/graphql/queries/users/findAllUsers';
-import { FIND_ONE_TODO, FindOneTodoData, FindOneTodoVars } from '@/graphql/queries/todos/findOneTodo';
-import { CREATE_TODO, CreateTodoData, CreateTodoVars } from '@/graphql/mutations/todos/createTodo';
-import { UPDATE_TODO, UpdateTodoData, UpdateTodoVars } from '@/graphql/mutations/todos/updateTodo';
-import { DELETE_TODO, DeleteTodoData, DeleteTodoVars } from '@/graphql/mutations/todos/deleteTodo';
+import {
+  useCreateTodoMutation,
+  useDeleteTodoMutation,
+  useFindAllUsersLazyQuery,
+  useFindOneTodoQuery,
+  useUpdateTodoMutation,
+} from '@/graphql/schema';
 
 type FormData = {
   user: {
-    id: number,
-    firstName: string,
-    lastName: string,
-    email: string,
-  },
-  title: string,
-  completed: boolean,
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  title: string;
+  completed: boolean;
 };
 
 export default function AdminTodosEditPage() {
   const router = useRouter();
   const id = Number(router.query.id);
 
-  const { loading, data } = useQuery<FindOneTodoData, FindOneTodoVars>(FIND_ONE_TODO, {
+  const { loading, data } = useFindOneTodoQuery({
     variables: {
       id,
     },
     skip: Number.isNaN(id),
   });
 
-  const [createTodo, { loading: createLoading }] = useMutation<CreateTodoData, CreateTodoVars>(CREATE_TODO);
-  const [updateTodo, { loading: updateLoading }] = useMutation<UpdateTodoData, UpdateTodoVars>(UPDATE_TODO);
-  const [removeTodo, { loading: removeLoading }] = useMutation<DeleteTodoData, DeleteTodoVars>(DELETE_TODO);
+  const [createTodo, { loading: createLoading }] = useCreateTodoMutation();
+  const [updateTodo, { loading: updateLoading }] = useUpdateTodoMutation();
+  const [removeTodo, { loading: removeLoading }] = useDeleteTodoMutation();
 
-  const [searchUsers, searchUsersResult] = useLazyQuery<FindAllUsersData, FindAllUsersVars>(FIND_ALL_USERS, {
+  const [searchUsers, searchUsersResult] = useFindAllUsersLazyQuery({
     fetchPolicy: 'no-cache',
     errorPolicy: 'ignore',
   });
@@ -51,31 +52,39 @@ export default function AdminTodosEditPage() {
   const todo = useMemo(() => data?.findOneTodo || null, [data?.findOneTodo]);
 
   const form = useForm<FormData>({
-    resolver: yupResolver(yup.object({
-      user: yup.object().required(),
-      title: yup.string().required().min(2),
-      completed: yup.boolean().required(),
-    })),
+    resolver: yupResolver(
+      yup.object({
+        user: yup.object().required(),
+        title: yup.string().required().min(2),
+        completed: yup.boolean().required(),
+      })
+    ),
     defaultValues: {
-      user: todo ? {
-        id: todo.user.id,
-        firstName: todo.user.firstName,
-        lastName: todo.user.lastName,
-        email: todo.user.email,
-      } : undefined,
+      user: todo
+        ? {
+            id: todo.user.id,
+            firstName: todo.user.firstName,
+            lastName: todo.user.lastName,
+            email: todo.user.email,
+          }
+        : undefined,
       title: todo?.title || '',
       completed: todo?.completed || false,
     },
   });
   const formErrors = form.formState.errors;
 
-  const handleSearch = useMemo(() => debounce((search: string) => {
-    searchUsers({
-      variables: {
-        search,
-      },
-    });
-  }, 350), [searchUsers]);
+  const handleSearch = useMemo(
+    () =>
+      debounce((search: string) => {
+        searchUsers({
+          variables: {
+            search,
+          },
+        });
+      }, 350),
+    [searchUsers]
+  );
 
   const handleSubmit = form.handleSubmit(async (formData) => {
     if (todo?.id) {
@@ -132,12 +141,14 @@ export default function AdminTodosEditPage() {
 
   useEffect(() => {
     form.reset({
-      user: todo ? {
-        id: todo.user.id,
-        firstName: todo.user.firstName,
-        lastName: todo.user.lastName,
-        email: todo.user.email,
-      } : undefined,
+      user: todo
+        ? {
+            id: todo.user.id,
+            firstName: todo.user.firstName,
+            lastName: todo.user.lastName,
+            email: todo.user.email,
+          }
+        : undefined,
       title: todo?.title || '',
       completed: todo?.completed || false,
     });
@@ -150,7 +161,7 @@ export default function AdminTodosEditPage() {
         { href: '/admin/todos', label: 'Todos' },
         { href: router.asPath, label: todo ? `${todo.title}` : 'Create' },
       ]}
-      actions={(
+      actions={
         <>
           <Button
             htmlType="submit"
@@ -174,7 +185,7 @@ export default function AdminTodosEditPage() {
             </Button>
           )}
         </>
-      )}
+      }
     >
       <Form id="hook-form" onSubmit={handleSubmit}>
         <Controller
@@ -189,11 +200,13 @@ export default function AdminTodosEditPage() {
                 showSearch
                 filterOption={false}
                 notFoundContent={searchUsersResult.loading ? <Spin size="small" /> : null}
-                value={user && {
-                  user,
-                  value: user.id,
-                  label: `${user.firstName} ${user.lastName} (${user.email})`,
-                }}
+                value={
+                  user && {
+                    user,
+                    value: user.id,
+                    label: `${user.firstName} ${user.lastName} (${user.email})`,
+                  }
+                }
                 options={searchUsersResult.data?.findAllUsers.users.map((user) => ({
                   user,
                   value: user.id,

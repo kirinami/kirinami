@@ -3,7 +3,7 @@ import { ComponentProps } from 'react';
 import styles from './Button.styles';
 
 export type ButtonProps = ComponentProps<'button'> & {
-  variant?: 'primary' | 'secondary',
+  variant?: 'primary' | 'secondary';
 };
 
 export default function Button({ type = 'button', variant = 'primary', children, ...props }: ButtonProps) {

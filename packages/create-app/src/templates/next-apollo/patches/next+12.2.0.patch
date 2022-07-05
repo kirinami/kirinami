@@ -1,0 +1,71 @@
+diff --git a/node_modules/next/dist/server/render.js b/node_modules/next/dist/server/render.js
+index e9da6a7..4c9ac17 100755
+--- a/node_modules/next/dist/server/render.js
++++ b/node_modules/next/dist/server/render.js
+@@ -744,7 +744,13 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
+                 }
+                 const { App: EnhancedApp , Component: EnhancedComponent  } = enhanceComponents(options, App, Component);
+                 if (renderShell) {
+-                    return renderShell(EnhancedApp, EnhancedComponent).then(async (stream)=>{
++                    return renderShell(EnhancedApp, EnhancedComponent, options.enhanceRenderShell).then(async (stream)=>{
++                        if (stream._result) {
++                            return {
++                                html: stream._result,
++                                head: head1
++                            }
++                        }
+                         const forwardStream = (0, _nodeWebStreamsHelper).readableStreamTee(stream)[1];
+                         const html = await (0, _nodeWebStreamsHelper).streamToString(forwardStream);
+                         return {
+@@ -778,7 +784,7 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
+                 documentCtx
+             };
+         }
+-        const renderContent = (_App, _Component)=>{
++        const renderContent = (_App, _Component, props0)=>{
+             const EnhancedApp = _App || App;
+             const EnhancedComponent = _Component || Component;
+             return ctx.err && ErrorDebug ? /*#__PURE__*/ _react.default.createElement(Body, null, /*#__PURE__*/ _react.default.createElement(ErrorDebug, {
+@@ -826,8 +832,14 @@ async function renderToHTML(req, res, pathname, query, renderOpts) {
+             }
+         } else {
+             // Enabling react concurrent rendering mode: __NEXT_REACT_ROOT = true
+-            const renderShell = async (EnhancedApp, EnhancedComponent)=>{
++            const renderShell = async (EnhancedApp, EnhancedComponent, enhancedRender)=>{
+                 const content = renderContent(EnhancedApp, EnhancedComponent);
++                if (enhancedRender) {
++                    const { stream, html, pageProps } = await enhancedRender(content, ReactDOMServer);
++                    stream._result = html;
++                    Object.assign(props1.pageProps, pageProps);
++                    return stream;
++                }
+                 return await (0, _nodeWebStreamsHelper).renderToInitialStream({
+                     ReactDOMServer,
+                     element: content
+diff --git a/node_modules/next/dist/shared/lib/utils.d.ts b/node_modules/next/dist/shared/lib/utils.d.ts
+index 85b1d75..b657b6e 100755
+--- a/node_modules/next/dist/shared/lib/utils.d.ts
++++ b/node_modules/next/dist/shared/lib/utils.d.ts
+@@ -7,6 +7,8 @@ import type { IncomingMessage, ServerResponse } from 'http';
+ import type { NextRouter } from './router/router';
+ import type { ParsedUrlQuery } from 'querystring';
+ import type { PreviewData } from 'next/types';
++import type * as React from 'react';
++import type * as ReactDOMServer from 'react-dom/server';
+ export declare type NextComponentType<C extends BaseContext = NextPageContext, IP = {}, P = {}> = ComponentType<P> & {
+     /**
+      * Used for initial page load data population. Data returned from `getInitialProps` is serialized when server rendered.
+@@ -39,6 +41,13 @@ export declare type Enhancer<C> = (Component: C) => C;
+ export declare type ComponentsEnhancer = {
+     enhanceApp?: Enhancer<AppType>;
+     enhanceComponent?: Enhancer<NextComponentType>;
++    enhanceRenderShell?: (Tree: React.ReactNode, reactDOMServer: typeof ReactDOMServer) => Promise<{
++        stream: ReadableStream,
++        html: string,
++        pageProps?: {
++            [key: string]: any;
++        }
++    }>,
+ } | Enhancer<NextComponentType>;
+ export declare type RenderPageResult = {
+     html: string;

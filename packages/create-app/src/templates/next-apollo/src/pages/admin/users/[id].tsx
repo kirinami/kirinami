@@ -3,51 +3,52 @@ import { Controller, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { Button, Input, Modal, Select } from 'antd';
 import { DeleteFilled, ExclamationCircleOutlined, SaveFilled } from '@ant-design/icons';
-import { useMutation, useQuery } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import Form from '@/components/Common/Form/Form';
 import FormGroup from '@/components/Common/FormGroup/FormGroup';
 import AdminLayout from '@/components/Layout/AdminLayout/AdminLayout';
-import { FIND_ONE_USER, FindOneUserData, FindOneUserVars } from '@/graphql/queries/users/findOneUser';
-import { CREATE_USER, CreateUserData, CreateUserVars } from '@/graphql/mutations/users/createUser';
-import { UPDATE_USER, UpdateUserData, UpdateUserVars } from '@/graphql/mutations/users/updateUser';
-import { DELETE_USER, DeleteUserData, DeleteUserVars } from '@/graphql/mutations/users/deleteUser';
+import { useCreateUserMutation, useDeleteUserMutation, useFindOneUserQuery, useUpdateUserMutation } from '@/graphql/schema';
 
 type FormData = {
-  firstName: string,
-  lastName: string,
-  email: string,
-  password: string,
-  roles: string[],
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  roles: string[];
 };
 
 export default function AdminUsersEditPage() {
   const router = useRouter();
   const id = Number(router.query.id);
 
-  const { loading, data } = useQuery<FindOneUserData, FindOneUserVars>(FIND_ONE_USER, {
+  const { loading, data } = useFindOneUserQuery({
     variables: {
       id,
     },
     skip: Number.isNaN(id),
   });
 
-  const [createUser, { loading: createLoading }] = useMutation<CreateUserData, CreateUserVars>(CREATE_USER);
-  const [updateUser, { loading: updateLoading }] = useMutation<UpdateUserData, UpdateUserVars>(UPDATE_USER);
-  const [removeUser, { loading: removeLoading }] = useMutation<DeleteUserData, DeleteUserVars>(DELETE_USER);
+  const [createUser, { loading: createLoading }] = useCreateUserMutation();
+  const [updateUser, { loading: updateLoading }] = useUpdateUserMutation();
+  const [removeUser, { loading: removeLoading }] = useDeleteUserMutation();
 
   const user = useMemo(() => data?.findOneUser || null, [data?.findOneUser]);
 
   const form = useForm<FormData>({
-    resolver: yupResolver(yup.object({
-      firstName: yup.string().required().min(2),
-      lastName: yup.string().required().min(2),
-      email: yup.string().required().email(),
-      password: yup.string().when({ is: () => !!user, then: yup.string().transform((value) => value || undefined) }).min(8),
-      roles: yup.array().required().min(1),
-    })),
+    resolver: yupResolver(
+      yup.object({
+        firstName: yup.string().required().min(2),
+        lastName: yup.string().required().min(2),
+        email: yup.string().required().email(),
+        password: yup
+          .string()
+          .when({ is: () => !!user, then: yup.string().transform((value) => value || undefined) })
+          .min(8),
+        roles: yup.array().required().min(1),
+      })
+    ),
     defaultValues: {
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
@@ -122,7 +123,7 @@ export default function AdminUsersEditPage() {
         { href: '/admin/users', label: 'Users' },
         { href: router.asPath, label: user ? `${user.firstName} ${user.lastName}` : 'Create' },
       ]}
-      actions={(
+      actions={
         <>
           <Button
             htmlType="submit"
@@ -146,7 +147,7 @@ export default function AdminUsersEditPage() {
             </Button>
           )}
         </>
-      )}
+      }
     >
       <Form id="hook-form" onSubmit={handleSubmit}>
         <Controller

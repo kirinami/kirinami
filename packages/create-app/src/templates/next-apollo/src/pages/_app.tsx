@@ -11,10 +11,7 @@ import initApolloClient from '@/helpers/initApolloClient';
 import initEmotionCache from '@/helpers/initEmotionCache';
 import initTranslations from '@/helpers/initTranslations';
 
-function MyApp({
-  pageProps: { i18n, apolloClient, apolloState, emotionCache, ...pageProps },
-  Component,
-}: AppProps) {
+function MyApp({ pageProps: { i18n, apolloClient, apolloState, emotionCache, ...pageProps }, Component }: AppProps) {
   return (
     <ApolloProvider client={useMemo(() => apolloClient || initApolloClient(null, apolloState), [apolloClient, apolloState])}>
       <CacheProvider value={useMemo(() => emotionCache || initEmotionCache(), [emotionCache])}>

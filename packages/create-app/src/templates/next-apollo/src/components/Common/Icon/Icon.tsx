@@ -4,9 +4,9 @@ import icons from './icons/icons';
 import styles from './Icon.styles';
 
 type IconProps = {
-  className?: string,
-  name: keyof typeof icons,
-  size?: number,
+  className?: string;
+  name: keyof typeof icons;
+  size?: number;
 };
 
 export default function Icon({ className, name, size = 16 }: IconProps) {

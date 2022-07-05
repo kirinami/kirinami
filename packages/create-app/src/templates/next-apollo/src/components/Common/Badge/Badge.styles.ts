@@ -10,22 +10,26 @@ const styles = {
     border-radius: 12px;
     text-align: center;
 
-    ${variant === 'primary' && css`
+    ${variant === 'primary' &&
+    css`
       color: #56ccf2;
       background: rgba(86, 204, 242, 0.2);
     `};
 
-    ${variant === 'secondary' && css`
+    ${variant === 'secondary' &&
+    css`
       color: #27ae60;
       background: rgba(39, 174, 96, 0.2);
     `};
 
-    ${variant === 'warning' && css`
+    ${variant === 'warning' &&
+    css`
       color: #f2994a;
       background: rgba(242, 153, 74, 0.2);
     `};
 
-    ${variant === 'danger' && css`
+    ${variant === 'danger' &&
+    css`
       color: #eb5757;
       background: rgba(235, 87, 87, 0.2);
     `};

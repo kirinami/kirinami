@@ -21,17 +21,20 @@ const styles = {
     border-radius: 50%;
     animation: ${spin} 1s linear infinite;
 
-    ${variant === 'primary' && css`
+    ${variant === 'primary' &&
+    css`
       border-color: rgba(0, 112, 243, 0.2);
       border-left-color: #0070f3;
     `}
 
-    ${variant === 'secondary' && css`
+    ${variant === 'secondary' &&
+    css`
       border-color: rgba(68, 68, 68, 0.2);
       border-left-color: #444444;
     `}
 
-    ${variant === 'light' && css`
+    ${variant === 'light' &&
+    css`
       border-color: rgba(255, 255, 255, 0.2);
       border-left-color: #ffffff;
     `}

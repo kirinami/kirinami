@@ -43,7 +43,7 @@ const styles = {
     align-items: center;
     padding: 1.75rem;
     border-top: 1px solid #eaeaea;
-    
+
     a {
       color: #111111;
     }
