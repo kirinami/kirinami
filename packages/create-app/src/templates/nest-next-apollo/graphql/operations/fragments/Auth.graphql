@@ -1,0 +1,4 @@
+fragment Auth on AuthType {
+  accessToken
+  refreshToken
+}

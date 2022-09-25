@@ -1,30 +1,27 @@
 import { css } from '@emotion/react';
 
 const styles = {
-  spinner: css`
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    padding: 32px;
-  `,
   section: css`
-    > :not([hidden]) ~ :not([hidden]) {
-      margin-top: 16px;
-
-      @media (min-width: 670px) {
-        margin-top: 24px;
-      }
-    }
-  `,
-  sectionTitle: css`
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;
+  `,
+  title: css`
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1;
+  `,
+  description: css`
+    font-weight: 500;
     font-size: 18px;
-    line-height: 28px;
-
-    > :not([hidden]) ~ :not([hidden]) {
-      margin-left: 12px;
-    }
+    line-height: 1;
+  `,
+  children: css`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 32px;
   `,
 };
 

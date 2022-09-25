@@ -1,0 +1,9 @@
+fragment User on UserType {
+  id
+  email
+  firstName
+  lastName
+  roles
+  createdAt
+  updatedAt
+}

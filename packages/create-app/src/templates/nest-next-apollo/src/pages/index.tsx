@@ -1,24 +1,23 @@
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
-import Title from '@/components/Common/Title/Title';
-import PageLayout from '@/components/Layout/PageLayout/PageLayout';
+import Button from '@/components/Common/Button/Button';
+import Container from '@/components/Common/Container/Container';
+import AuthForm from '@/components/Form/AuthForm/AuthForm';
+import Layout from '@/components/Layout/Layout';
 import useAuth from '@/hooks/useAuth';
 
 export default function IndexPage() {
   const { t } = useTranslation();
 
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
-    <PageLayout>
-      <Title>
-        <Trans
-          t={t}
-          i18nKey="pages.home.title"
-          values={{ name: user ? `${user.firstName} ${user.lastName}` : t('auth.anonymous') }}
-          components={[<span />]}
-        />
-      </Title>
-    </PageLayout>
+    <Layout>
+      <Container padding>
+        {t('pages.index.hello')}, {user ? `${user.firstName} ${user.lastName}` : t('pages.index.anonymous')}
+        <hr />
+        {user ? <Button onClick={logout}>{t('pages.index.logout')}</Button> : <AuthForm />}
+      </Container>
+    </Layout>
   );
 }

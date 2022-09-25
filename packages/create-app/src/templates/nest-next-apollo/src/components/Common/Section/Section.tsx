@@ -2,16 +2,18 @@ import { ReactNode } from 'react';
 
 import styles from './Section.styles';
 
-export type TitleProps = {
-  title: ReactNode,
-  children: ReactNode,
+export type SectionProps = {
+  title?: string;
+  description?: string;
+  children: ReactNode;
 };
 
-export default function Section({ title, children }: TitleProps) {
+export default function Section({ title, description, children }: SectionProps) {
   return (
     <div css={styles.section}>
-      <h3 css={styles.sectionTitle}>{title}</h3>
-      {children}
+      <div css={styles.title}>{title}</div>
+      <div css={styles.description}>{description}</div>
+      <div css={styles.children}>{children}</div>
     </div>
   );
 }

@@ -1,0 +1,8 @@
+fragment Translation on TranslationType {
+  id
+  locale
+  key
+  value
+  createdAt
+  updatedAt
+}

@@ -1,0 +1,5 @@
+mutation DeleteTranslation($id: Int!) {
+  deleteTranslation(id: $id) {
+    ...Translation
+  }
+}

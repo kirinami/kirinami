@@ -1,0 +1,101 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthType {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type TranslationType {
+  id: Int!
+  locale: String!
+  key: String!
+  value: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type UserType {
+  id: Int!
+  email: String!
+  firstName: String!
+  lastName: String!
+  roles: [String!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type UserPaginationType {
+  items: [UserType!]!
+  total: Int!
+}
+
+type Query {
+  locales: [String!]!
+  translations(locale: String): [TranslationType!]!
+  currentUser: UserType!
+  users: [UserType!]!
+  usersWithPagination(page: Int, size: Int): UserPaginationType!
+  user(id: Int!): UserType!
+}
+
+type Mutation {
+  login(input: LoginInput!): AuthType!
+  register(input: RegisterInput!): AuthType!
+  refresh(token: String!): AuthType!
+  createTranslation(input: CreateTranslationInput!): TranslationType!
+  updateTranslation(input: UpdateTranslationInput!): TranslationType!
+  upsertTranslation(input: [UpdateTranslationInput!]!): Boolean!
+  deleteTranslation(id: Int!): TranslationType!
+  createUser(input: CreateUserInput!): UserType!
+  updateUser(input: UpdateUserInput!): UserType!
+  deleteUser(id: Int!): UserType!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
+}
+
+input CreateTranslationInput {
+  locale: String!
+  key: String!
+  value: String!
+}
+
+input UpdateTranslationInput {
+  locale: String!
+  key: String!
+  value: String!
+  id: Int!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
+  roles: [String!]!
+}
+
+input UpdateUserInput {
+  email: String
+  password: String
+  firstName: String
+  lastName: String
+  roles: [String!]
+  id: Int!
+}

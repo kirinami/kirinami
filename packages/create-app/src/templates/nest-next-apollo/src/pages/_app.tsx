@@ -1,61 +1,41 @@
+import { useMemo } from 'react';
 import { I18nextProvider } from 'react-i18next';
-import App, { AppContext, AppProps } from 'next/app';
+import App, { AppProps } from 'next/app';
 import { ApolloProvider } from '@apollo/client';
 import { CacheProvider } from '@emotion/react';
 
-import Meta from '@/components/Common/Meta/Meta';
-import AuthProvider from '@/components/Provider/AuthProvider/AuthProvider';
-import ThemeProvider from '@/components/Provider/ThemeProvider/ThemeProvider';
-import { RETRIEVE_USER, RetrieveUserData, RetrieveUserVars } from '@/graphql/queries/users/retrieveUser';
+import Meta from '@/components/Meta/Meta';
+import Styles from '@/components/Styles/Styles';
+import AuthProvider from '@/contexts/AuthProvider/AuthProvider';
 import initApolloClient from '@/helpers/initApolloClient';
 import initEmotionCache from '@/helpers/initEmotionCache';
-import initTranslations from '@/helpers/initTranslations';
+import initI18n from '@/helpers/initI18n';
 
-function MyApp({
-  pageProps: { i18n, apolloClient, apolloState, emotionCache, user, ...pageProps },
-  Component,
-}: AppProps) {
+function MyApp({ pageProps: { apolloClient, i18n, initialState, ...pageProps }, Component }: AppProps<any>) {
+  const emotionCacheMemo = useMemo(() => initEmotionCache(), []);
+
+  const apolloClientMemo = useMemo(
+    () => apolloClient || initApolloClient(null, initialState?.apolloClient),
+    [apolloClient, initialState?.apolloClient]
+  );
+
+  const i18nMemo = useMemo(() => i18n || initI18n(null, initialState?.i18n), [i18n, initialState?.i18n]);
+
   return (
-    <ApolloProvider client={apolloClient || initApolloClient(null, apolloState)}>
-      <CacheProvider value={emotionCache || initEmotionCache()}>
-        <I18nextProvider i18n={i18n || initTranslations()}>
-          <AuthProvider user={user}>
-            <ThemeProvider>
-              <Meta />
-              <Component {...pageProps} />
-            </ThemeProvider>
+    <CacheProvider value={emotionCacheMemo}>
+      <ApolloProvider client={apolloClientMemo}>
+        <I18nextProvider i18n={i18nMemo}>
+          <AuthProvider>
+            <Meta />
+            <Styles />
+            <Component {...pageProps} />
           </AuthProvider>
         </I18nextProvider>
-      </CacheProvider>
-    </ApolloProvider>
+      </ApolloProvider>
+    </CacheProvider>
   );
 }
 
-MyApp.getInitialProps = async (appContext: AppContext) => {
-  const { ctx } = appContext;
-
-  const apolloClient = initApolloClient(ctx);
-  const emotionCache = initEmotionCache();
-  const i18n = initTranslations(ctx);
-
-  const { data } = await apolloClient.query<RetrieveUserData | undefined, RetrieveUserVars>({
-    query: RETRIEVE_USER,
-    fetchPolicy: 'no-cache',
-    errorPolicy: 'ignore',
-  });
-
-  const initialProps = await App.getInitialProps(appContext);
-
-  Object.assign(initialProps.pageProps, {
-    i18n,
-    apolloClient,
-    emotionCache,
-    user: data?.retrieveUser || null,
-  });
-
-  if (ctx.req) ctx.req.pageProps = initialProps.pageProps;
-
-  return initialProps;
-};
+MyApp.getInitialProps = App.getInitialProps;
 
 export default MyApp;

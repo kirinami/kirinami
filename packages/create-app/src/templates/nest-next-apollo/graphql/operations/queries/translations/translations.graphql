@@ -1,0 +1,6 @@
+query Translations($locale: String) {
+  locales
+  translations(locale: $locale) {
+    ...Translation
+  }
+}

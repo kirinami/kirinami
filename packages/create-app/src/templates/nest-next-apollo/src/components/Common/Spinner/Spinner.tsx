@@ -3,9 +3,9 @@ import React from 'react';
 import styles from './Spinner.styles';
 
 export type SpinnerProps = {
-  className?: string,
-  variant?: 'primary' | 'secondary' | 'light',
-  size?: number,
+  className?: string;
+  variant?: 'primary' | 'secondary' | 'light';
+  size?: number;
 };
 
 export default function Spinner({ className, variant = 'primary', size = 24 }: SpinnerProps) {

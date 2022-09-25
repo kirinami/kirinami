@@ -1,25 +1,36 @@
-import { IncomingHttpHeaders } from 'http';
 import { NextPageContext } from 'next';
-import { ApolloClient, ApolloLink, from, fromPromise, HttpLink, InMemoryCache, NormalizedCacheObject } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloLink,
+  Context,
+  from,
+  fromPromise,
+  HttpLink,
+  InMemoryCache,
+  NormalizedCacheObject,
+  split,
+} from '@apollo/client';
 import { GraphQLErrors } from '@apollo/client/errors';
 import { onError } from '@apollo/client/link/error';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { createClient } from 'graphql-ws';
+import { v5 } from 'uuid';
 
-import { REFRESH, RefreshData } from '@/graphql/mutations/auth/refresh';
-import parseCookie from '@/utils/parseCookie';
+import { RefreshDocument, RefreshMutation, RefreshMutationVariables } from '@/graphql/client';
+import { parseCookie } from '@/utils/cookie';
+import { isServer } from '@/utils/ssr';
 
-let apolloClientMemo: ReturnType<typeof createApolloClient> | undefined;
+let apolloClientMemo: ApolloClient<NormalizedCacheObject> | undefined;
 
-const isServer = typeof window === 'undefined';
-
-const createCache = () => new InMemoryCache();
-
-const createAuthLink = (ctx?: NextPageContext | null) => {
+function createAuthLink(ctx?: NextPageContext | null) {
   const authLink = new ApolloLink((operation, forward) => {
     const cookies = parseCookie(isServer ? ctx?.req?.headers?.cookie || '' : document.cookie);
 
-    operation.setContext(({ headers = {} }) => ({
+    operation.setContext((ctx: Context) => ({
+      ...ctx,
       headers: {
-        ...headers,
+        ...(ctx.headers || {}),
         authorization: cookies['access-token'] ? `Bearer ${cookies['access-token']}` : '',
       },
     }));
@@ -29,28 +40,33 @@ const createAuthLink = (ctx?: NextPageContext | null) => {
 
   const refreshLink = onError(({ graphQLErrors, operation, forward }) => {
     const errors: GraphQLErrors = Array.isArray(graphQLErrors) ? graphQLErrors : [graphQLErrors];
-    const unauthorizedError = errors.find((error) => error?.message === 'Unauthorized');
+    const unauthorizedError = errors.find((error) => error?.message === 'Not authenticated');
 
     if (unauthorizedError) {
       const cookies = parseCookie(isServer ? ctx?.req?.headers?.cookie || '' : document.cookie);
 
+      if (!cookies['refresh-token']) {
+        return undefined;
+      }
+
       return fromPromise(
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        createApolloClient({
-          'refresh-token': cookies['refresh-token'],
+        createApolloClient().mutate<RefreshMutation, RefreshMutationVariables>({
+          mutation: RefreshDocument,
+          variables: {
+            token: cookies['refresh-token'],
+          },
+          fetchPolicy: 'no-cache',
+          errorPolicy: 'ignore',
         })
-          .mutate<RefreshData>({
-            mutation: REFRESH,
-            fetchPolicy: 'no-cache',
-            errorPolicy: 'ignore',
-          }),
       ).flatMap((response) => {
         cookies['access-token'] = response?.data?.refresh.accessToken || '';
         cookies['refresh-token'] = response?.data?.refresh.refreshToken || '';
 
-        operation.setContext(({ headers = {} }) => ({
+        operation.setContext((ctx: Context) => ({
+          ...ctx,
           headers: {
-            ...headers,
+            ...(ctx.headers || {}),
             authorization: cookies['access-token'] ? `Bearer ${cookies['access-token']}` : '',
           },
         }));
@@ -73,42 +89,87 @@ const createAuthLink = (ctx?: NextPageContext | null) => {
   });
 
   return from([authLink, refreshLink]);
-};
+}
 
-const createHttpLink = (headers?: IncomingHttpHeaders) => new HttpLink({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_URL,
-  credentials: 'same-origin',
-  headers,
-});
+function createHttpLink() {
+  return new HttpLink({
+    uri: process.env.NEXT_PUBLIC_GRAPHQL_HTTP_URL,
+    credentials: 'same-origin',
+  });
+}
 
-const createApolloClient = (headers?: IncomingHttpHeaders) => new ApolloClient({
-  ssrMode: isServer,
-  ssrForceFetchDelay: isServer ? 100 : undefined,
-  link: createHttpLink(headers),
-  cache: createCache(),
-  defaultOptions: {
-    query: {
-      fetchPolicy: 'network-only',
-      errorPolicy: 'none',
+function createApolloClient() {
+  return new ApolloClient({
+    ssrMode: isServer,
+    ssrForceFetchDelay: isServer ? 100 : undefined,
+    link: createHttpLink(),
+    cache: new InMemoryCache({
+      dataIdFromObject(object, context) {
+        const NS = '40e1d236-d2d4-46ec-bd0c-6ceb0e83d43b';
+
+        return object.id ? `${context.typename}:${object.id}:${v5(Object.keys(object).join(','), NS)}` : undefined;
+      },
+    }),
+    defaultOptions: {
+      watchQuery: {
+        errorPolicy: 'all',
+        fetchPolicy: 'cache-first',
+        notifyOnNetworkStatusChange: true,
+      },
+      query: {
+        errorPolicy: 'all',
+        fetchPolicy: 'cache-first',
+        notifyOnNetworkStatusChange: true,
+      },
+      mutate: {
+        errorPolicy: 'all',
+        fetchPolicy: 'network-only',
+      },
     },
-    mutate: {
-      fetchPolicy: 'network-only',
-      errorPolicy: 'none',
-    },
-  },
-});
+  });
+}
+
+function createWebSocketLink(ctx?: NextPageContext | null) {
+  return new GraphQLWsLink(
+    createClient({
+      url: String(process.env.NEXT_PUBLIC_GRAPHQL_WS_URL),
+      connectionParams: async () => {
+        const cookies = parseCookie(isServer ? ctx?.req?.headers?.cookie || '' : document.cookie);
+
+        return {
+          authorization: cookies['access-token'] ? `Bearer ${cookies['access-token']}` : '',
+        };
+      },
+    })
+  );
+}
+
+function createApolloLink(ctx?: NextPageContext | null) {
+  const baseLink = from([createAuthLink(ctx), createHttpLink()]);
+
+  return isServer
+    ? baseLink
+    : split(
+        ({ query }) => {
+          const definition = getMainDefinition(query);
+
+          return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
+        },
+        createWebSocketLink(ctx),
+        baseLink
+      );
+}
 
 export default function initApolloClient(ctx?: NextPageContext | null, initialState?: NormalizedCacheObject) {
   const apolloClient = apolloClientMemo ?? createApolloClient();
 
-  apolloClient.setLink(from([
-    createAuthLink(ctx),
-    createHttpLink(),
-  ]));
+  if (!apolloClientMemo) {
+    apolloClient.onResetStore(async () => {
+      apolloClient.setLink(createApolloLink(ctx));
+    });
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  apolloClient.toJSON = () => undefined;
+    apolloClient.setLink(createApolloLink(ctx));
+  }
 
   if (initialState) {
     const existingCache = apolloClient.extract();
@@ -116,6 +177,10 @@ export default function initApolloClient(ctx?: NextPageContext | null, initialSt
     apolloClient.restore({
       ...existingCache,
       ...initialState,
+      ROOT_QUERY: {
+        ...(existingCache.ROOT_QUERY || {}),
+        ...(initialState.ROOT_QUERY || {}),
+      },
     });
   }
 

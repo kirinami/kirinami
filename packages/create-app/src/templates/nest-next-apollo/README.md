@@ -1,67 +1,45 @@
-# Nest-Next-Apollo Starter
+# nest-next-apollo-template
 
-This project was bootstrapped with [NestJS](https://github.com/nestjs/nest) and [TypeORM](https://github.com/typeorm/typeorm).
+This project was bootstrapped with [Nest.js](https://nestjs.com/), [Next.js](https://nextjs.org/), [Apollo GraphQL](https://www.apollographql.com/)
+and [Prisma](https://www.prisma.io/).
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `yarn typeorm schema:drop`
+### `yarn prisma migrate reset`
 
 Drops all tables in the database on your default connection.
 
-### `yarn typeorm migration:run`
+### `yarn prisma migrate deploy`
 
 Runs all pending migrations.
 
-### `yarn typeorm migration:revert`
-
-Reverts last executed migration.
-
-### `yarn typeorm migration:generate -n <name> --pretty`
+### `yarn prisma migrate dev`
 
 Generates a new migration file with sql needs to be executed to update schema.
 
-### `yarn start:dev`
+### `yarn gen`
 
-Runs the api in the development mode.\
-Open [http://localhost:3000/docs](http://localhost:3000/docs) to view it in the browser.
+Generates a latest types for prisma and graphql from schemas.
+
+### `yarn dev`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
 ### `yarn build`
 
-Builds the api for production to the `dist` folder.\
+Builds the app for production to the `.nest` and `.next` folders.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.\
-Your api is ready to be deployed!
+Your app is ready to be deployed!
 
 ## Learn More
 
-You can learn more in the [NestJS documentation](https://docs.nestjs.com/) and [TypeORM documentation](https://typeorm.io/).
-
-## Deploy via Docker
-
-docker-compose.yml
-```yaml
-version: '3.7'
-
-services:
-  postgres:
-    env_file:
-      - .env.local
-    image: postgres:13.2-alpine
-    ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    restart: unless-stopped
-
-  app:
-    env_file:
-      - .env.local
-    build: .
-    ports:
-      - 3000:3000
-    restart: unless-stopped
-```
+You can learn more in the [Nest.js Documentation](https://docs.nestjs.com/), [Next.js Documentation](https://nextjs.org/docs/), [Apollo GraphQL Documentation](https://www.apollographql.com/docs/)
+and [Prisma Documentation](https://www.prisma.io/docs/).

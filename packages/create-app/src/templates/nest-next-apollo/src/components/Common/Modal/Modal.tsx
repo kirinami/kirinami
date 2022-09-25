@@ -1,34 +1,59 @@
-import BaseModal from 'react-modal';
+import { ReactNode, useCallback } from 'react';
+import ModalBase from 'react-modal';
+import { useKey } from 'react-use';
 import { ClassNames } from '@emotion/react';
+import { Icon } from '@iconify/react';
 
-import Icon from '../Icon/Icon';
+import Button from '@/components/Common/Button/Button';
+import Spinner from '@/components/Common/Spinner/Spinner';
 
 import styles from './Modal.styles';
 
-BaseModal.setAppElement('#__next');
+ModalBase.setAppElement('#__next');
 
-export type ModalProps = Omit<BaseModal.Props, 'className' | 'overlayClassName' | 'portalClassName' | 'htmlOpenClassName'
-| 'bodyOpenClassName' | 'closeTimeoutMS'>;
+export type ModalProps = {
+  open: boolean;
+  loading?: boolean;
+  children: ReactNode;
+  onClose?: () => void;
+};
 
-export default function Modal({ children, onRequestClose, ...props }: ModalProps) {
+export default function Modal({ open, loading, children, onClose }: ModalProps) {
+  const handleClose = useCallback(() => {
+    if (!loading && onClose) {
+      onClose();
+    }
+  }, [loading, onClose]);
+
+  useKey('Escape', handleClose);
+
   return (
     <ClassNames>
       {({ css }) => (
-        <BaseModal
-          {...props}
-          overlayClassName={css(styles.overlay)}
+        <ModalBase
+          bodyOpenClassName={css(styles.bodyOpen)}
           className={css(styles.modal)}
-          onRequestClose={onRequestClose}
-          closeTimeoutMS={200}
+          closeTimeoutMS={300}
+          isOpen={open}
+          overlayClassName={css(styles.overlay)}
+          onRequestClose={handleClose}
         >
-          {!!onRequestClose && (
-            <button css={styles.close} type="button" onClick={onRequestClose}>
-              <Icon name="close" />
-            </button>
+          {!loading && onClose && (
+            <div css={styles.close}>
+              <Button onClick={handleClose}>
+                <Icon icon="akar-icons:cross" />
+              </Button>
+            </div>
           )}
 
-          {children}
-        </BaseModal>
+          {loading ? (
+            <div css={styles.spinner}>
+              <Spinner />
+            </div>
+          ) : (
+            <div css={styles.children}>{children}</div>
+          )}
+        </ModalBase>
       )}
     </ClassNames>
   );

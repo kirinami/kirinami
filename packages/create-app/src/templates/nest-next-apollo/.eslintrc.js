@@ -1,94 +1,84 @@
 module.exports = {
-  extends: [
-    'next/core-web-vitals',
-    'airbnb',
-    'airbnb-typescript',
-    'airbnb/hooks',
-    'plugin:@typescript-eslint/recommended',
-  ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     project: './tsconfig.json',
+    sourceType: 'module',
   },
+  plugins: ['unused-imports', 'simple-import-sort'],
+  extends: [
+    'airbnb',
+    'airbnb/hooks',
+    'airbnb-typescript',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+  ],
   rules: {
-    'no-console': 'warn',
+    'prettier/prettier': 'error',
     'no-param-reassign': 'off',
-    'no-restricted-exports': 'off',
-    'no-empty-pattern': 'off',
-    'max-len': ['error', 128, 2, {
-      ignoreUrls: true,
-      ignoreRegExpLiterals: true,
-      ignoreStrings: true,
-      ignoreTemplateLiterals: true,
-    }],
-    'consistent-return': 'off',
     'prefer-destructuring': 'off',
     'class-methods-use-this': 'off',
-    'object-curly-newline': ['error', {
-      consistent: true,
-      multiline: true,
-    }],
-
-    'import/no-cycle': 'off',
-    'import/no-named-as-default': 'off',
-    'import/prefer-default-export': 'off',
-    'import/order': ['error', {
-      groups: [['builtin', 'external'], 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
-      pathGroups: [
-        {
-          pattern: '@/**',
-          group: 'internal',
-        },
-      ],
-      'newlines-between': 'always',
-    }],
-
-    'react/prop-types': 'off',
-    'react/react-in-jsx-scope': 'off',
-    'react/jsx-props-no-spreading': 'off',
-    'react/jsx-one-expression-per-line': 'off',
-    'react/destructuring-assignment': 'off',
-    'react/require-default-props': 'off',
-
-    'jsx-a11y/anchor-is-valid': ['error', {
-      components: ['a'],
-      aspects: ['invalidHref', 'preferButton'],
-    }],
-    'jsx-a11y/label-has-associated-control': ['error', {
-      assert: 'nesting',
-    }],
-
-    '@typescript-eslint/no-shadow': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn',
-    '@typescript-eslint/no-empty-interface': 'off',
-    '@typescript-eslint/no-inferrable-types': 'warn',
-    '@typescript-eslint/member-delimiter-style': ['error', {
-      overrides: {
-        typeLiteral: {
-          singleline: {
-            delimiter: 'comma',
-            requireLast: false,
-          },
-          multiline: {
-            delimiter: 'comma',
-            requireLast: true,
-          },
-        },
+    'consistent-return': 'off',
+    'jsx-a11y/no-autofocus': 'off',
+    'jsx-a11y/anchor-is-valid': [
+      'error',
+      {
+        components: ['a'],
+        aspects: ['invalidHref', 'preferButton'],
       },
+    ],
+    'react/no-unknown-property': ['error', {
+      ignore: ['css'],
     }],
-    '@typescript-eslint/lines-between-class-members': ['error', 'always', {
-      exceptAfterSingleLine: true,
+    'react/destructuring-assignment': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
+    'react/require-default-props': 'off',
+    'react/jsx-props-no-spreading': 'off',
+    'react/jsx-sort-props': ['error', {
+      callbacksLast: true,
+      shorthandFirst: true,
+      reservedFirst: true,
+      noSortAlphabetically: true,
     }],
+    'unused-imports/no-unused-imports': 'error',
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [
+          ['^\\u0000'],
+          [`^(${require('module').builtinModules.join('|')})(/|$)`],
+          ['^react', '^next', '^@?\\w', '^'],
+          ['^@/\\w'],
+          ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+          ['^.+\\.styles$'],
+        ],
+      },
+    ],
+    'simple-import-sort/exports': 'error',
+    '@typescript-eslint/no-shadow': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/interface-name-prefix': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/indent': ['error', 2, {
-      SwitchCase: 1,
-      ignoredNodes: [
-        'TSTypeParameterInstantiation',
-        'FunctionExpression > .params[decorators.length > 0]',
-        'FunctionExpression > .params > :matches(Decorator, :not(:first-child))',
-        'ClassBody.body > PropertyDefinition[decorators.length > 0] > .key',
-      ],
-    }],
   },
+  overrides: [
+    {
+      files: ['src/**/*.ts', 'src/**/*.tsx', 'next-env.d.ts'],
+      excludedFiles: ['src/server/**/*.ts', 'src/main.ts'],
+      parserOptions: {
+        project: './tsconfig.json',
+      },
+      extends: ['plugin:@next/next/core-web-vitals', 'plugin:@next/next/recommended'],
+    },
+    {
+      files: ['src/server/**/*.ts', 'src/main.ts'],
+      parserOptions: {
+        project: './tsconfig.server.json',
+      },
+    },
+  ],
   settings: {
     'import/resolver': {
       typescript: {
@@ -96,4 +86,5 @@ module.exports = {
       },
     },
   },
+  ignorePatterns: ['**/node_modules/**', '**/graphql/**', '**/prisma/**', '*.js', '*.jsx'],
 };

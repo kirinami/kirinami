@@ -1,59 +1,70 @@
 import { css } from '@emotion/react';
 
 const styles = {
+  bodyOpen: css`
+    overflow: hidden;
+  `,
   overlay: css`
     position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(4px);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(65, 65, 65, 0.75);
+    opacity: 0;
     z-index: 1000;
 
-    &.ReactModal__Overlay {
-      opacity: 0;
-      transition: opacity 200ms ease-in-out;
-    }
-
-    &.ReactModal__Overlay--after-open{
+    &.ReactModal__Overlay--after-open {
       opacity: 1;
+      transition: opacity ease-in 300ms;
     }
 
-    &.ReactModal__Overlay--before-close{
+    &.ReactModal__Overlay--before-close {
       opacity: 0;
+      transition: opacity ease-out 300ms;
     }
   `,
   modal: css`
-    position: relative;
-    max-width: calc(100% - 36px);
-    padding: 36px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: auto;
+    min-width: 352px;
+    max-width: calc(100vw - 112px);
+    max-height: calc(100vh - 112px);
+    padding: 48px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.1);
     outline: none;
-    border-radius: 10px;
-    background: #ffffff;
-    border: 1px solid #e2e0e0;
-    box-shadow: 0 4px 40px rgba(0, 0, 0, 0.2);
+    transform: translate(-50%, -50%) scale(0.95);
+    overflow: auto;
+    z-index: 1;
+
+    &.ReactModal__Content--after-open {
+      transform: translate(-50%, -50%) scale(1);
+      transition: transform ease-in 300ms;
+    }
+
+    &.ReactModal__Content--before-close {
+      transform: translate(-50%, -50%) scale(0.95);
+      transition: transform ease-out 300ms;
+    }
   `,
   close: css`
     position: absolute;
-    top: 12px;
-    right: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    color: #bebbbb;
-    background: #f2f2f2;
-    cursor: pointer;
-
-    &:hover {
-      opacity: 0.8;
-    }
+    top: 10px;
+    right: 10px;
+    padding: 8px;
   `,
+  spinner: css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  `,
+  children: css``,
 };
 
 export default styles;

@@ -1,17 +1,18 @@
-import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document';
+import React, { Children } from 'react';
 import { streamToString } from 'next/dist/server/node-web-streams-helper';
+import Document, { DocumentContext, DocumentProps, Head, Html, Main, NextScript } from 'next/document';
 import { getMarkupFromTree } from '@apollo/client/react/ssr';
 import createEmotionServer from '@emotion/server/create-instance';
 
-function MyDocument() {
+import getLocaleFromContext from '@/helpers/getLocaleFromContext';
+import initApolloClient from '@/helpers/initApolloClient';
+import initEmotionCache from '@/helpers/initEmotionCache';
+import initI18n, { loadTranslation } from '@/helpers/initI18n';
+
+function MyDocument({ locale }: DocumentProps) {
   return (
-    <Html lang="en">
-      <Head>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;400;500;600;700&display=swap"
-        />
-      </Head>
+    <Html lang={locale}>
+      <Head />
       <body>
         <Main />
         <NextScript />
@@ -21,51 +22,62 @@ function MyDocument() {
 }
 
 MyDocument.getInitialProps = async (ctx: DocumentContext) => {
-  const { req: { pageProps }, renderPage } = ctx;
+  const { renderPage } = ctx;
 
-  ctx.renderPage = () => renderPage({
-    enhanceRenderShell: async (Tree, { renderToReadableStream }) => {
-      let stream: ReadableStream;
+  const locale = getLocaleFromContext(ctx);
 
-      const html = await getMarkupFromTree({
-        tree: Tree,
-        renderFunction: async (Tree) => {
-          stream = await renderToReadableStream(Tree);
+  const apolloClient = initApolloClient(ctx);
+  const i18n = initI18n(ctx, await loadTranslation(apolloClient, locale));
 
-          return streamToString(stream.tee()[1]);
+  ctx.renderPage = () =>
+    renderPage({
+      enhanceApp: (App) =>
+        function EnhanceApp({ pageProps, ...props }) {
+          return <App pageProps={{ ...pageProps, apolloClient, i18n }} {...props} />;
         },
-      });
+      enhanceRender: async (Tree, { renderToReadableStream }) => {
+        let stream: Awaited<ReturnType<typeof renderToReadableStream>>;
 
-      return {
-        stream: stream!,
-        html,
-        pageProps: {
-          i18n: undefined,
-          apolloClient: undefined,
-          apolloState: pageProps.apolloClient.extract(),
-          emotionCache: undefined,
-        },
-      };
-    },
-  });
+        const html = await getMarkupFromTree({
+          tree: Tree,
+          renderFunction: async (Tree) => {
+            stream = await renderToReadableStream(Tree);
 
-  const emotionServer = createEmotionServer(pageProps.emotionCache);
+            return streamToString(stream.tee()[1]);
+          },
+        });
 
-  const initialProps = await Document.getInitialProps(ctx);
-  const initialStyles = initialProps.styles ? ([] as unknown[]).concat(initialProps.styles) : [];
+        return {
+          stream: stream!,
+          html,
+          pageProps: {
+            initialState: {
+              apolloClient: apolloClient.extract(),
+              i18n: i18n.extract(),
+            },
+          },
+        };
+      },
+    });
 
-  const emotionChunks = emotionServer.extractCriticalToChunks(initialProps.html);
+  const emotionCache = initEmotionCache();
+  const emotionServer = createEmotionServer(emotionCache);
+
+  const documentProps = await Document.getInitialProps(ctx);
+  const documentStyles = documentProps.styles;
+
+  const emotionChunks = emotionServer.extractCriticalToChunks(documentProps.html);
   const emotionStyles = emotionChunks?.styles.map((style) => (
     <style
       key={style.key}
-      data-emotion={`${style.key} ${style.ids.join(' ')}`.trim()}
       dangerouslySetInnerHTML={{ __html: style.css }}
+      data-emotion={`${style.key} ${style.ids.join(' ')}`}
     />
   ));
 
-  return Object.assign(initialProps, {
-    styles: initialStyles.concat(emotionStyles || []),
-  });
+  const styles = Children.toArray([documentStyles, emotionStyles]);
+
+  return { ...documentProps, locale, styles };
 };
 
 export default MyDocument;
