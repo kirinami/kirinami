@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "prepare": "husky install",
+    "postinstall": "husky install",
     "gen": "graphql-codegen -o && prisma generate",
     "dev": "graphql-codegen -o && prisma migrate dev && nest start --watch",
     "build": "yarn gen && next build && nest build",
