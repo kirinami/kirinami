@@ -19,7 +19,7 @@ const styles = css`
     font-style: normal;
     font-weight: 400;
     font-size: 14px;
-    line-height: 17px;
+    line-height: 1;
     color: #1c1c1c;
   }
 
