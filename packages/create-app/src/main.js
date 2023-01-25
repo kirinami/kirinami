@@ -16,11 +16,11 @@ const frameworks = [
     color: lightRed,
     variants: [
       {
-        name: 'graphql',
+        name: 'nest-graphql',
         color: magenta,
       },
       {
-        name: 'restapi',
+        name: 'nest-restapi',
         color: green,
       },
     ],
@@ -30,11 +30,11 @@ const frameworks = [
     color: green,
     variants: [
       {
-        name: 'apollo',
+        name: 'next-apollo',
         color: magenta,
       },
       {
-        name: 'redux',
+        name: 'next-redux',
         color: blue,
       },
     ],
