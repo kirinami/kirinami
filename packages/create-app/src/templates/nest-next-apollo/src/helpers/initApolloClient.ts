@@ -17,7 +17,7 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 import { v5 } from 'uuid';
 
-import { RefreshDocument, RefreshMutation, RefreshMutationVariables } from '@/graphql/client';
+import { RefreshTokenDocument, RefreshTokenMutation, RefreshTokenMutationVariables } from '@/graphql/client';
 import { parseCookie } from '@/utils/cookie';
 import { isServer } from '@/utils/ssr';
 
@@ -51,17 +51,19 @@ function createAuthLink(ctx?: NextPageContext | null) {
 
       return fromPromise(
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        createApolloClient().mutate<RefreshMutation, RefreshMutationVariables>({
-          mutation: RefreshDocument,
+        createApolloClient().mutate<RefreshTokenMutation, RefreshTokenMutationVariables>({
+          mutation: RefreshTokenDocument,
           variables: {
-            token: cookies['refresh-token'],
+            input: {
+              refreshToken: cookies['refresh-token'],
+            },
           },
           fetchPolicy: 'no-cache',
           errorPolicy: 'ignore',
         })
       ).flatMap((response) => {
-        cookies['access-token'] = response?.data?.refresh.accessToken || '';
-        cookies['refresh-token'] = response?.data?.refresh.refreshToken || '';
+        cookies['access-token'] = response?.data?.refreshToken.accessToken || '';
+        cookies['refresh-token'] = response?.data?.refreshToken.refreshToken || '';
 
         operation.setContext((ctx: Context) => ({
           ...ctx,

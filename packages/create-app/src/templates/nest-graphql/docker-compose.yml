@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  db:
+    env_file:
+      - .env
+    image: postgres:13.2-alpine
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - backend
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -q -d ${POSTGRES_USER} -U ${POSTGRES_USER}
+      start_period: 5s
+      interval: 5s
+    restart: unless-stopped
+
+  api:
+    depends_on:
+      - db
+    build: .
+    networks:
+      - backend
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  postgres:
+
+networks:
+  backend:

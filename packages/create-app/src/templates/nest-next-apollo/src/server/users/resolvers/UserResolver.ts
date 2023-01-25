@@ -1,51 +1,33 @@
-import { BadRequestException, DefaultValuePipe, NotFoundException } from '@nestjs/common';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import bcrypt from 'bcryptjs';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { type User, Prisma } from '@/prisma/client';
+import JwtAccess from '@/server/auth/decorators/JwtAccess';
+import RolesAccess from '@/server/auth/decorators/RolesAccess';
+import PrismaService from '@/server/utils/services/PrismaService';
 
-import CurrentUser from '../../auth/decorators/CurrentUser';
-import JwtAccess from '../../auth/decorators/JwtAccess';
-import RolesAccess from '../../auth/decorators/RolesAccess';
-import PrismaService from '../../utils/prisma/PrismaService';
-import CreateUserInput from '../dto/CreateUserInput';
-import UpdateUserInput from '../dto/UpdateUserInput';
-import UserPaginationType from '../dto/UserPaginationType';
-import UserType from '../dto/UserType';
+import CreateUserArgs from '../dto/args/CreateUserArgs';
+import DeleteUserArgs from '../dto/args/DeleteUserArgs';
+import GetUserArgs from '../dto/args/GetUserArgs';
+import GetUsersPaginatedArgs from '../dto/args/GetUsersPaginatedArgs';
+import UpdateUserArgs from '../dto/args/UpdateUserArgs';
+import UserPaginatedType from '../dto/types/UserPaginatedType';
+import UserType from '../dto/types/UserType';
+import UsersService from '../UsersService';
 
 @JwtAccess()
 @Resolver(() => UserType)
 export default class UserResolver {
-  constructor(private readonly prismaService: PrismaService) {}
-
-  @Query(() => UserType)
-  async currentUser(@CurrentUser() user?: User) {
-    return user;
-  }
+  constructor(private readonly prismaService: PrismaService, private readonly usersService: UsersService) {}
 
   @RolesAccess(['Admin'])
-  @Query(() => [UserType])
-  async users() {
-    return this.prismaService.user.findMany({
-      orderBy: {
-        id: 'desc',
-      },
-    });
-  }
-
-  @RolesAccess(['Admin'])
-  @Query(() => UserPaginationType)
-  async usersWithPagination(
-    @Args('page', { type: () => Int, nullable: true }, new DefaultValuePipe(1)) page: number,
-    @Args('size', { type: () => Int, nullable: true }, new DefaultValuePipe(10)) size: number
-  ) {
+  @Query(() => UserPaginatedType)
+  async getUsersPaginated(@Args() { page, size }: GetUsersPaginatedArgs): Promise<UserPaginatedType> {
     const [items, total] = await Promise.all([
       this.prismaService.user.findMany({
         orderBy: {
           id: 'desc',
         },
-        skip: Math.abs(size * (page - 1)),
-        take: Math.abs(size),
+        skip: size * (page - 1),
+        take: size,
       }),
       this.prismaService.user.count(),
     ]);
@@ -55,86 +37,25 @@ export default class UserResolver {
 
   @RolesAccess(['Admin'])
   @Query(() => UserType)
-  async user(@Args('id', { type: () => Int }) id: number) {
-    try {
-      return await this.prismaService.user.findUniqueOrThrow({
-        where: {
-          id,
-        },
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') {
-          throw new NotFoundException();
-        }
-      }
-
-      throw err;
-    }
+  async getUser(@Args() { id }: GetUserArgs): Promise<UserType> {
+    return this.usersService.findUserById(id);
   }
 
   @RolesAccess(['Admin'])
   @Mutation(() => UserType)
-  async createUser(@Args('input') input: CreateUserInput) {
-    try {
-      const password = await bcrypt.hash(input.password, 10);
-
-      return await this.prismaService.user.create({
-        data: { ...input, password },
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') {
-          throw new BadRequestException(['Cannot be created with this email']);
-        }
-      }
-
-      throw err;
-    }
+  async createUser(@Args() { input }: CreateUserArgs): Promise<UserType> {
+    return this.usersService.createUser(input);
   }
 
   @RolesAccess(['Admin'])
   @Mutation(() => UserType)
-  async updateUser(@Args('input') { id, ...input }: UpdateUserInput) {
-    try {
-      const password = input.password ? await bcrypt.hash(input.password, 10) : undefined;
-
-      return await this.prismaService.user.update({
-        where: {
-          id,
-        },
-        data: { ...input, password },
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') {
-          throw new BadRequestException(['Cannot be created with this email']);
-        } else if (err.code === 'P2025') {
-          throw new NotFoundException();
-        }
-      }
-
-      throw err;
-    }
+  async updateUser(@Args() { input: { id, ...input } }: UpdateUserArgs): Promise<UserType> {
+    return this.usersService.updateUser(id, input);
   }
 
   @RolesAccess(['Admin'])
   @Mutation(() => UserType)
-  async deleteUser(@Args('id', { type: () => Int }) id: number) {
-    try {
-      return await this.prismaService.user.delete({
-        where: {
-          id,
-        },
-      });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') {
-          throw new NotFoundException();
-        }
-      }
-
-      throw err;
-    }
+  async deleteUser(@Args() { id }: DeleteUserArgs): Promise<UserType> {
+    return this.usersService.deleteUser(id);
   }
 }

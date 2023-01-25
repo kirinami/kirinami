@@ -3,7 +3,7 @@ import { NextPageContext } from 'next';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { createInstance } from 'i18next';
 
-import { TranslationsDocument, TranslationsQuery, TranslationsQueryVariables } from '@/graphql/client';
+import { GetTranslationsDocument, GetTranslationsQuery, GetTranslationsQueryVariables } from '@/graphql/client';
 
 import getLocaleFromContext from './getLocaleFromContext';
 
@@ -15,8 +15,8 @@ const i18n = createInstance().use(initReactI18next) as I18N & {
 };
 
 export async function loadTranslation(apolloClient: ApolloClient<NormalizedCacheObject>, locale: string) {
-  const { data } = await apolloClient.query<TranslationsQuery, TranslationsQueryVariables>({
-    query: TranslationsDocument,
+  const { data } = await apolloClient.query<GetTranslationsQuery, GetTranslationsQueryVariables>({
+    query: GetTranslationsDocument,
     variables: {
       locale,
     },
@@ -24,7 +24,7 @@ export async function loadTranslation(apolloClient: ApolloClient<NormalizedCache
     errorPolicy: 'all',
   });
 
-  return data.translations.reduce(
+  return data.getTranslations.reduce(
     (translations, { key, value }) => ({
       ...translations,
       [key]: value,

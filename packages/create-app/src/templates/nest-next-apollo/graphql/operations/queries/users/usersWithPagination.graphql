@@ -1,8 +1,0 @@
-query UsersWithPagination($page: Int, $size: Int) {
-  usersWithPagination(page: $page, size: $size) {
-    items {
-      ...User
-    }
-    total
-  }
-}

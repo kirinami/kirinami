@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 
 services:
   postgres:
@@ -17,20 +17,34 @@ services:
       interval: 5s
     restart: unless-stopped
 
-  app:
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - .env
+#  app:
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    env_file:
+#      - .env
+#    build:
+#      context: .
+#      cache_from:
+#        - type=local,src=.cache/docker
+#      cache_to:
+#        - type=local,dest=.cache/docker
+#    expose:
+#      - 3000
+#    volumes:
+#      - $PWD/public:/app/public
+#    networks:
+#      - backend
+#    ports:
+#      - 3000:3000
+#    restart: unless-stopped
+
+  static:
     build: .
     volumes:
-      - $PWD/public:/app/public
-    networks:
-      - backend
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
+      - $PWD/public:/usr/share/nginx/html
+    expose:
+      - 80
 
 volumes:
   postgres:

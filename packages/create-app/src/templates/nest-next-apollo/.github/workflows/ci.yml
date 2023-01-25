@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  vars:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up vars
+        id: vars
+        run: |
+          repo=$(echo $GITHUB_REPOSITORY/$GITHUB_REF_NAME | awk '{print tolower($0)}'); echo "::set-output name=repo::$repo"
+          name=$(echo $repo | sed -E 's/[^a-zA-Z0-9]+/-/g'); echo "::set-output name=name::$name"
+    outputs:
+      repo: ${{ steps.vars.outputs.repo }}
+      name: ${{ steps.vars.outputs.name }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [vars]
+    steps:
+      - name: Set up container
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/download/v4.27.5/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Prepare project environment
+        run: |
+          cat > .env <<- 'END'
+          ${{ secrets.ENV_MAIN }}
+          END
+          
+          query=$(
+          cat <<- END
+            .services.[] |= (
+              with(select(.);
+                del(.ports)
+              ) |
+              with(select(.build != null);
+                del(.build) |
+                .image = "${{ needs.vars.outputs.name }}:latest"
+              ) |
+              with(select(.expose != null);
+                .networks += ["traefik"] |
+                .labels += [
+                  "traefik.enable=true",
+                  "traefik.http.routers.${{ needs.vars.outputs.name }}.rule=Host(\`$(awk -F '=' '/^HOSTNAME=/ {print $2}' .env)\`)",
+                  "traefik.http.routers.${{ needs.vars.outputs.name }}.entrypoints=http"
+                ]
+              )
+            ) |
+            .networks.traefik = { "name": "traefik", "external": true }
+          END
+          )
+          yq eval "$query" -i docker-compose.yml
+
+      - name: Build docker image
+        env:
+          DOCKER_BUILDKIT: 1
+        run: |
+          mkdir .docker
+          if [[ -e Dockerfile ]]; then
+            docker buildx create --use
+            docker buildx build \
+              --cache-from=type=local,src=/tmp/cache/docker \
+              --cache-to=type=local,dest=/tmp/cache/docker-new,mode=max \
+              --tag=${{ needs.vars.outputs.name }}:latest \
+              --output=type=docker,dest=- \
+              . | gzip > .docker/${{ needs.vars.outputs.name }}.tar.gz
+            rm -rf /tmp/cache/docker && mv /tmp/cache/docker-new /tmp/cache/docker
+          fi
+
+      - name: Build artifacts
+        run: |
+          mkdir .build
+          cp -r .docker public .env docker-compose.yml .build
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: .build
+          retention-days: 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [vars, build]
+    steps:
+      - name: Set up container
+        run: |
+          mkdir ~/.ssh
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+          cat > ~/.ssh/id_rsa <<- 'END'
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          END
+          chmod 400 ~/.ssh/id_rsa
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Upload to server
+        run: |
+          rsync \
+            -arzvh \
+            --progress \
+            --rsync-path="mkdir -p projects/${{ needs.vars.outputs.repo }} && rsync" \
+            artifact/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:projects/${{ needs.vars.outputs.repo }}/
+
+      - name: Run on server
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} <<- END
+            pushd projects/${{ needs.vars.outputs.repo }}
+              if [[ -e .docker/${{ needs.vars.outputs.name }}.tar.gz ]]; then docker load < .docker/${{ needs.vars.outputs.name }}.tar.gz; fi              
+              docker compose -p ${{ needs.vars.outputs.name }} up -d --remove-orphans
+              docker ps
+            popd
+          END

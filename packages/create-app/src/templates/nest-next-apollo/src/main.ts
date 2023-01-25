@@ -3,8 +3,8 @@ import 'reflect-metadata';
 import path from 'path';
 
 import next from 'next';
-import { ExecutionContext, ValidationPipe } from '@nestjs/common';
-import { BaseExceptionFilter, NestFactory } from '@nestjs/core';
+import { ExecutionContext, HttpException, ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import AppModule from './server/AppModule';
@@ -34,25 +34,33 @@ async function main() {
   );
 
   app.useGlobalFilters({
-    catch(exception: unknown, context: ExecutionContext) {
-      if (context.getType() !== 'http') {
-        return;
+    catch(exception: HttpException, context: ExecutionContext) {
+      if (context.getType() === 'http') {
+        const http = context.switchToHttp();
+        const req = http.getRequest();
+        const res = http.getResponse();
+
+        const url = req.originalUrl || req.url;
+
+        if (!res.headersSent && !/^\/(?:api|graphql)(?:\/.*|$)/.test(url)) {
+          requestHandler(req, res);
+          return;
+        }
       }
 
-      const http = context.switchToHttp();
+      const status = exception.getStatus();
 
-      const req = http.getRequest();
-      const res = http.getResponse();
-
-      const url = req.originalUrl || req.url;
-
-      if (!res.headersSent && !/^\/(?:api|graphql)(?:\/.*|$)/.test(url)) {
-        requestHandler(req, res);
-      } else {
-        new BaseExceptionFilter(app.getHttpAdapter()).catch(exception, context);
-      }
+      return new HttpException(
+        {
+          statusCode: status,
+          message: `server.exception.${exception.message.toLowerCase().replace(/\W+/g, '_').replace(/_+/g, '_')}`,
+        },
+        status
+      );
     },
   });
+
+  app.enableShutdownHooks();
 
   await app.listen(3000, '0.0.0.0');
 }

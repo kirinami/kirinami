@@ -1,5 +1,0 @@
-mutation UpdateTranslation($input: UpdateTranslationInput!) {
-  updateTranslation(input: $input) {
-    ...Translation
-  }
-}

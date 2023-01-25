@@ -16,9 +16,15 @@ yarn-debug.log*
 yarn-error.log*
 package-lock.json*
 
+# projects
+.nest
+.next
+prisma/client
+graphql/client
+.env
+
 # misc
 .DS_Store
-*.pem
 
 # typescript
 tsconfig.tsbuildinfo

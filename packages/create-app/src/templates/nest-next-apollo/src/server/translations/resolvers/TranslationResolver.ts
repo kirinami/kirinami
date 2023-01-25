@@ -1,18 +1,23 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import JwtAccess from '../../auth/decorators/JwtAccess';
-import RolesAccess from '../../auth/decorators/RolesAccess';
-import PrismaService from '../../utils/prisma/PrismaService';
-import CreateTranslationInput from '../dto/CreateTranslationInput';
-import TranslationType from '../dto/TranslationType';
-import UpdateTranslationInput from '../dto/UpdateTranslationInput';
+import JwtAccess from '@/server/auth/decorators/JwtAccess';
+import RolesAccess from '@/server/auth/decorators/RolesAccess';
+import PrismaService from '@/server/utils/services/PrismaService';
+
+import CreateTranslationArgs from '../dto/args/CreateTranslationArgs';
+import DeleteTranslationArgs from '../dto/args/DeleteTranslationArgs';
+import GetLocalesArgs from '../dto/args/GetLocalesArgs';
+import GetTranslationsArgs from '../dto/args/GetTranslationsArgs';
+import UpdateTranslationArgs from '../dto/args/UpdateTranslationArgs';
+import UpsertTranslationArgs from '../dto/args/UpsertTranslationArgs';
+import TranslationType from '../dto/types/TranslationType';
 
 @Resolver(() => TranslationType)
 export default class TranslationResolver {
   constructor(private readonly prismaService: PrismaService) {}
 
   @Query(() => [String])
-  async locales() {
+  async getLocales(@Args() {}: GetLocalesArgs): Promise<string[]> {
     const translations = await this.prismaService.translation.groupBy({
       by: ['locale'],
     });
@@ -21,10 +26,10 @@ export default class TranslationResolver {
   }
 
   @Query(() => [TranslationType])
-  async translations(@Args('locale', { nullable: true }) locale?: string) {
+  async getTranslations(@Args() { locale }: GetTranslationsArgs): Promise<TranslationType[]> {
     return this.prismaService.translation.findMany({
       where: {
-        locale,
+        locale: locale || undefined,
       },
       orderBy: {
         id: 'asc',
@@ -32,17 +37,19 @@ export default class TranslationResolver {
     });
   }
 
+  @RolesAccess(['Admin'])
   @JwtAccess()
   @Mutation(() => TranslationType)
-  async createTranslation(@Args('input') input: CreateTranslationInput) {
+  async createTranslation(@Args() { input }: CreateTranslationArgs): Promise<TranslationType> {
     return this.prismaService.translation.create({
       data: input,
     });
   }
 
+  @RolesAccess(['Admin'])
   @JwtAccess()
   @Mutation(() => TranslationType)
-  async updateTranslation(@Args('input') { id, ...input }: UpdateTranslationInput) {
+  async updateTranslation(@Args() { input: { id, ...input } }: UpdateTranslationArgs): Promise<TranslationType> {
     return this.prismaService.translation.update({
       where: {
         id,
@@ -54,7 +61,7 @@ export default class TranslationResolver {
   @RolesAccess(['Admin'])
   @JwtAccess()
   @Mutation(() => Boolean)
-  async upsertTranslation(@Args('input', { type: () => [UpdateTranslationInput] }) input: UpdateTranslationInput[]) {
+  async upsertTranslation(@Args() { input }: UpsertTranslationArgs): Promise<boolean> {
     const translationIds = await this.prismaService.translation.findMany({
       select: {
         id: true,
@@ -101,9 +108,10 @@ export default class TranslationResolver {
     return true;
   }
 
+  @RolesAccess(['Admin'])
   @JwtAccess()
   @Mutation(() => TranslationType)
-  async deleteTranslation(@Args('id', { type: () => Int }) id: number) {
+  async deleteTranslation(@Args() { id }: DeleteTranslationArgs): Promise<TranslationType> {
     return this.prismaService.translation.delete({
       where: {
         id,

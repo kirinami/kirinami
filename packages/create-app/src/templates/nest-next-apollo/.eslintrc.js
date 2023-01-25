@@ -14,6 +14,7 @@ module.exports = {
   ],
   rules: {
     'prettier/prettier': 'error',
+    'no-empty-pattern': 'off',
     'no-param-reassign': 'off',
     'prefer-destructuring': 'off',
     'class-methods-use-this': 'off',
@@ -62,6 +63,12 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/ban-types': ['error', {
+      types: {
+        '{}': false
+      },
+      extendDefaults: true
+    }]
   },
   overrides: [
     {

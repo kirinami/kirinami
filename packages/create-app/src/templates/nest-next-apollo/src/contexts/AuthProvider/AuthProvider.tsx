@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useCallback, useMemo } from 'react';
-import { makeVar, useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
 
 import {
   LoginInput,
@@ -7,17 +7,12 @@ import {
   useCurrentUserQuery,
   useLoginMutation,
   useRegisterMutation,
-  UserQuery,
+  UserType,
 } from '@/graphql/client';
 import useIsReady from '@/hooks/useIsReady';
 
-const reactiveVar = makeVar({
-  isLoginOpen: false,
-  isRegisterOpen: false,
-});
-
 export type AuthContextValue = {
-  user: UserQuery['user'] | null;
+  user: UserType | null;
   login: (input: LoginInput) => Promise<void>;
   loginLoading: boolean;
   loginError?: Error;

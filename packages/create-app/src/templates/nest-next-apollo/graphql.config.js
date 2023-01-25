@@ -1,13 +1,30 @@
 module.exports = {
-  schema: 'graphql/scheme.graphql',
+  overwrite: true,
+  schema: {
+    './graphql/scheme.graphql': {
+      loader: './graphql.schema.js',
+    },
+  },
+  documents: [
+    {
+      './graphql/scheme.graphql': {
+        loader: './graphql.documents.js',
+        pluginContext: {
+          depthLimit: 3,
+        },
+      },
+    },
+  ],
   extensions: {
     codegen: {
       generates: {
-        'graphql/client/index.ts': {
-          documents: ['graphql/operations/**/*.graphql'],
+        './graphql/client/index.ts': {
+          documents: [
+            './graphql/operations/**/*.graphql',
+          ],
           plugins: [
-            { typescript: {} },
-            { 'typescript-operations': {} },
+            'typescript',
+            'typescript-operations',
             {
               'typescript-react-apollo': {
                 withHooks: true,

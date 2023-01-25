@@ -1,5 +1,0 @@
-mutation Refresh($token: String!) {
-  refresh(token: $token) {
-    ...Auth
-  }
-}

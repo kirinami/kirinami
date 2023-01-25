@@ -23,11 +23,6 @@ const styles = css`
     color: #1c1c1c;
   }
 
-  input,
-  select {
-    width: 100%;
-  }
-
   a {
     color: #14c682;
     text-decoration: none;

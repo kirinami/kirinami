@@ -17,6 +17,7 @@
 /package-lock.json*
 
 # project
+/.cache
 /.build
 /.nest
 /.next
@@ -24,8 +25,8 @@
 /graphql/client
 /prisma/client
 /public/uploads
-/.env
-!/.env.example
+/.env*
+!/.env*.example
 
 # misc
 .DS_Store
