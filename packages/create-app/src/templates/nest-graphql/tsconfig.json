@@ -11,11 +11,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "nest-env.d.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "nest-env.d.ts"],
+  "exclude": ["node_modules"]
 }

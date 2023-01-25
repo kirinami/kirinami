@@ -9,7 +9,9 @@ import helmet from 'helmet';
 import AppModule from './AppModule';
 
 async function main() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter());
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, new ExpressAdapter(), {
+    cors: true,
+  });
 
   app.use(
     helmet({

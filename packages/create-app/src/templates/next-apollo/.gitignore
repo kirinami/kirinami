@@ -17,10 +17,11 @@ yarn-error.log*
 package-lock.json*
 
 # project
-.nest
-prisma/client
-.env.example
-nest-env.d.ts
+.next
+graphql/client
+graphql/scheme.graphql
+.env
+next-env.d.ts
 
 # misc
 .DS_Store

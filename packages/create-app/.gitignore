@@ -21,6 +21,7 @@ package-lock.json*
 .next
 prisma/client
 graphql/client
+graphql/scheme.graphql
 .env
 
 # misc
@@ -28,3 +29,4 @@ graphql/client
 
 # typescript
 tsconfig.tsbuildinfo
+/src/templates/next-apollo/graphql/schema.graphql

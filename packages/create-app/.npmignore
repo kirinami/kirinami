@@ -21,6 +21,7 @@ package-lock.json*
 .next
 prisma/client
 graphql/client
+graphql/scheme.graphql
 .env
 
 # misc

@@ -20,6 +20,7 @@ package-lock.json*
 .nest
 prisma/client
 .env
+nest-env.d.ts
 
 # misc
 .DS_Store
