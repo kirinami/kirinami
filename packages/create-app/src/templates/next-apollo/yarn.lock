@@ -3384,7 +3384,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:^16.0.0":
+"dotenv-expand@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "dotenv-expand@npm:10.0.0"
+  checksum: 2a38b470efe0abcb1ac8490421a55e1d764dc9440fd220942bce40965074f3fb00b585f4346020cb0f0f219966ee6b4ee5023458b3e2953fe5b3214de1b314ee
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.0.0, dotenv@npm:^16.0.3":
   version: 16.0.3
   resolution: "dotenv@npm:16.0.3"
   checksum: afcf03f373d7a6d62c7e9afea6328e62851d627a4e73f2e12d0a8deae1cd375892004f3021883f8aec85932cd2834b091f568ced92b4774625b321db83b827f8
@@ -5918,6 +5925,8 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.49.0
     "@typescript-eslint/parser": ^5.49.0
     date-fns: 2.29.3
+    dotenv: ^16.0.3
+    dotenv-expand: ^10.0.0
     eslint: ^8.32.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0
@@ -6019,7 +6028,7 @@ __metadata:
 
 "next@patch:next@npm%3A13.1.5#./.yarn/patches/next-npm-13.1.5-5d106abb81.patch::locator=next-apollo%40workspace%3A.":
   version: 13.1.5
-  resolution: "next@patch:next@npm%3A13.1.5#./.yarn/patches/next-npm-13.1.5-5d106abb81.patch::version=13.1.5&hash=8fe2c1&locator=next-apollo%40workspace%3A."
+  resolution: "next@patch:next@npm%3A13.1.5#./.yarn/patches/next-npm-13.1.5-5d106abb81.patch::version=13.1.5&hash=5d5262&locator=next-apollo%40workspace%3A."
   dependencies:
     "@next/env": 13.1.5
     "@next/swc-android-arm-eabi": 13.1.5
@@ -6081,7 +6090,7 @@ __metadata:
       optional: true
   bin:
     next: dist/bin/next
-  checksum: 855c0e92f257ac87d220e22474dfa60a937d2e90405fe3b5de189a4ff3484c1dc1bf8f4273cfccbc54c8bd02bb818cbca7afd1a8fd7e69560a3856cc8decde0e
+  checksum: 371bcfd6edbe3ea7b46435f8c973604f43deab679448fc584e8977db16cd76c9bec058b584e15cfd88ae3f9e10d4e361014fa1e1a84e1e7863c3f4f2f91e67d0
   languageName: node
   linkType: hard
 

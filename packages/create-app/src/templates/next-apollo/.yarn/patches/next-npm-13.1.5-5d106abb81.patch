@@ -1,3 +1,33 @@
+diff --git a/dist/server/next-server.js b/dist/server/next-server.js
+index dfe17dc51e4e99a1e4f19162a9f83e1587693f2c..ccbdf158352d956ac9d522164d712a787559bbac 100644
+--- a/dist/server/next-server.js
++++ b/dist/server/next-server.js
+@@ -348,21 +348,11 @@ class NextNodeServer extends _baseServer.default {
+                         }
+                         pathParts.splice(0, basePathParts.length);
+                     }
+-                    let path = `/${pathParts.join("/")}`;
+-                    if (!publicFiles.has(path)) {
+-                        // In `next-dev-server.ts`, we ensure encoded paths match
+-                        // decoded paths on the filesystem. So we need do the
+-                        // opposite here: make sure decoded paths match encoded.
+-                        path = encodeURI(path);
+-                    }
+-                    if (publicFiles.has(path)) {
+-                        await this.serveStatic(req, res, (0, _path).join(this.publicDir, ...pathParts), parsedUrl);
+-                        return {
+-                            finished: true
+-                        };
+-                    }
++
++                    await this.serveStatic(req, res, (0, _path).join(this.publicDir, ...pathParts), parsedUrl);
++
+                     return {
+-                        finished: false
++                        finished: true
+                     };
+                 }
+             }, 
 diff --git a/dist/server/render.js b/dist/server/render.js
 index ebd8a9bf5f5f5ba571ad1d38daf5266be7c836c7..74856cd22a99328df6ad250eb54b2b6fe3d6656f 100644
 --- a/dist/server/render.js

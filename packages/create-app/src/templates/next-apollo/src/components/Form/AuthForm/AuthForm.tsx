@@ -43,14 +43,6 @@ export default function AuthForm() {
   const registerSchema = useMemo(
     () =>
       yup.object({
-        firstName: yup
-          .string()
-          .min(2, t('auth_form.validation.min', { count: 2 }))
-          .required(t('auth_form.validation.required')),
-        lastName: yup
-          .string()
-          .min(2, t('auth_form.validation.min', { count: 2 }))
-          .required(t('auth_form.validation.required')),
         email: yup.string().email(t('auth_form.validation.email')).required(t('auth_form.validation.required')),
         password: yup
           .string()
@@ -108,24 +100,6 @@ export default function AuthForm() {
 
       {mode === 'register' && (
         <form css={styles.form} onSubmit={handleRegisterFormSubmit}>
-          <div css={styles.formField}>
-            <input
-              css={styles.formInput}
-              {...registerForm.register('firstName')}
-              type="text"
-              placeholder={t('auth_form.fields.firstName')}
-            />
-            <small css={styles.formError}>{registerFormErrors.firstName?.message}</small>
-          </div>
-          <div css={styles.formField}>
-            <input
-              css={styles.formInput}
-              {...registerForm.register('lastName')}
-              type="text"
-              placeholder={t('auth_form.fields.lastName')}
-            />
-            <small css={styles.formError}>{registerFormErrors.lastName?.message}</small>
-          </div>
           <div css={styles.formField}>
             <input
               css={styles.formInput}

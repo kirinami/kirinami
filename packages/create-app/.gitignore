@@ -21,8 +21,9 @@ package-lock.json*
 .next
 prisma/client
 graphql/client
-graphql/schema.graphql
 .env
+nest-env.d.ts
+next-env.d.ts
 
 # misc
 .DS_Store

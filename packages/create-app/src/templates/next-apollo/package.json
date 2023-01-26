@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "postinstall": "husky install",
-    "gen": "graphql-codegen -o",
-    "dev": "yarn gen && NODE_ENV=development PORT=4200 next dev",
+    "gen": "node graphql.config.js",
+    "dev": "yarn gen --load && NODE_ENV=development PORT=4200 next dev",
     "build": "yarn gen && NODE_ENV=production next build",
-    "start": "yarn gen && NODE_ENV=production PORT=4200 next start",
+    "start": "NODE_ENV=production PORT=4200 next start",
     "lint": "yarn gen && eslint --fix src && tsc --incremental false",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -50,6 +50,8 @@
     "@types/yup": "^0",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
+    "dotenv": "^16.0.3",
+    "dotenv-expand": "^10.0.0",
     "eslint": "^8.32.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",

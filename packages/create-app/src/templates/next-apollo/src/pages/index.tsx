@@ -14,7 +14,7 @@ export default function IndexPage() {
   return (
     <Layout>
       <Container padding>
-        {/* {t('pages.index.hello')}, {user ? `${user.firstName} ${user.lastName}` : t('pages.index.anonymous')} */}
+        {t('pages.index.hello')}, {user ? `${user.email}` : t('pages.index.anonymous')}
         <hr />
         {user ? <Button onClick={logout}>{t('pages.index.logout')}</Button> : <AuthForm />}
       </Container>
