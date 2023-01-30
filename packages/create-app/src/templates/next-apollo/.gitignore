@@ -19,8 +19,9 @@ package-lock.json*
 # project
 .next
 graphql/client
-.env
 next-env.d.ts
+.env*
+!.env.example
 
 # misc
 .DS_Store
