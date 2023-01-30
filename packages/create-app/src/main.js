@@ -1,61 +1,64 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import minimist from 'minimist';
-import prompts from 'prompts';
-import { blue, green, lightRed, magenta, red, reset, yellow } from 'kolorist';
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import minimist from "minimist";
+import prompts from "prompts";
+import { blue, green, lightRed, magenta, red, reset } from "kolorist";
 
-const argv = minimist(process.argv.slice(2), { string: ['_'] });
+const argv = minimist(process.argv.slice(2), { string: ["_"] });
 const cwd = process.cwd();
 
-const frameworks = [
+const FRAMEWORKS = [
   {
-    name: 'nest',
+    name: "nest",
+    display: "Nest.js",
     color: lightRed,
     variants: [
       {
-        name: 'nest-graphql',
+        name: "nest-graphql",
+        display: "GraphQL",
         color: magenta,
       },
       {
-        name: 'nest-restapi',
+        name: "nest-restapi",
+        display: "RestAPI",
         color: green,
       },
     ],
   },
   {
-    name: 'next',
+    name: "next",
+    display: "Next.js",
     color: green,
     variants: [
       {
-        name: 'next-apollo',
+        name: "next-graphql",
+        display: "GraphQL",
         color: magenta,
       },
       {
-        name: 'next-redux',
+        name: "next-redux",
+        display: "Redux",
         color: blue,
       },
     ],
   },
 ];
 
-const templates = frameworks.flatMap((framework) => framework?.variants.map((v) => v.name) || [framework.name]);
+const TEMPLATES = FRAMEWORKS.map(
+  (f) => (f.variants && f.variants.map((v) => v.name)) || [f.name]
+).reduce((a, b) => a.concat(b), []);
 
-const renameFiles = {};
+const renameFiles = {
+  _gitignore: ".gitignore",
+};
 
-function isValidPackageName(projectName) {
-  return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(projectName);
-}
+const defaultTargetDir = "app";
 
-function toValidPackageName(projectName) {
-  return projectName
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/^[._]/, '')
-    .replace(/[^a-z0-9-~]+/g, '-');
+function formatTargetDir(targetDir) {
+  return targetDir?.trim().replace(/\/+$/g, "");
 }
 
 function copy(src, dest) {
@@ -67,6 +70,21 @@ function copy(src, dest) {
   }
 }
 
+function isValidPackageName(projectName) {
+  return /^(?:@[a-z\d\-*~][a-z\d\-*._~]*\/)?[a-z\d\-~][a-z\d\-._~]*$/.test(
+    projectName
+  );
+}
+
+function toValidPackageName(projectName) {
+  return projectName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/^[._]/, "")
+    .replace(/[^a-z\d\-~]+/g, "-");
+}
+
 function copyDir(srcDir, destDir) {
   fs.mkdirSync(destDir, { recursive: true });
   for (const file of fs.readdirSync(srcDir)) {
@@ -76,20 +94,27 @@ function copyDir(srcDir, destDir) {
   }
 }
 
-function isEmptyDir(dir) {
+function isEmpty(path) {
+  const files = fs.readdirSync(path);
+  return files.length === 0 || (files.length === 1 && files[0] === ".git");
+}
+
+function emptyDir(dir) {
   if (!fs.existsSync(dir)) {
-    return true;
+    return;
   }
-
-  const files = fs.readdirSync(dir);
-
-  return files.length === 0 || (files.length === 1 && files[0] === '.git');
+  for (const file of fs.readdirSync(dir)) {
+    if (file === ".git") {
+      continue;
+    }
+    fs.rmSync(path.resolve(dir, file), { recursive: true, force: true });
+  }
 }
 
 function pkgFromUserAgent(userAgent) {
   if (!userAgent) return undefined;
-  const pkgSpec = userAgent.split(' ')[0];
-  const pkgSpecArr = pkgSpec.split('/');
+  const pkgSpec = userAgent.split(" ")[0];
+  const pkgSpecArr = pkgSpec.split("/");
   return {
     name: pkgSpecArr[0],
     version: pkgSpecArr[1],
@@ -97,89 +122,126 @@ function pkgFromUserAgent(userAgent) {
 }
 
 async function main() {
-  let targetDir = argv._[0];
-  let template = argv.template || argv.t;
+  const argTargetDir = formatTargetDir(argv._[0]);
+  const argTemplate = argv.template || argv.t;
 
-  const defaultProjectName = !targetDir ? 'app' : targetDir.trim().replace(/\/+$/g, '');
+  let targetDir = argTargetDir || defaultTargetDir;
 
-  const { overwrite, packageName, framework, variant } = await prompts(
-    [
-      {
-        type: targetDir ? null : 'text',
-        name: 'projectName',
-        message: reset('Project name:'),
-        initial: defaultProjectName,
-        onState: (state) => (targetDir = state.value.trim().replace(/\/+$/g, '') || defaultProjectName),
-      },
-      {
-        type: () => isEmptyDir(targetDir) ? null : 'confirm',
-        name: 'overwrite',
-        message: () => `${targetDir === '.' ? 'Current directory' : `Target directory "${targetDir}"`} is not empty. Remove existing files and continue?`,
-      },
-      {
-        type: (_, { overwrite } = {}) => {
-          if (overwrite === false) {
-            throw new Error(red('✖') + ' Operation cancelled');
-          }
+  const getProjectName = () =>
+    targetDir === "." ? path.basename(path.resolve()) : targetDir;
 
-          return null;
+  let result;
+  try {
+    result = await prompts(
+      [
+        {
+          type: argTargetDir ? null : "text",
+          name: "projectName",
+          message: reset("Project name:"),
+          initial: defaultTargetDir,
+          onState: (state) => {
+            targetDir = formatTargetDir(state.value) || defaultTargetDir;
+          },
         },
-        name: 'overwriteChecker',
-      },
+        {
+          type: () =>
+            !fs.existsSync(targetDir) || isEmpty(targetDir) ? null : "confirm",
+          name: "overwrite",
+          message: () =>
+            (targetDir === "."
+              ? "Current directory"
+              : `Target directory "${targetDir}"`) +
+            ` is not empty. Remove existing files and continue?`,
+        },
+        {
+          type: (_, { overwrite }) => {
+            if (overwrite === false) {
+              throw new Error(red("✖") + " Operation cancelled");
+            }
+            return null;
+          },
+          name: "overwriteChecker",
+        },
+        {
+          type: () => (isValidPackageName(getProjectName()) ? null : "text"),
+          name: "packageName",
+          message: reset("Package name:"),
+          initial: () => toValidPackageName(getProjectName()),
+          validate: (dir) =>
+            isValidPackageName(dir) || "Invalid package.json name",
+        },
+        {
+          type:
+            argTemplate && TEMPLATES.includes(argTemplate) ? null : "select",
+          name: "framework",
+          message:
+            typeof argTemplate === "string" && !TEMPLATES.includes(argTemplate)
+              ? reset(
+                  `"${argTemplate}" isn't a valid template. Please choose from below: `
+                )
+              : reset("Select a framework:"),
+          initial: 0,
+          choices: FRAMEWORKS.map((framework) => {
+            const frameworkColor = framework.color;
+            return {
+              title: frameworkColor(framework.display || framework.name),
+              value: framework,
+            };
+          }),
+        },
+        {
+          type: (framework) =>
+            framework && framework.variants ? "select" : null,
+          name: "variant",
+          message: reset("Select a variant:"),
+          choices: (framework) =>
+            framework.variants.map((variant) => {
+              const variantColor = variant.color;
+              return {
+                title: variantColor(variant.display || variant.name),
+                value: variant.name,
+              };
+            }),
+        },
+      ],
       {
-        type: () => (isValidPackageName(targetDir) ? null : 'text'),
-        name: 'packageName',
-        message: reset('Package name:'),
-        initial: () => toValidPackageName(targetDir),
-        validate: (dir) => isValidPackageName(dir) || 'Invalid package.json name',
-      },
-      {
-        type: templates.includes(template) ? null : 'select',
-        name: 'framework',
-        message: template && !templates.includes(template)
-          ? reset(`"${template}" isn't a valid template. Please choose from below: `)
-          : reset('Select a framework:'),
-        initial: 0,
-        choices: frameworks.map((framework) => ({
-          title: framework.color(framework.name),
-          value: framework,
-        })),
-      },
-      {
-        type: (framework) => framework?.variants ? 'select' : null,
-        name: 'variant',
-        message: reset('Select a variant:'),
-        choices: (framework) => framework.variants.map((variant) => ({
-          title: variant.color(variant.name),
-          value: variant,
-        })),
-      },
-    ],
-    {
-      onCancel: () => {
-        throw new Error(red('✖') + ' Operation cancelled');
-      },
-    },
-  );
+        onCancel: () => {
+          throw new Error(red("✖") + " Operation cancelled");
+        },
+      }
+    );
+  } catch (cancelled) {
+    console.log(cancelled.message);
+    return;
+  }
 
-  const rootDir = path.join(cwd, targetDir);
+  // user choice associated with prompts
+  const { framework, overwrite, packageName, variant } = result;
 
+  const root = path.join(cwd, targetDir);
   if (overwrite) {
-    fs.rmSync(rootDir, { recursive: true, force: true });
-  } else if (!fs.existsSync(rootDir)) {
-    fs.mkdirSync(rootDir, { recursive: true });
+    emptyDir(root);
+  } else if (!fs.existsSync(root)) {
+    fs.mkdirSync(root, { recursive: true });
   }
 
   // determine template
-  template = variant?.name || framework?.name || template;
+  let template = variant || framework?.name || argTemplate;
 
-  console.log(`${green('✔')} Scaffolding project in ${rootDir}`);
+  const pkgInfo = pkgFromUserAgent(process.env.npm_config_user_agent);
+  const pkgManager = pkgInfo ? pkgInfo.name : "npm";
 
-  const templateDir = path.resolve(fileURLToPath(import.meta.url), `../templates/${template}`);
+  console.log(`\nScaffolding project in ${root}...`);
+
+  const templateDir = path.resolve(
+    fileURLToPath(import.meta.url),
+    "..",
+    "templates",
+    template
+  );
 
   const write = (file, content) => {
-    const targetPath = path.join(rootDir, renameFiles[file] || file);
-
+    const targetPath = path.join(root, renameFiles[file] ?? file);
     if (content) {
       fs.writeFileSync(targetPath, content);
     } else {
@@ -188,23 +250,24 @@ async function main() {
   };
 
   const files = fs.readdirSync(templateDir);
-  for (const file of files.filter((f) => f !== 'package.json')) write(file);
+  for (const file of files.filter((f) => f !== "package.json")) {
+    write(file);
+  }
 
-  const pkg = JSON.parse(fs.readFileSync(path.join(templateDir, `package.json`), 'utf-8'));
-  pkg.name = packageName || targetDir;
-  write('package.json', JSON.stringify(pkg, null, 2));
+  const pkg = JSON.parse(
+    fs.readFileSync(path.join(templateDir, `package.json`), "utf-8")
+  );
+  pkg.name = packageName || getProjectName();
+  write("package.json", JSON.stringify(pkg, null, 2));
 
-  const pkgInfo = pkgFromUserAgent(process.env.npm_config_user_agent);
-  const pkgManager = pkgInfo ? pkgInfo.name : 'npm';
-
-  console.log(`\n${green('✔')} Done. Now run:\n`);
-  if (rootDir !== cwd) {
-    console.log(`  cd ${path.relative(cwd, rootDir)}`);
+  console.log(`\nDone. Now run:\n`);
+  if (root !== cwd) {
+    console.log(`  cd ${path.relative(cwd, root)}`);
   }
   switch (pkgManager) {
-    case 'yarn':
-      console.log('  yarn');
-      console.log('  yarn dev');
+    case "yarn":
+      console.log("  yarn");
+      console.log("  yarn dev");
       break;
     default:
       console.log(`  ${pkgManager} install`);
@@ -214,5 +277,4 @@ async function main() {
   console.log();
 }
 
-main()
-  .catch((err) => console.error(err.message));
+main().catch((err) => console.error(err.message));

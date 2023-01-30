@@ -21,9 +21,10 @@ package-lock.json*
 .next
 prisma/client
 graphql/client
-.env
 nest-env.d.ts
 next-env.d.ts
+.env*
+!.env.example
 
 # misc
 .DS_Store

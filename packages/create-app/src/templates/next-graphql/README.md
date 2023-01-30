@@ -1,4 +1,4 @@
-# Next.js + Apollo
+# Next.js + GraphQL
 
 ## Getting Started
 
