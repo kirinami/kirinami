@@ -3,13 +3,13 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import JwtAccess from '@/auth/decorators/JwtAccess';
 import PrismaService from '@/common/services/PrismaService';
 
-import CreateTranslationArgs from '../dto/args/CreateTranslationArgs';
-import DeleteTranslationArgs from '../dto/args/DeleteTranslationArgs';
-import GetLanguagesArgs from '../dto/args/GetLanguagesArgs';
-import GetTranslationsArgs from '../dto/args/GetTranslationsArgs';
-import UpdateTranslationArgs from '../dto/args/UpdateTranslationArgs';
-import UpsertTranslationArgs from '../dto/args/UpsertTranslationArgs';
-import TranslationType from '../dto/types/TranslationType';
+import CreateTranslationArgs from '../args/CreateTranslationArgs';
+import DeleteTranslationArgs from '../args/DeleteTranslationArgs';
+import GetLanguagesArgs from '../args/GetLanguagesArgs';
+import GetTranslationsArgs from '../args/GetTranslationsArgs';
+import UpdateTranslationArgs from '../args/UpdateTranslationArgs';
+import UpsertTranslationArgs from '../args/UpsertTranslationArgs';
+import TranslationType from '../types/TranslationType';
 
 @Resolver(() => TranslationType)
 export default class TranslationsResolver {

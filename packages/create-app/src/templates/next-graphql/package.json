@@ -12,7 +12,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@apollo/client": "3.7.5",
+    "@apollo/client": "3.7.6",
     "@emotion/cache": "11.10.5",
     "@emotion/react": "11.10.5",
     "@emotion/server": "11.10.0",
@@ -35,12 +35,12 @@
   },
   "devDependencies": {
     "@graphql-codegen/add": "^3.2.3",
-    "@graphql-codegen/cli": "^2.16.4",
-    "@graphql-codegen/typescript": "^2.8.7",
-    "@graphql-codegen/typescript-document-nodes": "^2.3.12",
-    "@graphql-codegen/typescript-operations": "^2.5.12",
+    "@graphql-codegen/cli": "^2.16.5",
+    "@graphql-codegen/typescript": "^2.8.8",
+    "@graphql-codegen/typescript-document-nodes": "^2.3.13",
+    "@graphql-codegen/typescript-operations": "^2.5.13",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
-    "@graphql-codegen/typescript-resolvers": "^2.7.12",
+    "@graphql-codegen/typescript-resolvers": "^2.7.13",
     "@types/node": "^18.11.18",
     "@types/prettier": "^2",
     "@types/react": "^18.0.27",
@@ -48,8 +48,8 @@
     "@types/react-modal": "^3",
     "@types/uuid": "^9",
     "@types/yup": "^0",
-    "@typescript-eslint/eslint-plugin": "^5.49.0",
-    "@typescript-eslint/parser": "^5.49.0",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
     "dotenv": "^16.0.3",
     "dotenv-expand": "^10.0.0",
     "eslint": "^8.33.0",
@@ -67,7 +67,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "^2.8.3",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   },
   "resolutions": {
     "next@13.1.6": "patch:next@npm%3A13.1.6#./.yarn/patches/next-npm-13.1.6-5d106abb81.patch"

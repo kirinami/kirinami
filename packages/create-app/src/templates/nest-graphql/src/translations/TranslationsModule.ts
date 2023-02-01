@@ -8,6 +8,6 @@ import TranslationsService from './services/TranslationsService';
 @Module({
   imports: [CommonModule],
   providers: [TranslationsResolver, TranslationsService],
-  exports: [TranslationsResolver, TranslationsService],
+  exports: [TranslationsService],
 })
 export default class TranslationsModule {}

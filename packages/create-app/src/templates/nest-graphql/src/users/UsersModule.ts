@@ -8,6 +8,6 @@ import UsersService from './services/UsersService';
 @Module({
   imports: [CommonModule],
   providers: [UsersResolver, UsersService],
-  exports: [UsersResolver, UsersService],
+  exports: [UsersService],
 })
 export default class UsersModule {}

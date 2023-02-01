@@ -5,9 +5,9 @@ import bcrypt from 'bcryptjs';
 import { User } from '@/prisma/client';
 import UsersService from '@/users/services/UsersService';
 
-import LoginInput from '../dto/args/inputs/LoginInput';
-import RefreshTokenInput from '../dto/args/inputs/RefreshTokenInput';
-import RegisterInput from '../dto/args/inputs/RegisterInput';
+import LoginInput from '../args/inputs/LoginInput';
+import RefreshTokenInput from '../args/inputs/RefreshTokenInput';
+import RegisterInput from '../args/inputs/RegisterInput';
 
 @Injectable()
 export default class AuthService {

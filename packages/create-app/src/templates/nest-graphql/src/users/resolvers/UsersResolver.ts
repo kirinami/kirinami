@@ -3,13 +3,13 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import JwtAccess from '@/auth/decorators/JwtAccess';
 import PrismaService from '@/common/services/PrismaService';
 
-import CreateUserArgs from '../dto/args/CreateUserArgs';
-import DeleteUserArgs from '../dto/args/DeleteUserArgs';
-import GetUserArgs from '../dto/args/GetUserArgs';
-import GetUsersArgs from '../dto/args/GetUsersArgs';
-import UpdateUserArgs from '../dto/args/UpdateUserArgs';
-import UsersPaginationType from '../dto/types/UsersPaginationType';
-import UserType from '../dto/types/UserType';
+import CreateUserArgs from '../args/CreateUserArgs';
+import DeleteUserArgs from '../args/DeleteUserArgs';
+import GetUserArgs from '../args/GetUserArgs';
+import GetUsersArgs from '../args/GetUsersArgs';
+import UpdateUserArgs from '../args/UpdateUserArgs';
+import UsersPaginationType from '../types/pagination/UsersPaginationType';
+import UserType from '../types/UserType';
 import UsersService from '../services/UsersService';
 
 @JwtAccess(['Admin'])

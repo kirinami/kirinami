@@ -2,14 +2,14 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 
 import { type User } from '@/prisma/client';
-import UserType from '@/users/dto/types/UserType';
+import UserType from '@/users/types/UserType';
 
 import CurrentUser from '../decorators/CurrentUser';
 import JwtAccess from '../decorators/JwtAccess';
-import LoginArgs from '../dto/args/LoginArgs';
-import RefreshTokenArgs from '../dto/args/RefreshTokenArgs';
-import RegisterArgs from '../dto/args/RegisterArgs';
-import AuthType from '../dto/types/AuthType';
+import LoginArgs from '../args/LoginArgs';
+import RefreshTokenArgs from '../args/RefreshTokenArgs';
+import RegisterArgs from '../args/RegisterArgs';
+import AuthType from '../types/AuthType';
 import AuthService from '../services/AuthService';
 
 @Resolver(AuthType)

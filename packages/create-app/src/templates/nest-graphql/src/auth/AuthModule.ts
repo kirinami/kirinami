@@ -10,7 +10,7 @@ import JwtAccessStrategy from './strategies/JwtAccessStrategy';
 
 @Module({
   imports: [JwtModule.register({}), PassportModule, UsersModule],
-  providers: [AuthService, AuthResolver, JwtAccessStrategy],
-  exports: [AuthService, AuthResolver],
+  providers: [AuthResolver, AuthService, JwtAccessStrategy],
+  exports: [AuthService],
 })
 export default class AuthModule {}
