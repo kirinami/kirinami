@@ -1,0 +1,65 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REMOTE_DIR: projects/next-graphql/web
+  REMOTE_URL: https://next-graphql.example.com
+
+jobs:
+  deploy:
+    environment:
+      name: production
+      url: ${{ env.REMOTE_URL }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: /tmp/cache
+          key: ${{ runner.os }}-cache-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-cache-
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build artifacts
+        run: |
+          cat > .env <<- 'END'
+          ${{ secrets.MAIN_DOTENV }}
+          END
+          
+          docker buildx create --use
+          docker buildx bake -f docker-compose.yml
+          
+          mkdir -p /tmp/artifacts && rsync -r public .env docker-compose.yml *.tar $_/
+
+      - name: Setup ssh private key
+        run: |
+          mkdir -p ~/.ssh && ssh-keyscan -H '${{ secrets.SSH_HOST }}' > ~/.ssh/known_hosts
+          cat > ~/.ssh/id_rsa <<- 'END'
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          END
+          chmod 400 ~/.ssh/id_rsa
+
+      - name: Upload to server
+        run: |
+          rsync \
+            -azvh \
+            --progress \
+            --rsync-path='mkdir -p ${{ env.REMOTE_DIR }} && rsync' \
+            /tmp/artifacts/ '${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ env.REMOTE_DIR }}'
+
+      - name: Run on server
+        run: |
+          ssh '${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}' <<- END
+            cd '${{ env.REMOTE_DIR }}'
+            find . -maxdepth 1 -type f -name '*.tar' -exec bash -c 'docker image load -i {} && rm {}' \;
+            docker compose up -d --remove-orphans
+          END

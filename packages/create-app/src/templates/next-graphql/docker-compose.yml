@@ -1,10 +1,27 @@
 version: "3.9"
 
+name: next-graphql
+
 services:
   web:
-    build: .
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.next-graphql_web.rule=Host(`next-graphql.example.com`)
+      - traefik.http.routers.next-graphql_web.entrypoints=http
+    env_file: .env
+    build:
+      x-bake:
+        tags: next-graphql_web:latest
+        cache-from: type=local,src=/tmp/cache/next-graphql_web
+        cache-to: type=local,mode=max,dest=/tmp/cache/next-graphql_web
+        output: type=docker,dest=next-graphql_web.tar
+    image: next-graphql_web:latest
     volumes:
       - ./public:/app/public
-    ports:
-      - "4200:4200"
+    networks:
+      - traefik
     restart: unless-stopped
+
+networks:
+  traefik:
+    name: traefik

@@ -1,36 +1,50 @@
 version: "3.9"
 
+name: nest-graphql
+
 services:
-  db:
-    env_file:
-      - .env
+  postgres:
+    env_file: .env
     image: postgres:13.2-alpine
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
-      - backend
-    ports:
-      - "5432:5432"
+      - database
     healthcheck:
-      test: pg_isready -q -d ${POSTGRES_USER} -U ${POSTGRES_USER}
+      test: pg_isready -q
       start_period: 5s
       interval: 5s
     restart: unless-stopped
 
   api:
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.nest-graphql_api--strip-api.stripprefix.prefixes=/api
+      - traefik.http.middlewares.nest-graphql_api--strip-api.stripprefix.forceSlash=false
+      - traefik.http.routers.nest-graphql_api.rule=Host(`nest-graphql.example.com`) && PathPrefix(`/api`)
+      - traefik.http.routers.nest-graphql_api.middlewares=nest-graphql_api--strip-api
+      - traefik.http.routers.nest-graphql_api.entrypoints=http
     depends_on:
-      - db
-    build: .
+      - postgres
+    env_file: .env
+    build:
+      x-bake:
+        tags: nest-graphql_api:latest
+        cache-from: type=local,src=/tmp/cache/nest-graphql_api
+        cache-to: type=local,mode=max,dest=/tmp/cache/nest-graphql_api
+        output: type=docker,dest=nest-graphql_api.tar
+    image: nest-graphql_api:latest
     volumes:
       - ./public:/app/public
     networks:
-      - backend
-    ports:
-      - "3000:3000"
+      - database
+      - traefik
     restart: unless-stopped
 
 volumes:
   postgres:
 
 networks:
-  backend:
+  database:
+  traefik:
+    name: traefik
