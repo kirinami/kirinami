@@ -9,7 +9,7 @@ const spin = keyframes`
   }
 `;
 
-const styles = {
+export const styles = {
   container: css`
     position: relative;
     display: flex;
@@ -40,5 +40,3 @@ const styles = {
     `}
   `,
 };
-
-export default styles;

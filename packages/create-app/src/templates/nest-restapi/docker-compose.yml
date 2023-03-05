@@ -1,0 +1,50 @@
+version: "3.9"
+
+name: nest-restapi
+
+services:
+  postgres:
+    env_file: .env
+    image: postgres:13.2-alpine
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - database
+    healthcheck:
+      test: pg_isready -q
+      start_period: 5s
+      interval: 5s
+    restart: unless-stopped
+
+  api:
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.nest-restapi_api--strip-api.stripprefix.prefixes=/api
+      - traefik.http.middlewares.nest-restapi_api--strip-api.stripprefix.forceSlash=false
+      - traefik.http.routers.nest-restapi_api.rule=Host(`nest-restapi.example.com`) && PathPrefix(`/api`)
+      - traefik.http.routers.nest-restapi_api.middlewares=nest-restapi_api--strip-api
+      - traefik.http.routers.nest-restapi_api.entrypoints=http
+    depends_on:
+      - postgres
+    env_file: .env
+    build:
+      x-bake:
+        tags: nest-restapi_api:latest
+        cache-from: type=local,src=/tmp/cache/nest-restapi_api
+        cache-to: type=local,mode=max,dest=/tmp/cache/nest-restapi_api
+        output: type=docker,dest=nest-restapi_api.tar
+    image: nest-restapi_api:latest
+    volumes:
+      - ./public:/app/public
+    networks:
+      - database
+      - traefik
+    restart: unless-stopped
+
+volumes:
+  postgres:
+
+networks:
+  database:
+  traefik:
+    name: traefik

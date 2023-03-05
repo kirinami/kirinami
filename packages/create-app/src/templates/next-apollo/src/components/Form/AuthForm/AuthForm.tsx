@@ -1,59 +1,44 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-import Button from '@/components/Common/Button/Button';
-import useAuth from '@/hooks/useAuth';
+import { Button } from '@/components/Common/Button';
+import { useLogin } from '@/hooks/auth/useLogin';
+import { useRegister } from '@/hooks/auth/useRegister';
 
-import styles from './AuthForm.styles';
+import { styles } from './AuthForm.styles';
+
+const schema = yup.object({
+  email: yup.string().required('auth_form.validation.required').email('auth_form.validation.email'),
+  password: yup.string().required('auth_form.validation.required').min(6, 'auth_form.validation.min'),
+});
+
+type FormData = yup.InferType<typeof schema>;
 
 type Mode = 'login' | 'register';
 
-export default function AuthForm() {
+export function AuthForm() {
   const { t } = useTranslation();
 
-  const { login, loginLoading, loginError, register, registerLoading, registerError } = useAuth();
+  const { loading: loginLoading, error: loginError, login } = useLogin();
+  const { loading: registerLoading, error: registerError, register } = useRegister();
 
   const [mode, setMode] = useState<Mode>('login');
 
   const handleMode = useCallback((mode: Mode) => () => setMode(mode), []);
 
-  const loginSchema = useMemo(
-    () =>
-      yup.object({
-        email: yup.string().email().required(t('auth_form.validation.required')),
-        password: yup
-          .string()
-          .min(6, t('auth_form.validation.min', { count: 6 }))
-          .required(t('auth_form.validation.required')),
-      }),
-    [t]
-  );
-
-  const loginForm = useForm<yup.InferType<typeof loginSchema>>({
-    resolver: yupResolver(loginSchema),
+  const loginForm = useForm<FormData>({
+    resolver: yupResolver(schema),
   });
 
   const loginFormErrors = loginForm.formState.errors;
 
   const handleLoginFormSubmit = loginForm.handleSubmit((formData) => login(formData));
 
-  const registerSchema = useMemo(
-    () =>
-      yup.object({
-        email: yup.string().email(t('auth_form.validation.email')).required(t('auth_form.validation.required')),
-        password: yup
-          .string()
-          .min(6, t('auth_form.validation.min', { count: 6 }))
-          .required(t('auth_form.validation.required')),
-      }),
-    [t]
-  );
-
-  const registerForm = useForm<yup.InferType<typeof registerSchema>>({
-    resolver: yupResolver(registerSchema),
+  const registerForm = useForm<FormData>({
+    resolver: yupResolver(schema),
   });
 
   const registerFormErrors = registerForm.formState.errors;

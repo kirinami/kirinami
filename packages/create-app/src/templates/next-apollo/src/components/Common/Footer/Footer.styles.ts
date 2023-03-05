@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   footer: css`
     padding: 1.75rem 0;
     background-color: #1b2936;
@@ -19,5 +19,3 @@ const styles = {
     }
   `,
 };
-
-export default styles;

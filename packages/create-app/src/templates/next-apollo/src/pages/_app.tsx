@@ -4,14 +4,13 @@ import App, { AppProps } from 'next/app';
 import { ApolloProvider } from '@apollo/client';
 import { CacheProvider } from '@emotion/react';
 
-import Meta from '@/components/Meta/Meta';
-import Styles from '@/components/Styles/Styles';
-import AuthProvider from '@/contexts/AuthProvider/AuthProvider';
-import initApolloClient from '@/helpers/initApolloClient';
-import initEmotionCache from '@/helpers/initEmotionCache';
-import initI18n from '@/helpers/initI18n';
+import { Meta } from '@/components/Meta';
+import { Styles } from '@/components/Styles';
+import { initApolloClient } from '@/helpers/initApolloClient';
+import { initEmotionCache } from '@/helpers/initEmotionCache';
+import { initI18n } from '@/helpers/initI18n';
 
-function MyApp({ pageProps: { apolloClient, i18n, initialState, ...pageProps }, Component }: AppProps<any>) {
+function MyApp({ pageProps: { apolloClient, i18n, initialState, ...pageProps }, Component }: AppProps) {
   const emotionCacheMemo = useMemo(() => initEmotionCache(), []);
 
   const apolloClientMemo = useMemo(
@@ -25,11 +24,9 @@ function MyApp({ pageProps: { apolloClient, i18n, initialState, ...pageProps }, 
     <CacheProvider value={emotionCacheMemo}>
       <ApolloProvider client={apolloClientMemo}>
         <I18nextProvider i18n={i18nMemo}>
-          <AuthProvider>
-            <Meta />
-            <Styles />
-            <Component {...pageProps} />
-          </AuthProvider>
+          <Meta />
+          <Styles />
+          <Component {...pageProps} />
         </I18nextProvider>
       </ApolloProvider>
     </CacheProvider>

@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  REMOTE_DIR: projects/next-graphql/web
-  REMOTE_URL: https://next-graphql.example.com
+  REMOTE_DIR: projects/next-apollo/web
+  REMOTE_URL: https://next-apollo.example.com
 
 jobs:
   deploy:

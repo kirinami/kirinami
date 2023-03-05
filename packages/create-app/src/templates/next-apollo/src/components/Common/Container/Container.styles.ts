@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   container: (padding?: boolean) => css`
     display: flex;
     flex-direction: column;
@@ -10,5 +10,3 @@ const styles = {
     padding: ${padding ? 16 : 0}px 16px;
   `,
 };
-
-export default styles;

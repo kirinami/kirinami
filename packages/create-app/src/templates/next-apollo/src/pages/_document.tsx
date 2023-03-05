@@ -1,13 +1,13 @@
-import React, { Children } from 'react';
+import { Children } from 'react';
 import { streamToString } from 'next/dist/server/node-web-streams-helper';
 import Document, { DocumentContext, DocumentProps, Head, Html, Main, NextScript } from 'next/document';
 import { getMarkupFromTree } from '@apollo/client/react/ssr';
 import createEmotionServer from '@emotion/server/create-instance';
 
-import getLanguageFromContext from '@/helpers/getLanguageFromContext';
-import initApolloClient from '@/helpers/initApolloClient';
-import initEmotionCache from '@/helpers/initEmotionCache';
-import initI18n, { loadTranslation } from '@/helpers/initI18n';
+import { getLanguageFromContext } from '@/helpers/getLanguageFromContext';
+import { initApolloClient } from '@/helpers/initApolloClient';
+import { initEmotionCache } from '@/helpers/initEmotionCache';
+import { initI18n, loadTranslation } from '@/helpers/initI18n';
 
 function MyDocument({ locale }: DocumentProps) {
   return (

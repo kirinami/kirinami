@@ -6,14 +6,9 @@ import { createInstance } from 'i18next';
 import { GetTranslationsDocument, GetTranslationsQuery, GetTranslationsQueryVariables } from '@/graphql/client';
 import { isServer } from '@/utils/ssr';
 
-import getLanguageFromContext from './getLanguageFromContext';
+import { getLanguageFromContext } from './getLanguageFromContext';
 
-type I18N = ReturnType<typeof createInstance>;
-
-const i18n = createInstance().use(initReactI18next) as I18N & {
-  changeLanguageBase: I18N['changeLanguage'];
-  extract: () => Record<string, string>;
-};
+let i18nMemo: ReturnType<typeof createI18n> | undefined;
 
 export async function loadTranslation(apolloClient: ApolloClient<NormalizedCacheObject>, language: string) {
   const { data } = await apolloClient.query<GetTranslationsQuery, GetTranslationsQueryVariables>({
@@ -25,7 +20,7 @@ export async function loadTranslation(apolloClient: ApolloClient<NormalizedCache
     errorPolicy: 'all',
   });
 
-  return data.getTranslations.reduce(
+  return data.getTranslations.reduce<Record<string, string>>(
     (translations, { key, value }) => ({
       ...translations,
       [key]: value,
@@ -34,43 +29,57 @@ export async function loadTranslation(apolloClient: ApolloClient<NormalizedCache
   );
 }
 
-export default function initI18n(ctx: NextPageContext | null, translation?: Record<string, string>) {
-  const language = getLanguageFromContext(ctx);
+function createI18n(language: string, translation: Record<string, string> | undefined) {
+  type I18N = ReturnType<typeof createInstance>;
 
-  if (!i18n.isInitialized) {
-    i18n.init({
-      lng: language,
-      fallbackLng: 'uk',
-      interpolation: {
-        escapeValue: false,
+  const i18n = createInstance().use(initReactI18next) as I18N & {
+    extract: () => Record<string, string>;
+  };
+
+  i18n.init({
+    lng: language,
+    fallbackLng: 'uk',
+    interpolation: {
+      escapeValue: false,
+    },
+    returnNull: false,
+    resources: {
+      [language]: {
+        translation: translation || {},
       },
-      returnNull: false,
-    });
+    },
+  });
 
-    i18n.changeLanguageBase = i18n.changeLanguage;
-
-    i18n.changeLanguage = async (language: string) => {
-      if (isServer) {
-        return i18n.t;
-      }
-
-      document.cookie = `accept-language=${language}; path=/`;
-      window.location.reload();
-
+  i18n.changeLanguage = async (language: string) => {
+    if (isServer) {
       return i18n.t;
-    };
-  }
+    }
 
-  if (translation) {
-    i18n.addResourceBundle(language, 'translation', translation, true, true);
-    i18n.changeLanguageBase(language);
-  }
+    document.cookie = `accept-language=${language}; path=/`;
+    window.location.reload();
+
+    return i18n.t;
+  };
 
   i18n.extract = () => translation || {};
 
-  return i18n as typeof i18n & {
-    extract: () => typeof translation;
-  };
+  return i18n;
+}
+
+export function initI18n(ctx: NextPageContext | null, initialTranslation?: Record<string, string>) {
+  const language = getLanguageFromContext(ctx);
+
+  const i18n = i18nMemo || createI18n(language, initialTranslation || {});
+
+  if (isServer) {
+    return i18n;
+  }
+
+  if (!i18nMemo) {
+    i18nMemo = i18n;
+  }
+
+  return i18n;
 }
 
 //

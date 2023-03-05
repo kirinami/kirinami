@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import styles from './Section.styles';
+import { styles } from './Section.styles';
 
 export type SectionProps = {
   title?: string;
@@ -8,7 +8,7 @@ export type SectionProps = {
   children: ReactNode;
 };
 
-export default function Section({ title, description, children }: SectionProps) {
+export function Section({ title, description, children }: SectionProps) {
   return (
     <div css={styles.section}>
       <div css={styles.title}>{title}</div>

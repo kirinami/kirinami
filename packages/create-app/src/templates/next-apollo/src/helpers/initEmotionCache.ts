@@ -1,9 +1,9 @@
 import createCache from '@emotion/cache';
 
 const cache = createCache({
-  key: 'nest-next-apollo-template',
+  key: 'next-apollo',
 });
 
-export default function initEmotionCache() {
+export function initEmotionCache() {
   return cache;
 }

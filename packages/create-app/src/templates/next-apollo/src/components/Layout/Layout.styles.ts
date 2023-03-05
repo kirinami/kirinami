@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   layout: css`
     position: relative;
     display: flex;
@@ -15,5 +15,3 @@ const styles = {
     width: 100%;
   `,
 };
-
-export default styles;

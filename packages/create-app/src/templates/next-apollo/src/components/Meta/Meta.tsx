@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import Head from 'next/head';
 
-export default function Meta() {
+export function Meta() {
   const { t } = useTranslation();
 
   return (

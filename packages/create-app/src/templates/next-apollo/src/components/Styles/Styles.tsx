@@ -1,7 +1,7 @@
 import { Global } from '@emotion/react';
 
-import styles from './Styles.styles';
+import { styles } from './Styles.styles';
 
-export default function Styles() {
+export function Styles() {
   return <Global styles={styles} />;
 }

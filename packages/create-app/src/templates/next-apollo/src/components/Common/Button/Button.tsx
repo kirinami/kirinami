@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 
-import Spinner from '@/components/Common/Spinner/Spinner';
+import { Spinner } from '@/components/Common/Spinner';
 
-import styles from './Button.styles';
+import { styles } from './Button.styles';
 
 export type ButtonProps = {
   className?: string;
@@ -12,7 +12,7 @@ export type ButtonProps = {
   onClick?: () => void;
 };
 
-export default function Button({ className, type = 'button', loading, children, onClick }: ButtonProps) {
+export function Button({ className, type = 'button', loading, children, onClick }: ButtonProps) {
   return (
     // eslint-disable-next-line react/button-has-type
     <button css={styles.button} className={className} type={type} disabled={loading} onClick={onClick}>

@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   header: css`
     padding: 1.75rem 0;
     background-color: #1b2936;
@@ -18,6 +18,11 @@ const styles = {
     line-height: 1;
     margin: 0;
   `,
+  menu: css`
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+  `,
   languages: css`
     display: flex;
     flex-direction: row;
@@ -31,5 +36,3 @@ const styles = {
     color: ${active ? '#14c682' : '#ffffff'};
   `,
 };
-
-export default styles;

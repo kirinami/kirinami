@@ -1,5 +1,4 @@
 import path from 'path';
-import * as process from 'process';
 
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -27,6 +26,9 @@ async function main() {
     .useGlobalPipes(
       new ValidationPipe({
         transform: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
         forbidUnknownValues: false,
       })
     )

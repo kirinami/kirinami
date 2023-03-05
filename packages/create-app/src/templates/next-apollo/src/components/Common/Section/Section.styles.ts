@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   section: css`
     display: flex;
     flex-direction: column;
@@ -24,5 +24,3 @@ const styles = {
     gap: 32px;
   `,
 };
-
-export default styles;

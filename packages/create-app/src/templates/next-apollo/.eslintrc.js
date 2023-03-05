@@ -49,6 +49,9 @@ module.exports = {
         noSortAlphabetically: true,
       },
     ],
+    'react-hooks/exhaustive-deps': 'warn',
+    'import/order': 'off',
+    'import/prefer-default-export': 'off',
     'unused-imports/no-unused-imports': 'error',
     'simple-import-sort/imports': [
       'error',

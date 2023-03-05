@@ -4,10 +4,10 @@ import { useKey } from 'react-use';
 import { ClassNames } from '@emotion/react';
 import { Icon } from '@iconify/react';
 
-import Button from '@/components/Common/Button/Button';
-import Spinner from '@/components/Common/Spinner/Spinner';
+import { Button } from '@/components/Common/Button';
+import { Spinner } from '@/components/Common/Spinner';
 
-import styles from './Modal.styles';
+import { styles } from './Modal.styles';
 
 ModalBase.setAppElement('#__next');
 
@@ -18,7 +18,7 @@ export type ModalProps = {
   onClose?: () => void;
 };
 
-export default function Modal({ open, loading, children, onClose }: ModalProps) {
+export function Modal({ open, loading, children, onClose }: ModalProps) {
   const handleClose = useCallback(() => {
     if (!loading && onClose) {
       onClose();

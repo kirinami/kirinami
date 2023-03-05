@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   authForm: css`
     display: flex;
     flex-direction: column;
@@ -48,5 +48,3 @@ const styles = {
     color: #e12312;
   `,
 };
-
-export default styles;

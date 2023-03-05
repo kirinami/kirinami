@@ -17,7 +17,7 @@ import { RefreshTokenDocument, RefreshTokenMutation, RefreshTokenMutationVariabl
 import { parseCookie } from '@/utils/cookie';
 import { isServer } from '@/utils/ssr';
 
-let apolloClientMemo: ApolloClient<NormalizedCacheObject> | undefined;
+let apolloClientMemo: ReturnType<typeof createApolloClient> | undefined;
 
 function createAuthLink(ctx?: NextPageContext | null) {
   const authLink = new ApolloLink((operation, forward) => {
@@ -131,7 +131,7 @@ function createApolloLink(ctx?: NextPageContext | null) {
   return from([createAuthLink(ctx), createHttpLink()]);
 }
 
-export default function initApolloClient(ctx?: NextPageContext | null, initialState?: NormalizedCacheObject) {
+export function initApolloClient(ctx?: NextPageContext | null, initialState?: NormalizedCacheObject) {
   const apolloClient = apolloClientMemo ?? createApolloClient();
 
   if (!apolloClientMemo) {

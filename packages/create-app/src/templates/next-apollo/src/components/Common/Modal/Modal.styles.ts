@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   bodyOpen: css`
     overflow: hidden;
   `,
@@ -66,5 +66,3 @@ const styles = {
   `,
   children: css``,
 };
-
-export default styles;

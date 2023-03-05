@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = css`
+export const styles = css`
   *,
   :before,
   :after {
@@ -47,5 +47,3 @@ const styles = css`
     height: 100%;
   }
 `;
-
-export default styles;

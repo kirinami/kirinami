@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-const styles = {
+export const styles = {
   button: css`
     display: flex;
     flex-direction: row;
@@ -27,5 +27,3 @@ const styles = {
     }
   `,
 };
-
-export default styles;

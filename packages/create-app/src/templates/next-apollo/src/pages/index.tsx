@@ -1,22 +1,30 @@
 import { useTranslation } from 'react-i18next';
 
-import Button from '@/components/Common/Button/Button';
-import Container from '@/components/Common/Container/Container';
-import AuthForm from '@/components/Form/AuthForm/AuthForm';
-import Layout from '@/components/Layout/Layout';
-import useAuth from '@/hooks/useAuth';
+import { Button } from '@/components/Common/Button';
+import { Container } from '@/components/Common/Container';
+import { AuthForm } from '@/components/Form/AuthForm';
+import { Layout } from '@/components/Layout';
+import { useCurrentUser } from '@/hooks/auth/useCurrentUser';
+import { useLogout } from '@/hooks/auth/useLogout';
 
 export default function IndexPage() {
   const { t } = useTranslation();
 
-  const { user, logout } = useAuth();
+  const { currentUser } = useCurrentUser();
+  const { loading: logoutLoading, logout } = useLogout();
 
   return (
     <Layout>
       <Container padding>
-        {t('pages.index.hello')}, {user ? `${user.email}` : t('pages.index.anonymous')}
+        {t('pages.index.hello')}, {currentUser ? `${currentUser.id}` : t('pages.index.anonymous')}
         <hr />
-        {user ? <Button onClick={logout}>{t('pages.index.logout')}</Button> : <AuthForm />}
+        {currentUser ? (
+          <Button loading={logoutLoading} onClick={() => logout()}>
+            {t('pages.index.logout')}
+          </Button>
+        ) : (
+          <AuthForm />
+        )}
       </Container>
     </Layout>
   );

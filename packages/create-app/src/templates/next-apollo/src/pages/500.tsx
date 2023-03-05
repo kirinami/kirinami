@@ -2,10 +2,10 @@ import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import Button from '@/components/Common/Button/Button';
-import Container from '@/components/Common/Container/Container';
-import Section from '@/components/Common/Section/Section';
-import Layout from '@/components/Layout/Layout';
+import { Button } from '@/components/Common/Button';
+import { Container } from '@/components/Common/Container';
+import { Section } from '@/components/Common/Section';
+import { Layout } from '@/components/Layout';
 
 export default function NotFoundPage() {
   const router = useRouter();

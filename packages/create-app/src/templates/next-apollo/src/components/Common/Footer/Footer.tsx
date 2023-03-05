@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 
-import Container from '@/components/Common/Container/Container';
+import { Container } from '@/components/Common/Container';
 
-import styles from './Footer.styles';
+import { styles } from './Footer.styles';
 
-export default function Footer() {
+export function Footer() {
   const { t } = useTranslation();
 
   return (

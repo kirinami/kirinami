@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 let isReadyMemo = typeof window === 'undefined';
 
-export default function useIsReady() {
+export function useIsReady() {
   const [isReady, setIsReady] = useState(isReadyMemo);
 
   useEffect(() => {
@@ -11,5 +11,5 @@ export default function useIsReady() {
     setIsReady(true);
   }, []);
 
-  return useMemo(() => isReady, [isReady]);
+  return isReady;
 }

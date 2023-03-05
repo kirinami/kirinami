@@ -19,16 +19,7 @@ export default class UsersResolver {
 
   @Query(() => UsersPaginationType)
   async getUsers(@Args() { page, size }: GetUsersArgs): Promise<UsersPaginationType> {
-    const [items, total] = await Promise.all([
-      this.prismaService.user.findMany({
-        orderBy: {
-          id: 'desc',
-        },
-        skip: size * (page - 1),
-        take: size,
-      }),
-      this.prismaService.user.count(),
-    ]);
+    const [items, total] = await this.usersService.findManyPagination(page, size);
 
     return { items, total };
   }
