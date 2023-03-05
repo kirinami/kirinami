@@ -17,7 +17,7 @@ const FRAMEWORKS = [
     color: lightRed,
     variants: [
       {
-        name: "nest-graphql",
+        name: "nest-apollo",
         display: "GraphQL",
         color: magenta,
       },
@@ -34,7 +34,7 @@ const FRAMEWORKS = [
     color: green,
     variants: [
       {
-        name: "next-graphql",
+        name: "next-apollo",
         display: "GraphQL",
         color: magenta,
       },
