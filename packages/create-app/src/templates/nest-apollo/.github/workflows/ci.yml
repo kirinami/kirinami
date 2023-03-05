@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  REMOTE_DIR: projects/nest-graphql/api
-  REMOTE_URL: https://nest-graphql.example.com/api
+  REMOTE_DIR: projects/nest-apollo/api
+  REMOTE_URL: https://nest-apollo.example.com/api
 
 jobs:
   deploy:
