@@ -1,15 +1,11 @@
-import { useCallback, useMemo } from 'react';
-import { useApolloClient } from '@apollo/client';
+import { useMemo } from 'react';
+
+import { logoutAction } from '@/slices/authSlice/actions';
+
+import { useAction } from '../useAction';
 
 export function useLogout() {
-  const apolloClient = useApolloClient();
+  const { loading, error, action: logout } = useAction(logoutAction, { lazy: true });
 
-  const logout = useCallback(async () => {
-    document.cookie = 'access-token=; path=/;';
-    document.cookie = 'refresh-token=; path=/;';
-
-    await apolloClient.resetStore();
-  }, [apolloClient]);
-
-  return useMemo(() => ({ loading: false, error: null, logout }), [logout]);
+  return useMemo(() => ({ loading, error, logout }), [error, loading, logout]);
 }

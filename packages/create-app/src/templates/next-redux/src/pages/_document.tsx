@@ -1,13 +1,14 @@
 import { Children } from 'react';
 import { streamToString } from 'next/dist/server/node-web-streams-helper';
 import Document, { DocumentContext, DocumentProps, Head, Html, Main, NextScript } from 'next/document';
-import { getMarkupFromTree } from '@apollo/client/react/ssr';
 import createEmotionServer from '@emotion/server/create-instance';
 
 import { getLanguageFromContext } from '@/helpers/getLanguageFromContext';
-import { initApolloClient } from '@/helpers/initApolloClient';
+import { getMarkupFromTree } from '@/helpers/getMarkupFromTree';
+import { initApiClient } from '@/helpers/initApiClient';
 import { initEmotionCache } from '@/helpers/initEmotionCache';
 import { initI18n, loadTranslation } from '@/helpers/initI18n';
+import { initStore } from '@/helpers/initStore';
 
 function MyDocument({ locale }: DocumentProps) {
   return (
@@ -26,14 +27,15 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
 
   const language = getLanguageFromContext(ctx);
 
-  const apolloClient = initApolloClient(ctx);
-  const i18n = initI18n(ctx, await loadTranslation(apolloClient, language));
+  const apiClient = initApiClient(ctx);
+  const store = initStore(ctx);
+  const i18n = initI18n(ctx, await loadTranslation(apiClient, language));
 
   ctx.renderPage = () =>
     renderPage({
       enhanceApp: (App) =>
         function EnhanceApp({ pageProps, ...props }) {
-          return <App pageProps={{ ...pageProps, apolloClient, i18n }} {...props} />;
+          return <App pageProps={{ ...pageProps, i18n, store }} {...props} />;
         },
       enhanceRender: async (Tree, { renderToReadableStream }) => {
         let stream: Awaited<ReturnType<typeof renderToReadableStream>>;
@@ -53,8 +55,8 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
           html,
           pageProps: {
             initialState: {
-              apolloClient: apolloClient.extract(),
-              i18n: i18n.extract(),
+              i18n: i18n.getState(),
+              store: store.getState(),
             },
           },
         };

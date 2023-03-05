@@ -18,7 +18,7 @@
     "plugins": [{"name": "next"}],
     "baseUrl": ".",
     "paths": {
-      "@/graphql/*": ["graphql/*"],
+      "@/api/*": ["api/*"],
       "@/*": ["src/*"]
     }
   },

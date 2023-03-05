@@ -1,21 +1,21 @@
 version: "3.9"
 
-name: next-apollo
+name: next-redux
 
 services:
   web:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.next-apollo_web.rule=Host(`next-apollo.example.com`)
-      - traefik.http.routers.next-apollo_web.entrypoints=http
+      - traefik.http.routers.next-redux_web.rule=Host(`next-redux.example.com`)
+      - traefik.http.routers.next-redux_web.entrypoints=http
     env_file: .env
     build:
       x-bake:
-        tags: next-apollo_web:latest
-        cache-from: type=local,src=/tmp/cache/next-apollo_web
-        cache-to: type=local,mode=max,dest=/tmp/cache/next-apollo_web
-        output: type=docker,dest=next-apollo_web.tar
-    image: next-apollo_web:latest
+        tags: next-redux_web:latest
+        cache-from: type=local,src=/tmp/cache/next-redux_web
+        cache-to: type=local,mode=max,dest=/tmp/cache/next-redux_web
+        output: type=docker,dest=next-redux_web.tar
+    image: next-redux_web:latest
     volumes:
       - ./public:/app/public
     networks:

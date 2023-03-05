@@ -1,4 +1,4 @@
-# Next.js + GraphQL
+# Next.js + Redux
 
 ## Getting Started
 

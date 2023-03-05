@@ -18,7 +18,7 @@ package-lock.json*
 
 # project
 .next
-graphql/client
+api/client
 next-env.d.ts
 
 # misc

@@ -10,25 +10,25 @@ import { initApolloClient } from '@/helpers/initApolloClient';
 import { initEmotionCache } from '@/helpers/initEmotionCache';
 import { initI18n } from '@/helpers/initI18n';
 
-function MyApp({ pageProps: { apolloClient, i18n, initialState, ...pageProps }, Component }: AppProps) {
+function MyApp({ pageProps: { i18n, apolloClient, initialState, ...pageProps }, Component }: AppProps) {
   const emotionCacheMemo = useMemo(() => initEmotionCache(), []);
+
+  const i18nMemo = useMemo(() => i18n || initI18n(null, initialState?.i18n), [i18n, initialState?.i18n]);
 
   const apolloClientMemo = useMemo(
     () => apolloClient || initApolloClient(null, initialState?.apolloClient),
     [apolloClient, initialState?.apolloClient]
   );
 
-  const i18nMemo = useMemo(() => i18n || initI18n(null, initialState?.i18n), [i18n, initialState?.i18n]);
-
   return (
     <CacheProvider value={emotionCacheMemo}>
-      <ApolloProvider client={apolloClientMemo}>
-        <I18nextProvider i18n={i18nMemo}>
+      <I18nextProvider i18n={i18nMemo}>
+        <ApolloProvider client={apolloClientMemo}>
           <Meta />
           <Styles />
           <Component {...pageProps} />
-        </I18nextProvider>
-      </ApolloProvider>
+        </ApolloProvider>
+      </I18nextProvider>
     </CacheProvider>
   );
 }

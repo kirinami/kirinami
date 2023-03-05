@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  REMOTE_DIR: projects/next-apollo/web
-  REMOTE_URL: https://next-apollo.example.com
+  REMOTE_DIR: projects/next-redux/web
+  REMOTE_URL: https://next-redux.example.com
 
 jobs:
   deploy:

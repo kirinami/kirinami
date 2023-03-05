@@ -1,34 +1,11 @@
-import { useCallback, useMemo } from 'react';
-import { useApolloClient } from '@apollo/client';
+import { useMemo } from 'react';
 
-import { LoginInput, useLoginMutation } from '@/graphql/client';
+import { loginAction } from '@/slices/authSlice/actions';
+
+import { useAction } from '../useAction';
 
 export function useLogin() {
-  const apolloClient = useApolloClient();
+  const { loading, error, action: login } = useAction(loginAction, { lazy: true });
 
-  const [loginMutation, { loading, error }] = useLoginMutation();
-
-  const login = useCallback(
-    async (input: LoginInput) => {
-      const { data, errors } = await loginMutation({
-        variables: {
-          input,
-        },
-      });
-
-      if (errors?.length) {
-        throw errors[0];
-      }
-
-      if (data?.login) {
-        document.cookie = `access-token=${data.login.accessToken}; path=/;`;
-        document.cookie = `refresh-token=${data.login.refreshToken}; path=/;`;
-      }
-
-      await apolloClient.resetStore();
-    },
-    [apolloClient, loginMutation]
-  );
-
-  return useMemo(() => ({ loading, error, login }), [loading, error, login]);
+  return useMemo(() => ({ loading, error, login }), [error, loading, login]);
 }

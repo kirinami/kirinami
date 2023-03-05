@@ -33,7 +33,7 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
     renderPage({
       enhanceApp: (App) =>
         function EnhanceApp({ pageProps, ...props }) {
-          return <App pageProps={{ ...pageProps, apolloClient, i18n }} {...props} />;
+          return <App pageProps={{ ...pageProps, i18n, apolloClient }} {...props} />;
         },
       enhanceRender: async (Tree, { renderToReadableStream }) => {
         let stream: Awaited<ReturnType<typeof renderToReadableStream>>;
@@ -53,8 +53,8 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
           html,
           pageProps: {
             initialState: {
-              apolloClient: apolloClient.extract(),
               i18n: i18n.extract(),
+              apolloClient: apolloClient.extract(),
             },
           },
         };

@@ -1,17 +1,22 @@
 import { useMemo } from 'react';
 
-import { useCurrentUserQuery } from '@/graphql/client';
+import { currentUserAction } from '@/slices/authSlice/actions';
+import { useCurrentUserSelector } from '@/slices/authSlice/selectors';
+
+import { useAction } from '../useAction';
 
 export function useCurrentUser() {
-  const { loading, error, data, refetch } = useCurrentUserQuery();
+  const currentUser = useCurrentUserSelector();
+
+  const { loading, error, action: refetch } = useAction(currentUserAction, { ssr: true });
 
   return useMemo(
     () => ({
       loading,
       error,
-      currentUser: data?.currentUser,
       refetch,
+      currentUser,
     }),
-    [loading, error, data?.currentUser, refetch]
+    [loading, error, refetch, currentUser]
   );
 }
