@@ -1,11 +1,11 @@
 version: "3.9"
 
-name: nest-restapi
-
 services:
   postgres:
-    env_file: .env
     image: postgres:13.2-alpine
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:
@@ -19,21 +19,21 @@ services:
   api:
     labels:
       - traefik.enable=true
-      - traefik.http.middlewares.nest-restapi_api--strip-api.stripprefix.prefixes=/api
-      - traefik.http.middlewares.nest-restapi_api--strip-api.stripprefix.forceSlash=false
-      - traefik.http.routers.nest-restapi_api.rule=Host(`nest-restapi.example.com`) && PathPrefix(`/api`)
-      - traefik.http.routers.nest-restapi_api.middlewares=nest-restapi_api--strip-api
-      - traefik.http.routers.nest-restapi_api.entrypoints=http
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_api--strip-api.stripprefix.prefixes=/api
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_api--strip-api.stripprefix.forceSlash=false
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_api.middlewares=${COMPOSE_PROJECT_NAME}_api--strip-api
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_api.entrypoints=http
     depends_on:
-      - postgres
-    env_file: .env
+      postgres:
+        condition: service_healthy
     build:
       x-bake:
-        tags: nest-restapi_api:latest
-        cache-from: type=local,src=/tmp/cache/nest-restapi_api
-        cache-to: type=local,mode=max,dest=/tmp/cache/nest-restapi_api
-        output: type=docker,dest=nest-restapi_api.tar
-    image: nest-restapi_api:latest
+        tags: ${COMPOSE_PROJECT_NAME}_api:latest
+        cache-from: type=local,src=/tmp/cache/${COMPOSE_PROJECT_NAME}_api
+        cache-to: type=local,mode=max,dest=/tmp/cache/${COMPOSE_PROJECT_NAME}_api
+        output: type=docker,dest=${COMPOSE_PROJECT_NAME}_api.tar
+    image: ${COMPOSE_PROJECT_NAME}_api:latest
     volumes:
       - ./public:/app/public
     networks:

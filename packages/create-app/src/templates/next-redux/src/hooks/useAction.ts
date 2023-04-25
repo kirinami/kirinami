@@ -22,10 +22,9 @@ export function useAction<Return, Args>(thunk: Thunk<Return, Args>, options?: Op
 
   const dispatch = useDispatch();
 
-  const key = useMemo(
-    () => `${thunk.typePrefix}(${options?.args ? JSON.stringify(options.args) : ''})`,
-    [thunk.typePrefix, options?.args]
-  );
+  const hash = options?.args ? JSON.stringify(options.args) : '';
+
+  const key = useMemo(() => `${thunk.typePrefix}(${hash})`, [thunk.typePrefix, hash]);
 
   const [loading, setLoading] = useState(!options?.ssr || options?.lazy ? false : renderPromises.isDone(key));
   const [error, setError] = useState<Error>();

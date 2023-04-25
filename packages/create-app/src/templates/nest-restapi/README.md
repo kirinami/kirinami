@@ -1,4 +1,4 @@
-# Nest.js + GraphQL
+# Nest.js + RestAPI
 
 ## Getting Started
 

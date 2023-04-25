@@ -56,20 +56,20 @@ export function useRenderPromises() {
   return useContext(renderPromisesContext);
 }
 
-export function getMarkupFromTree({
+export function getMarkupFromTree<T>({
   tree,
   renderFunction,
 }: {
   tree: ReactNode;
-  renderFunction: (tree: ReactElement) => string | Promise<string>;
-}): Promise<string> {
+  renderFunction: (tree: ReactElement) => Promise<T>;
+}): Promise<T> {
   const renderPromises = new RenderPromises();
 
-  function process(): Promise<string> {
-    return new Promise<string>((resolve) => {
+  function process(): Promise<T> {
+    return new Promise<T>((resolve) => {
       resolve(renderFunction(createElement(renderPromisesContext.Provider, { value: renderPromises }, tree)));
     })
-      .then((html) => (renderPromises.hasPending() ? renderPromises.awaitPending().then(process) : html))
+      .then((data) => (renderPromises.hasPending() ? renderPromises.awaitPending().then(process) : data))
       .finally(() => renderPromises.reset());
   }
 

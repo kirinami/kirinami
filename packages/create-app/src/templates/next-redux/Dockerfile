@@ -5,6 +5,7 @@ COPY .yarn .yarn
 COPY .yarnrc.yml package.json yarn.lock ./
 RUN yarn workspaces focus --all
 COPY . .
+ENV NEXT_TELEMETRY_DISABLED 1
 RUN yarn build
 RUN yarn workspaces focus --all --production
 
@@ -17,5 +18,6 @@ COPY --from=builder /builder/public public
 COPY --from=builder /builder/next.config.js ./
 COPY --from=builder /builder/.env ./
 COPY --from=builder /builder/.yarnrc.yml /builder/package.json /builder/yarn.lock ./
+ENV NEXT_TELEMETRY_DISABLED 1
 EXPOSE 4200
 CMD ["yarn", "start"]

@@ -20,19 +20,16 @@ module.exports = {
     'consistent-return': 'off',
 
     'unused-imports/no-unused-imports': 'error',
-    'simple-import-sort/imports': [
-      'error',
-      {
-        groups: [
-          ['^\\u0000'],
-          [`^(${require('module').builtinModules.join('|')})(/|$)`],
-          ['^@?\\w', '^'],
-          ['^@/prisma/\\w', '^@/\\w'],
-          ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
-          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
-        ],
-      },
-    ],
+    'simple-import-sort/imports': ['error', {
+      groups: [
+        ['^\\u0000'],
+        [`^(${require('module').builtinModules.join('|')})(/|$)`],
+        ['^@?\\w', '^'],
+        ['^@/prisma/\\w', '^@/\\w'],
+        ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+        ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+      ],
+    }],
     'simple-import-sort/exports': 'error',
 
     '@typescript-eslint/no-shadow': 'off',

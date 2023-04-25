@@ -1,21 +1,18 @@
 version: "3.9"
 
-name: next-redux
-
 services:
   web:
     labels:
       - traefik.enable=true
-      - traefik.http.routers.next-redux_web.rule=Host(`next-redux.example.com`)
-      - traefik.http.routers.next-redux_web.entrypoints=http
-    env_file: .env
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.entrypoints=http
     build:
       x-bake:
-        tags: next-redux_web:latest
-        cache-from: type=local,src=/tmp/cache/next-redux_web
-        cache-to: type=local,mode=max,dest=/tmp/cache/next-redux_web
-        output: type=docker,dest=next-redux_web.tar
-    image: next-redux_web:latest
+        tags: ${COMPOSE_PROJECT_NAME}_web:latest
+        cache-from: type=local,src=/tmp/cache/${COMPOSE_PROJECT_NAME}_web
+        cache-to: type=local,mode=max,dest=/tmp/cache/${COMPOSE_PROJECT_NAME}_web
+        output: type=docker,dest=${COMPOSE_PROJECT_NAME}_web.tar
+    image: ${COMPOSE_PROJECT_NAME}_web:latest
     volumes:
       - ./public:/app/public
     networks:

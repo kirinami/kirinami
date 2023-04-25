@@ -1,4 +1,4 @@
-# Nest.js + GraphQL
+# Nest.js + Apollo
 
 ## Getting Started
 

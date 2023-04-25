@@ -9,7 +9,7 @@ async function main(args) {
   const load = args.includes('--load');
 
   if (load) {
-    const { data } = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_HTTP_URL, {
+    const { data } = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

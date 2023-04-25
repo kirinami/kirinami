@@ -4,17 +4,16 @@ on:
   push:
     branches:
       - main
+      - develop
   workflow_dispatch:
 
 env:
-  REMOTE_DIR: projects/next-apollo/web
-  REMOTE_URL: https://next-apollo.example.com
+  REMOTE_DIR: projects/${{ github.event.repository.name }}/${{ github.ref_name }}
 
 jobs:
   deploy:
     environment:
       name: production
-      url: ${{ env.REMOTE_URL }}
     runs-on: ubuntu-latest
     steps:
       - name: Restore cache
@@ -32,7 +31,8 @@ jobs:
       - name: Build artifacts
         run: |
           cat > .env <<- 'END'
-          ${{ secrets.MAIN_DOTENV }}
+          COMPOSE_PROJECT_NAME=${{ github.event.repository.name }}-${{ github.ref_name }}
+          ${{ github.ref_name == 'main' && secrets.MAIN_DOTENV || secrets.DEVELOP_DOTENV }}
           END
           
           docker buildx create --use

@@ -1,5 +1,4 @@
 import { Children } from 'react';
-import { streamToString } from 'next/dist/server/node-web-streams-helper';
 import Document, { DocumentContext, DocumentProps, Head, Html, Main, NextScript } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 
@@ -37,30 +36,27 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
         function EnhanceApp({ pageProps, ...props }) {
           return <App pageProps={{ ...pageProps, i18n, store }} {...props} />;
         },
-      enhanceRender: async (Tree, { renderToReadableStream }) => {
-        let stream: Awaited<ReturnType<typeof renderToReadableStream>>;
+      enhancedRenderToInitialStream:
+        (renderToInitialStream) =>
+          async ({ ReactDOMServer, element }) => {
+            const stream = await getMarkupFromTree({
+              tree: element,
+              renderFunction: async (element) =>
+                renderToInitialStream({
+                  ReactDOMServer,
+                  element,
+                }),
+            });
 
-        const html = await getMarkupFromTree({
-          tree: Tree,
-          renderFunction: async (Tree) => {
-            stream = await renderToReadableStream(Tree);
+            stream.pageProps = {
+              initialState: {
+                i18n: i18n.getState(),
+                store: store.getState(),
+              },
+            };
 
-            return streamToString(stream.tee()[1]);
+            return stream;
           },
-        });
-
-        return {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          stream: stream!,
-          html,
-          pageProps: {
-            initialState: {
-              i18n: i18n.getState(),
-              store: store.getState(),
-            },
-          },
-        };
-      },
     });
 
   const emotionCache = initEmotionCache();
