@@ -33,7 +33,7 @@ async function main() {
       })
     )
     .enableShutdownHooks()
-    .listen(process.env.POST || 3000, '0.0.0.0');
+    .listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0');
 }
 
 main().catch((err) => {

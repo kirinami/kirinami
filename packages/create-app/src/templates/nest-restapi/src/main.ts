@@ -19,8 +19,8 @@ async function main() {
     SwaggerModule.createDocument(
       app,
       new DocumentBuilder()
-        .setTitle('Nest RestAPI')
-        .setDescription('The Nest RestAPI description')
+        .setTitle('RestAPI')
+        .setDescription('Description')
         .setVersion('1.0.0')
         .addBearerAuth()
         .build()
@@ -60,7 +60,7 @@ async function main() {
       })
     )
     .enableShutdownHooks()
-    .listen(process.env.POST || 3000, '0.0.0.0');
+    .listen(process.env.PORT || 3000, process.env.HOST || '0.0.0.0');
 }
 
 main().catch((err) => {
