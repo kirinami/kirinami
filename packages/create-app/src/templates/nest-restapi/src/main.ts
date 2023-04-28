@@ -20,7 +20,7 @@ async function main() {
       app,
       new DocumentBuilder()
         .setTitle('RestAPI')
-        .setDescription('Description')
+        .setDescription('Documentation')
         .setVersion('1.0.0')
         .addBearerAuth()
         .build()

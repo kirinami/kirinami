@@ -16,24 +16,24 @@ services:
       interval: 5s
     restart: unless-stopped
 
-  api:
+  app:
     labels:
       - traefik.enable=true
-      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_api--strip-api.stripprefix.prefixes=/api
-      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_api--strip-api.stripprefix.forceSlash=false
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_api.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_api.middlewares=${COMPOSE_PROJECT_NAME}_api--strip-api
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_api.entrypoints=http
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_app--strip-api.stripprefix.prefixes=/api
+      - traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_app--strip-api.stripprefix.forceSlash=false
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.rule=Host(`${DOMAIN}`) && PathPrefix(`/api`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.middlewares=${COMPOSE_PROJECT_NAME}_app--strip-api
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.entrypoints=http
     depends_on:
       postgres:
         condition: service_healthy
     build:
       x-bake:
-        tags: ${COMPOSE_PROJECT_NAME}_api:latest
-        cache-from: type=local,src=/tmp/cache/${COMPOSE_PROJECT_NAME}_api
-        cache-to: type=local,mode=max,dest=/tmp/cache/${COMPOSE_PROJECT_NAME}_api
-        output: type=docker,dest=${COMPOSE_PROJECT_NAME}_api.tar
-    image: ${COMPOSE_PROJECT_NAME}_api:latest
+        tags: ${COMPOSE_PROJECT_NAME}_app:latest
+        cache-from: type=local,src=/tmp/cache/${COMPOSE_PROJECT_NAME}_app
+        cache-to: type=local,mode=max,dest=/tmp/cache/${COMPOSE_PROJECT_NAME}_app
+        output: type=docker,dest=${COMPOSE_PROJECT_NAME}_app.tar
+    image: ${COMPOSE_PROJECT_NAME}_app:latest
     volumes:
       - ./public:/app/public
     networks:
