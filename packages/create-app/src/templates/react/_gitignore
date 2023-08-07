@@ -17,12 +17,13 @@ yarn-error.log*
 package-lock.json*
 
 # project
-.next
-graphql/client
-next-env.d.ts
+.vite
+public/static
+.env*
+!.env.example
 
 # misc
 .DS_Store
 
 # typescript
-tsconfig.tsbuildinfo
+*.tsbuildinfo

@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      x-bake:
+        tags: ${COMPOSE_PROJECT_NAME}_app:latest
+        cache-from: type=local,src=${PWD}/.cache/${COMPOSE_PROJECT_NAME}_app
+        cache-to: type=local,dest=${PWD}/.cache/${COMPOSE_PROJECT_NAME}_app,mode=max
+        output: type=docker,dest=${PWD}/.docker/${COMPOSE_PROJECT_NAME}_app.tar
+    image: ${COMPOSE_PROJECT_NAME}_app:latest
+    volumes:
+      - ${PWD}/public:/app/public
+    networks:
+      - traefik
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.rule=Host(`${DOMAIN:-${COMPOSE_PROJECT_NAME}.localhost}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.entrypoints=web
+
+networks:
+  traefik:
+    name: traefik
