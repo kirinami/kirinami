@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15.3-alpine
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - database
+    restart: unless-stopped
+    healthcheck:
+      test: pg_isready -q
+      start_period: 5s
+      interval: 5s
+
+  app:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build:
+      x-bake:
+        tags: ${COMPOSE_PROJECT_NAME}_app:latest
+        cache-from: type=local,src=${PWD}/.cache/${COMPOSE_PROJECT_NAME}_app
+        cache-to: type=local,dest=${PWD}/.cache/${COMPOSE_PROJECT_NAME}_app,mode=max
+        output: type=docker,dest=${PWD}/.docker/${COMPOSE_PROJECT_NAME}_app.tar
+    image: ${COMPOSE_PROJECT_NAME}_app:latest
+    volumes:
+      - ${PWD}/public:/app/public
+    networks:
+      - database
+      - traefik
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.rule=Host(`${DOMAIN:-${COMPOSE_PROJECT_NAME}.localhost}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.entrypoints=web
+
+volumes:
+  postgres:
+
+networks:
+  database:
+  traefik:
+    name: traefik

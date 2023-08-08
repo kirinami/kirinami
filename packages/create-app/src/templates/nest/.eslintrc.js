@@ -12,17 +12,17 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['**/*.{js,jsx}'],
+      files: ['**/*.js'],
       extends: ['eslint:recommended'],
     },
     {
-      files: ['**/*.{ts,tsx}'],
+      files: ['**/*.ts'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
         project: true,
         tsconfigRootDir: __dirname,
       },
-      extends: ['airbnb/base', 'airbnb/rules/react', 'airbnb-typescript', 'plugin:@typescript-eslint/recommended'],
+      extends: ['airbnb/base', 'airbnb-typescript/base', 'plugin:@typescript-eslint/recommended'],
       rules: {
         'no-empty-pattern': 'off',
         'no-param-reassign': 'off',
@@ -35,18 +35,6 @@ module.exports = {
         'import/order': 'off',
         'import/extensions': 'off',
         'import/prefer-default-export': 'off',
-
-        'react/react-in-jsx-scope': 'off',
-        'react/require-default-props': 'off',
-        'react/jsx-props-no-spreading': 'off',
-        'react/jsx-sort-props': [
-          'error',
-          {
-            callbacksLast: true,
-            reservedFirst: true,
-            noSortAlphabetically: true,
-          },
-        ],
 
         '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/no-shadow': 'off',
@@ -63,7 +51,7 @@ module.exports = {
       },
     },
     {
-      files: ['**/*.{js,jsx,ts,tsx}'],
+      files: ['**/*.{js,ts}'],
       extends: ['prettier'],
       plugins: ['unused-imports', 'simple-import-sort', 'prettier'],
       rules: {
@@ -83,7 +71,8 @@ module.exports = {
             groups: [
               ['^\\u0000'],
               [`^(${builtinModules.join('|')})(/|$)`, '^node:'],
-              ['^react', '^@?\\w', '^'],
+              ['^@?\\w', '^'],
+              ['^@prisma/\\w'],
               ['^@/\\w'],
               ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
               ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
@@ -97,7 +86,7 @@ module.exports = {
       },
     },
     {
-      files: ['**/*.{spec,test}.{js,jsx,ts,tsx}'],
+      files: ['**/*.{spec,test}.{js,ts}'],
       rules: {
         'import/no-extraneous-dependencies': 'off',
       },

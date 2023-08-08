@@ -1,3 +1,6 @@
+# git
+.git
+
 # ide
 .idea
 .vscode
@@ -17,6 +20,9 @@ yarn-error.log*
 package-lock.json*
 
 # project
+.nest
+prisma/client
+public/static
 
 # misc
 .DS_Store

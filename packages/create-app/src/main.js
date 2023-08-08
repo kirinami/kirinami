@@ -15,35 +15,11 @@ const FRAMEWORKS = [
     name: 'nest',
     display: 'Nest.js',
     color: lightRed,
-    variants: [
-      {
-        name: 'nest-apollo',
-        display: 'Apollo GraphQL',
-        color: magenta,
-      },
-      {
-        name: 'nest-restapi',
-        display: 'RestAPI',
-        color: green,
-      },
-    ],
   },
   {
-    name: 'next',
-    display: 'Next.js',
-    color: green,
-    variants: [
-      {
-        name: 'next-apollo',
-        display: 'Apollo GraphQL',
-        color: magenta,
-      },
-      {
-        name: 'next-redux',
-        display: 'Redux Toolkit',
-        color: blue,
-      },
-    ],
+    name: 'react',
+    display: 'React.js',
+    color: blue,
   },
 ];
 

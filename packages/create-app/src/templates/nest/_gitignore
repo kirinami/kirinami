@@ -17,6 +17,11 @@ yarn-error.log*
 package-lock.json*
 
 # project
+.nest
+prisma/client
+public/static
+.env*
+!.env.example
 
 # misc
 .DS_Store

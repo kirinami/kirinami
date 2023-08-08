@@ -3,10 +3,14 @@ import path from 'node:path';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
 import { cjsInterop } from 'vite-plugin-cjs-interop';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ command, ssrBuild }) => ({
   appType: command === 'serve' || ssrBuild ? 'custom' : 'spa',
+  resolve: {
+    alias: {
+      '@/': 'src/',
+    },
+  },
   css: {
     modules: {
       localsConvention: 'camelCaseOnly',
@@ -18,8 +22,10 @@ export default defineConfig(({ command, ssrBuild }) => ({
       input: command === 'serve' || ssrBuild ? path.resolve('./index.ts') : undefined,
     },
   },
+  test: {
+    environment: 'happy-dom',
+  },
   plugins: [
-    tsconfigPaths(),
     cjsInterop({
       dependencies: [],
     }),
@@ -40,7 +46,4 @@ export default defineConfig(({ command, ssrBuild }) => ({
       },
     },
   ],
-  test: {
-    environment: 'happy-dom',
-  },
 }));
