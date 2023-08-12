@@ -36,7 +36,7 @@ function getCacheForType(resourceType: typeof createCacheRoot) {
 }
 
 export function cache<Args extends unknown[], Return>(fn: (...args: Args) => Return) {
-  return function cache(...args: Args): Return {
+  return (...args: Args): Return => {
     const fnMap = getCacheForType(createCacheRoot);
     const fnNode = fnMap.get(fn);
     let cacheNode;
