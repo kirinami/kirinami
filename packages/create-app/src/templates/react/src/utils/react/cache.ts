@@ -35,8 +35,8 @@ function getCacheForType(resourceType: typeof createCacheRoot) {
   return entry;
 }
 
-export function cache(fn: (...args: unknown[]) => unknown) {
-  return function (...args: unknown[]) {
+export function cache<Args extends unknown[], Return>(fn: (...args: Args) => Return) {
+  return function cache(...args: Args): Return {
     const fnMap = getCacheForType(createCacheRoot);
     const fnNode = fnMap.get(fn);
     let cacheNode;
@@ -52,7 +52,6 @@ export function cache(fn: (...args: unknown[]) => unknown) {
       const arg = args[i];
 
       if (typeof arg === 'function' || (typeof arg === 'object' && arg !== null)) {
-        // Objects go into a WeakMap
         let objectCache = cacheNode.o as WeakMap<object, unknown>;
 
         if (objectCache === null) {
@@ -70,7 +69,6 @@ export function cache(fn: (...args: unknown[]) => unknown) {
           cacheNode = objectNode;
         }
       } else {
-        // Primitives go into a regular Map
         let primitiveCache = cacheNode.p as Map<unknown, unknown>;
 
         if (primitiveCache === null) {
@@ -83,6 +81,7 @@ export function cache(fn: (...args: unknown[]) => unknown) {
 
         if (primitiveNode === undefined) {
           cacheNode = createCacheNode();
+
           primitiveCache.set(arg, cacheNode);
         } else {
           cacheNode = primitiveNode;
@@ -99,15 +98,20 @@ export function cache(fn: (...args: unknown[]) => unknown) {
     }
 
     try {
-      const result = fn(args);
+      const result = fn(...args);
+
       const terminatedNode = cacheNode;
+
       terminatedNode.s = TERMINATED;
       terminatedNode.v = result;
+
       return result;
     } catch (error) {
       const erroredNode = cacheNode;
+
       erroredNode.s = ERRORED;
       erroredNode.v = error;
+
       throw error;
     }
   };

@@ -52,19 +52,12 @@ export async function start(vite?: ViteDevServer) {
         body: req.method !== 'HEAD' && req.method !== 'GET' ? (req.body as BodyInit) : undefined,
       });
 
-      console.time('render');
       const { router, head, root } = await render(request);
-      console.timeEnd('render');
 
-      console.time('styles');
       const styles = import.meta.env.PROD ? '' : await renderStyles(vite!, '/src/entry-ssr.tsx');
-      console.timeEnd('styles');
 
-      console.time('scripts');
       const scripts = '';
-      console.timeEnd('scripts');
 
-      console.time('html');
       const html = template
         .replace(/<html.*>/g, head.html)
         .replace(`<!-- inject-meta -->`, head.meta.join(''))
@@ -72,7 +65,6 @@ export async function start(vite?: ViteDevServer) {
         .replace(`<!-- inject-styles -->`, styles)
         .replace(`<!-- inject-root -->`, root)
         .replace(`<!-- inject-scripts -->`, scripts);
-      console.timeEnd('html');
 
       return await reply.status(router.status).header('Content-Type', 'text/html').send(html);
     } catch (err) {
