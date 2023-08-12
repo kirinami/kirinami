@@ -9,7 +9,7 @@ import fastify, { FastifyInstance } from 'fastify';
 import type { ViteDevServer } from 'vite';
 
 import { render } from '@/entry-ssr';
-import { renderStyles } from '@/utils/react/dev';
+import { ejectStyles } from '@/utils/vite';
 
 let app: FastifyInstance | undefined;
 
@@ -54,7 +54,7 @@ export async function start(vite?: ViteDevServer) {
 
       const { router, head, root } = await render(request);
 
-      const styles = import.meta.env.PROD ? '' : await renderStyles(vite!, '/src/entry-ssr.tsx');
+      const styles = import.meta.env.PROD ? '' : await ejectStyles(vite!, '/src/entry-ssr.tsx');
 
       const scripts = '';
 
