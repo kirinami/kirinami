@@ -26,6 +26,7 @@ module.exports = {
       rules: {
         'no-empty-pattern': 'off',
         'no-param-reassign': 'off',
+        'no-async-promise-executor': 'off',
         'sort-imports': 'off',
         'consistent-return': 'off',
         'prefer-destructuring': 'off',
@@ -51,6 +52,7 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/no-shadow': 'off',
         '@typescript-eslint/no-empty-interface': 'off',
+        '@typescript-eslint/no-throw-literal': 'warn',
         '@typescript-eslint/ban-types': [
           'error',
           {

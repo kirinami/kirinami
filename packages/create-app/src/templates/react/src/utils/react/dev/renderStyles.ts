@@ -23,7 +23,7 @@ function filterCssModules(
   return cssModules;
 }
 
-export async function renderToStyles(vite: ViteDevServer, entryModuleUrl: string) {
+export async function renderStyles(vite: ViteDevServer, entryModuleUrl: string) {
   /* eslint-disable import/no-extraneous-dependencies */
   const { Parser } = await import('acorn');
   const { walk } = await import('estree-walker');

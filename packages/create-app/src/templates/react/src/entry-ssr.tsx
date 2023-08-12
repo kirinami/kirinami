@@ -1,35 +1,34 @@
-import { HelmetProvider, HelmetServerState } from 'react-helmet-async';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom/server';
 
-import { getMarkupFromTree } from './utils/react/ssr';
-import { routes } from './entry';
+import { routes } from '@/entry';
+import { Head, HeadProvider, headToJson } from '@/utils/react/head';
+import { getMarkupFromTree } from '@/utils/react/ssr';
 
 const handler = createStaticHandler(routes);
 
 export async function render(request: Request) {
   const context = {
-    helmet: {} as HelmetServerState,
+    head: {} as Head,
     router: await handler.query(request),
   };
 
   if (context.router instanceof Response) {
-    // eslint-disable-next-line @typescript-eslint/no-throw-literal
-    throw context;
+    throw context.router;
   }
 
   const router = createStaticRouter(handler.dataRoutes, context.router);
 
-  const html = await getMarkupFromTree({
-    tree: (
-      <HelmetProvider context={context}>
-        <StaticRouterProvider context={context.router} router={router} />
-      </HelmetProvider>
-    ),
-  });
+  const root = await getMarkupFromTree(
+    <HeadProvider context={context.head}>
+      <StaticRouterProvider context={context.router} router={router} />
+    </HeadProvider>,
+  );
 
   return {
-    helmet: context.helmet,
-    router: context.router,
-    html,
+    router: {
+      status: context.router.statusCode,
+    },
+    head: headToJson(context.head),
+    root,
   };
 }

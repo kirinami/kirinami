@@ -1,6 +1,6 @@
 import { createContext, createElement, ReactNode } from 'react';
 
-import { renderToHtml } from './renderToHtml';
+import { renderHtml } from './renderHtml';
 
 class RenderPromises {
   private queryPromises = new Map<string, () => Promise<unknown>>();
@@ -57,16 +57,15 @@ class RenderPromises {
 const RenderPromisesContext = createContext(new RenderPromises());
 
 export type GetMarkupFromTreeOptions = {
-  tree: ReactNode;
   onAfterRender?: (renderPromise: RenderPromises) => Promise<unknown>;
 };
 
-export async function getMarkupFromTree({ tree, onAfterRender }: GetMarkupFromTreeOptions) {
+export async function getMarkupFromTree(tree: ReactNode, { onAfterRender }: GetMarkupFromTreeOptions = {}) {
   const renderPromises = new RenderPromises();
 
   const process = (): Promise<string> =>
     new Promise<string>((resolve) => {
-      resolve(renderToHtml(createElement(RenderPromisesContext.Provider, { value: renderPromises }, tree)));
+      resolve(renderHtml(createElement(RenderPromisesContext.Provider, { value: renderPromises }, tree)));
     })
       .then(async (html) => {
         await onAfterRender?.(renderPromises);

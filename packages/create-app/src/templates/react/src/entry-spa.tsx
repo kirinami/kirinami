@@ -1,16 +1,18 @@
 import { hydrateRoot } from 'react-dom/client';
-import { HelmetProvider } from 'react-helmet-async';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import { routes } from './entry';
+import { routes } from '@/entry';
+import { HeadProvider } from '@/utils/react/head';
 
-const root = document.getElementById('root')!;
+export async function render() {
+  const router = createBrowserRouter(routes);
 
-const router = createBrowserRouter(routes);
+  hydrateRoot(
+    document.getElementById('root')!,
+    <HeadProvider>
+      <RouterProvider router={router} />
+    </HeadProvider>,
+  );
+}
 
-hydrateRoot(
-  root,
-  <HelmetProvider>
-    <RouterProvider router={router} />
-  </HelmetProvider>,
-);
+render().catch(console.error);

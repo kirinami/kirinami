@@ -8,7 +8,7 @@ export default defineConfig(({ command, ssrBuild }) => ({
   appType: command === 'serve' || ssrBuild ? 'custom' : 'spa',
   resolve: {
     alias: {
-      '@/': 'src/',
+      '@/': `${path.resolve('src')}/`,
     },
   },
   css: {
@@ -24,6 +24,7 @@ export default defineConfig(({ command, ssrBuild }) => ({
   },
   test: {
     environment: 'happy-dom',
+    passWithNoTests: true,
   },
   plugins: [
     cjsInterop({

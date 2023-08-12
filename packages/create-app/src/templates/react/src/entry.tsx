@@ -1,21 +1,34 @@
-import './entry.scss';
+import '@/entry.scss';
 
-import { RouteObject } from 'react-router-dom';
+import { redirect, RouteObject } from 'react-router-dom';
 
-import { HomePage } from './pages/HomePage';
-import { NotFoundPage } from './pages/NotFoundPage';
+import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
+import { HomePage } from '@/pages/HomePage';
+import { NotFoundPage } from '@/pages/NotFoundPage';
+import { hydrationLoader, HydrationProvider } from '@/providers/HydrationProvider';
 
 export const routes: RouteObject[] = [
   {
-    index: true,
-    element: <HomePage />,
+    path: ':language',
+    loader: hydrationLoader,
+    element: <HydrationProvider />,
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: '*',
+        loader: () =>
+          new Response('Not Found', {
+            status: 404,
+          }),
+        element: <NotFoundPage />,
+      },
+    ],
   },
   {
     path: '*',
-    loader: () =>
-      new Response('Not Found', {
-        status: 404,
-      }),
-    element: <NotFoundPage />,
+    loader: () => redirect(DEFAULT_LANGUAGE),
   },
 ];

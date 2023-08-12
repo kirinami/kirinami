@@ -3,7 +3,7 @@ import { Writable } from 'node:stream';
 import { ReactNode } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
 
-export async function renderToHtml(children: ReactNode) {
+export async function renderHtml(children: ReactNode) {
   return new Promise<string>((resolve, reject) => {
     let html = '';
 

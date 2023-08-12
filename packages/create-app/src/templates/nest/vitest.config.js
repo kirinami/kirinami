@@ -1,14 +1,17 @@
-const { default: swc } = require('unplugin-swc');
+const path = require('node:path');
+
 const { defineConfig } = require('vitest/config');
+const { default: swc } = require('unplugin-swc');
 
 module.exports = defineConfig({
-  test: {
-    include: ['src/**/*.{test,spec}.ts'],
-  },
   resolve: {
     alias: {
-      '@/': 'src/',
+      '@/': `${path.resolve('src')}/`,
     },
+  },
+  test: {
+    include: ['src/**/*.{test,spec}.ts'],
+    passWithNoTests: true,
   },
   plugins: [swc.vite()],
 });

@@ -4,13 +4,12 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
-import fastifyCompress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
 import fastify, { FastifyInstance } from 'fastify';
 import type { ViteDevServer } from 'vite';
 
-import { render } from './src/entry-ssr';
-import { renderToStyles } from './src/utils/react/ssr';
+import { render } from '@/entry-ssr';
+import { renderStyles } from '@/utils/react/dev';
 
 let app: FastifyInstance | undefined;
 
@@ -29,18 +28,10 @@ export async function start(vite?: ViteDevServer) {
     disableRequestLogging: true,
   });
 
-  if (import.meta.env.PROD) {
-    await app.register(fastifyCompress);
-    await app.register(fastifyStatic, {
-      root: path.resolve('.vite/spa'),
-      index: false,
-    });
-  } else {
-    await app.register(fastifyStatic, {
-      root: path.resolve('public'),
-      index: false,
-    });
-  }
+  await app.register(fastifyStatic, {
+    root: path.resolve(import.meta.env.PROD ? '.vite/spa' : 'public'),
+    index: false,
+  });
 
   let template = '';
 
@@ -61,31 +52,29 @@ export async function start(vite?: ViteDevServer) {
         body: req.method !== 'HEAD' && req.method !== 'GET' ? (req.body as BodyInit) : undefined,
       });
 
-      const { router, helmet, html } = await render(request);
+      console.time('render');
+      const { router, head, root } = await render(request);
+      console.timeEnd('render');
 
-      let styles = '';
+      console.time('styles');
+      const styles = import.meta.env.PROD ? '' : await renderStyles(vite!, '/src/entry-ssr.tsx');
+      console.timeEnd('styles');
 
-      if (!import.meta.env.PROD) {
-        styles = await renderToStyles(vite!, '/src/entry-ssr.tsx');
-      }
+      console.time('scripts');
+      const scripts = '';
+      console.timeEnd('scripts');
 
-      return await reply
-        .status(router.statusCode)
-        .header('Content-Type', 'text/html')
-        .send(
-          template
-            .replace(/^<(html).*>$/g, `<$1 ${helmet.htmlAttributes.toString()}>`)
-            .replace(/^<(body).*>$/g, `<$1 ${helmet.bodyAttributes.toString()}>`)
-            .replace(`<!-- inject-base -->`, helmet.base.toString())
-            .replace(`<!-- inject-priority -->`, helmet.priority.toString())
-            .replace(`<!-- inject-meta -->`, helmet.meta.toString())
-            .replace(/^<title.*>.*<\/title>$/g, helmet.title.toString())
-            .replace(`<!-- inject-link -->`, helmet.link.toString())
-            .replace(`<!-- inject-style -->`, styles + helmet.style.toString())
-            .replace(`<!-- inject-script -->`, helmet.script.toString())
-            .replace(`<!-- inject-noscript -->`, helmet.noscript.toString())
-            .replace(`<!-- inject-html -->`, html),
-        );
+      console.time('html');
+      const html = template
+        .replace(/<html.*>/g, head.html)
+        .replace(`<!-- inject-meta -->`, head.meta.join(''))
+        .replace(/<title.*>.*<\/title>/g, head.title)
+        .replace(`<!-- inject-styles -->`, styles)
+        .replace(`<!-- inject-root -->`, root)
+        .replace(`<!-- inject-scripts -->`, scripts);
+      console.timeEnd('html');
+
+      return await reply.status(router.status).header('Content-Type', 'text/html').send(html);
     } catch (err) {
       if (err instanceof Response && err.status >= 300 && err.status <= 399) {
         return await reply.status(err.status).redirect(err.headers.get('Location') || '/');

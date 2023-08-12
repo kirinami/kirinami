@@ -1,9 +1,18 @@
-export function Spinner() {
+import { clsx } from '@/utils/react/css';
+
+export type SpinnerProps = {
+  className?: string;
+};
+
+export function Spinner({ className }: SpinnerProps) {
   return (
     <div role="status">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="w-8 h-8 text-gray-200 dark:text-gray-600 fill-gray-600 dark:fill-gray-300 animate-spin"
+        className={clsx(
+          'h-8 w-8 animate-spin fill-blue-600 text-blue-600 text-opacity-25 dark:fill-blue-500 dark:text-blue-500 dark:text-opacity-25',
+          className,
+        )}
         viewBox="0 0 100 101"
         fill="none"
       >
