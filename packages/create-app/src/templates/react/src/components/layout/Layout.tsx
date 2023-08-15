@@ -13,8 +13,6 @@ export function Layout({ children }: LayoutProps) {
 
   const languages = {
     en: 'ENG',
-    de: 'DE',
-    de1: 'DE1',
     uk: 'УКР',
   };
 
