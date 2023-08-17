@@ -18,6 +18,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.rule=Host(`${DOMAIN:-${COMPOSE_PROJECT_NAME}.localhost}`)
       - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.entrypoints=web
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_app.loadbalancer.server.port=5173
 
 networks:
   traefik:
