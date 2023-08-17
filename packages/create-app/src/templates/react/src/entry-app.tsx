@@ -1,4 +1,4 @@
-import '@/entry.scss';
+import './entry-app.scss';
 
 import { redirect, RouteObject } from 'react-router-dom';
 

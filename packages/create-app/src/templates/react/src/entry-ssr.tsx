@@ -1,8 +1,8 @@
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom/server';
 
-import { routes } from '@/entry';
-import { Head, HeadProvider, headToJson } from '@/utils/react/head';
-import { getMarkupFromTree } from '@/utils/react/ssr';
+import { Head, HeadProvider, headToJson } from './utils/react/head';
+import { getMarkupFromTree } from './utils/react/ssr';
+import { routes } from './entry-app';
 
 const handler = createStaticHandler(routes);
 

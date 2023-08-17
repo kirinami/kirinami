@@ -23,12 +23,12 @@ services:
     build:
       x-bake:
         tags: ${COMPOSE_PROJECT_NAME}_app:latest
-        cache-from: type=local,src=${PWD}/.cache/${COMPOSE_PROJECT_NAME}_app
-        cache-to: type=local,dest=${PWD}/.cache/${COMPOSE_PROJECT_NAME}_app,mode=max
-        output: type=docker,dest=${PWD}/.docker/${COMPOSE_PROJECT_NAME}_app.tar
+        cache-from: type=local,src=./.cache/${COMPOSE_PROJECT_NAME}_app
+        cache-to: type=local,dest=./.cache/${COMPOSE_PROJECT_NAME}_app,mode=max
+        output: type=docker,dest=./.output/${COMPOSE_PROJECT_NAME}_app.tar.gz
     image: ${COMPOSE_PROJECT_NAME}_app:latest
     volumes:
-      - ${PWD}/public:/app/public
+      - ./public:/app/public
     networks:
       - database
       - traefik

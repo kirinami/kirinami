@@ -1,8 +1,8 @@
 import { hydrateRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import { routes } from '@/entry';
-import { HeadProvider } from '@/utils/react/head';
+import { HeadProvider } from './utils/react/head';
+import { routes } from './entry-app';
 
 export async function render() {
   const router = createBrowserRouter(routes);
