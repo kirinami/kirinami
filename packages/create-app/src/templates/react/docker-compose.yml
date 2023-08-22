@@ -1,14 +1,15 @@
 version: "3.9"
 
+networks:
+  traefik:
+    name: traefik
+
 services:
   app:
     build:
       x-bake:
-        tags: ${COMPOSE_PROJECT_NAME}_app:latest
-        cache-from: type=local,src=./.cache/${COMPOSE_PROJECT_NAME}_app
-        cache-to: type=local,dest=./.cache/${COMPOSE_PROJECT_NAME}_app,mode=max
-        output: type=docker,dest=./.output/${COMPOSE_PROJECT_NAME}_app.tar.gz
-    image: ${COMPOSE_PROJECT_NAME}_app:latest
+        output: type=docker,dest=./${COMPOSE_PROJECT_NAME}-app.tar.gz
+    image: ${COMPOSE_PROJECT_NAME}-app:latest
     volumes:
       - ./public:/app/public
     networks:
@@ -16,10 +17,6 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.rule=Host(`${DOMAIN:-${COMPOSE_PROJECT_NAME}.localhost}`)
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_app.entrypoints=web
-      - traefik.http.services.${COMPOSE_PROJECT_NAME}_app.loadbalancer.server.port=5173
-
-networks:
-  traefik:
-    name: traefik
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.rule=Host(`${DOMAIN:-${COMPOSE_PROJECT_NAME}.localhost}`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.entrypoints=web
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}-app.loadbalancer.server.port=5173
