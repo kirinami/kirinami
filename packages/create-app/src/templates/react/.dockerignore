@@ -21,7 +21,6 @@ package-lock.json*
 
 # project
 .vite
-public/static
 
 # misc
 .DS_Store

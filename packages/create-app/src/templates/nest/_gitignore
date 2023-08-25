@@ -18,8 +18,6 @@ package-lock.json*
 
 # project
 .nest
-prisma/client
-public/static
 .env*
 !.env.example
 
