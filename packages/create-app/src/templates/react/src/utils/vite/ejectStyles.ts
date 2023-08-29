@@ -25,7 +25,7 @@ function filterCssModules(
 
 export async function ejectStyles(vite: ViteDevServer, entryModuleUrl: string) {
   /* eslint-disable import/no-extraneous-dependencies */
-  const { Parser } = await import('acorn');
+  const { parse } = await import('acorn');
   const { walk } = await import('estree-walker');
   /* eslint-enable import/no-extraneous-dependencies */
 
@@ -40,9 +40,11 @@ export async function ejectStyles(vite: ViteDevServer, entryModuleUrl: string) {
       return styles;
     }
 
-    const ast = Parser.parse(transformResult.code, {
+    const ast = parse(transformResult.code, {
       sourceType: 'module',
       ecmaVersion: 'latest',
+      locations: true,
+      allowHashBang: true,
     });
 
     let id = '';

@@ -20,7 +20,7 @@ yarn-error.log*
 package-lock.json*
 
 # project
-.nest
+.build
 
 # misc
 .DS_Store

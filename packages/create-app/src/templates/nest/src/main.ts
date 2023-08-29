@@ -1,7 +1,6 @@
 import path from 'node:path';
 import process from 'node:process';
 
-import fastifyStatic from '@fastify/static';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -12,11 +11,6 @@ async function start() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   app.enableShutdownHooks();
-
-  await app.register(fastifyStatic, {
-    root: path.resolve('./public'),
-    index: false,
-  });
 
   app
     .getHttpAdapter()
@@ -32,6 +26,11 @@ async function start() {
     .decorateReply('end', function end() {
       this.send('');
     });
+
+  app.useStaticAssets({
+    root: path.resolve('./public'),
+    index: false,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

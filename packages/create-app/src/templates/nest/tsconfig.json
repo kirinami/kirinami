@@ -27,7 +27,7 @@
 
     /* Output */
     "incremental": true,
-    "outDir": "./.nest",
+    "outDir": "./.build",
     "removeComments": true,
     "declaration": true,
     "sourceMap": true

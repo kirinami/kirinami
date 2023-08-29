@@ -17,7 +17,7 @@ yarn-error.log*
 package-lock.json*
 
 # project
-.nest
+.build
 .env*
 !.env.example
 

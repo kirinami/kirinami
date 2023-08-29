@@ -20,7 +20,7 @@ yarn-error.log*
 package-lock.json*
 
 # project
-.vite
+.build
 
 # misc
 .DS_Store

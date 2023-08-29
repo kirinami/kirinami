@@ -1,6 +1,4 @@
-import { isRouteErrorResponse, Link, useAsyncError, useRouteError } from 'react-router-dom';
-
-import { Button } from '@/components/common/Button';
+import { isRouteErrorResponse, useAsyncError, useRouteError } from 'react-router-dom';
 
 export function ErrorBoundary() {
   const routeError = useRouteError();
@@ -27,10 +25,6 @@ export function ErrorBoundary() {
           <h1 className="text-7xl font-extrabold text-blue-600 dark:text-blue-500">{status}</h1>
           <p className="text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">{message}</p>
         </div>
-
-        <Link to="/">
-          <Button>Back to Home</Button>
-        </Link>
       </div>
     </div>
   );

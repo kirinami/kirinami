@@ -18,7 +18,7 @@ export function createI18n(language: string, resources?: Resource) {
     backend: {
       loadPath: '{{lng}}',
       request: (options, language, payload, done) => {
-        fetch(`${import.meta.env.VITE_API_URL}/api/translations/${language}`, {}, endpoints)
+        fetch(`${import.meta.env.VITE_API_URL}/translations/${language}`, {}, endpoints)
           .then((response) => response.json())
           .then((data: TranslationType[]) =>
             done(null, {
