@@ -5,7 +5,7 @@ import { Resource } from 'i18next';
 
 import { ErrorBoundary } from '@/components/fallback/ErrorBoundary';
 import { Loading } from '@/components/fallback/Loading';
-import { createI18n, DEFAULT_LANGUAGE, waitI18n } from '@/helpers/createI18n';
+import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/helpers/createI18n';
 import { useHead } from '@/utils/react/head';
 
 export type HydrationLoaderState = {
@@ -21,12 +21,10 @@ export type HydrationLoaderData = {
 
 export const hydrationLoader: LoaderFunction = async ({ params: { language = DEFAULT_LANGUAGE } }) => {
   const state: Promise<HydrationLoaderState> = new Promise(async (resolve) => {
-    const i18n = await waitI18n(createI18n(language));
-
     resolve({
       i18n: {
-        language: i18n.language,
-        resources: i18n.store.data,
+        language,
+        resources: await getResources(language),
       },
     });
   });
@@ -38,7 +36,7 @@ export const hydrationLoader: LoaderFunction = async ({ params: { language = DEF
   return defer(data);
 };
 
-export function HydrationAwaited() {
+export function HydrationOutlet() {
   const state = useAsyncValue() as HydrationLoaderState;
 
   const i18n = createI18n(state.i18n.language, state.i18n.resources);
@@ -63,7 +61,7 @@ export function HydrationProvider() {
   return (
     <Suspense fallback={<Loading />}>
       <Await resolve={state} errorElement={<ErrorBoundary />}>
-        <HydrationAwaited />
+        <HydrationOutlet />
       </Await>
     </Suspense>
   );

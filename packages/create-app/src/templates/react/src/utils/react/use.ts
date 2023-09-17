@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-throw-literal */
+
 type UsePromise<T> = Promise<T> & {
   status: string;
   reason: unknown;

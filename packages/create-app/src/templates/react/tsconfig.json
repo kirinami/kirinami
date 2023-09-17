@@ -28,6 +28,6 @@
     /* Output */
     "noEmit": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "index.ts"],
+  "include": ["src", "index.ts"],
   "exclude": ["node_modules"]
 }

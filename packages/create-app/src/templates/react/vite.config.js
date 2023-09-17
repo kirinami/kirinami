@@ -10,15 +10,13 @@ export default defineConfig(({ mode, command, ssrBuild }) => {
   const isDev = command === 'serve';
   const isSsr = isDev || ssrBuild;
 
-  const env = Object.entries(loadEnv(mode, path.resolve('.'), '')).reduce(
-    (env, [key, value]) => ({ ...env, [`import.meta.env.${key}`]: JSON.stringify(value) }),
-    {},
-  );
-
   return {
     appType: isSsr ? 'custom' : 'spa',
-    publicDir: false,
-    define: isSsr ? env : {},
+    define: isSsr
+      ? Object.entries(loadEnv(mode, process.cwd(), ''))
+          .filter(([key]) => !(key in process.env))
+          .reduce((env, [key, value]) => ({ ...env, [`import.meta.env.${key}`]: JSON.stringify(value) }), {})
+      : {},
     resolve: {
       alias: {
         '@/': `${path.resolve('src')}/`,
@@ -30,7 +28,6 @@ export default defineConfig(({ mode, command, ssrBuild }) => {
       },
     },
     build: {
-      minify: false,
       outDir: path.resolve(`.build/${isSsr ? 'ssr' : 'spa'}`),
       rollupOptions: {
         input: isSsr ? path.resolve('./index.ts') : undefined,
@@ -46,18 +43,26 @@ export default defineConfig(({ mode, command, ssrBuild }) => {
     },
     plugins: [
       react(),
-      isDev && {
+
+      {
         name: 'fastify',
+        apply: 'serve',
         configureServer: async (vite) => {
           vite.middlewares.use(async (req, res, next) => {
-            if (/^(?:\/@|\/node_modules|\/src)/.test(req.url)) {
-              return next();
+            try {
+              if (/^(?:\/@|\/node_modules|\/src)/.test(req.url)) {
+                next();
+
+                return;
+              }
+
+              const module = await vite.ssrLoadModule('./index.ts');
+              const app = await module.create(vite);
+
+              app.routing(req, res);
+            } catch (err) {
+              next();
             }
-
-            const module = await vite.ssrLoadModule('./index.ts');
-            const app = await module.start(vite);
-
-            app.routing(req, res);
           });
         },
       },
