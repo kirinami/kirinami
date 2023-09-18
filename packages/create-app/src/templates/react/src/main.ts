@@ -9,23 +9,22 @@ import fastify, { FastifyBaseLogger, FastifyInstance, RawServerDefault } from 'f
 import mime from 'mime';
 import type { ViteDevServer } from 'vite';
 
-import { render } from '@/entry-ssr';
 import { ejectStyles } from '@/utils/vite';
 
+import { render } from './entry-server';
+
 let appMemo:
-  | FastifyInstance<
-  RawServerDefault,
-  IncomingMessage,
-  ServerResponse<IncomingMessage>,
-  FastifyBaseLogger,
-  JsonSchemaToTsProvider
->
+  | FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse, FastifyBaseLogger, JsonSchemaToTsProvider>
   | undefined;
 
 export async function create(vite?: ViteDevServer) {
   if (appMemo) {
     return appMemo;
   }
+
+  const template = await fs.readFile(path.join(import.meta.env.PROD ? 'dist/public' : '.', 'index.html'), {
+    encoding: 'utf-8',
+  });
 
   const app = fastify({
     logger: {
@@ -36,8 +35,6 @@ export async function create(vite?: ViteDevServer) {
     },
     disableRequestLogging: true,
   }).withTypeProvider<JsonSchemaToTsProvider>();
-
-  const template = await fs.readFile(import.meta.env.PROD ? '.build/spa/index.html' : 'index.html', 'utf-8');
 
   app.route({
     method: 'GET',
@@ -56,7 +53,7 @@ export async function create(vite?: ViteDevServer) {
 
       if (slug.includes('.')) {
         try {
-          const file = path.join(import.meta.env.PROD ? '.build/spa' : 'public', slug);
+          const file = path.join(import.meta.env.PROD ? 'dist/public' : 'public', slug);
           const type = mime.getType(file) || 'application/octet-stream';
 
           const stat = await fs.stat(file);
@@ -87,20 +84,19 @@ export async function create(vite?: ViteDevServer) {
           }),
         );
 
-        const html = import.meta.env.PROD ? template : await vite!.transformIndexHtml(request.url, template);
-        const styles = import.meta.env.PROD ? '' : await ejectStyles(vite!, '/src/entry-ssr.tsx');
-        const scripts = '';
+        const markup = import.meta.env.PROD ? template : await vite!.transformIndexHtml(request.url, template);
+
+        const styles = import.meta.env.PROD ? '' : await ejectStyles(vite!, '/src/entry-app.tsx');
 
         return await reply
           .status(router.status)
           .type('text/html')
           .send(
-            html
+            markup
               .replace(/<html.*>/g, head.html)
               .replace(`<!-- inject-meta -->`, head.meta.join(''))
               .replace(/<title.*>.*<\/title>/g, head.title)
               .replace(`<!-- inject-styles -->`, styles)
-              .replace(`<!-- inject-scripts -->`, scripts)
               .replace(`<!-- inject-root -->`, root),
           );
       } catch (err) {

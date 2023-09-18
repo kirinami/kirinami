@@ -10,8 +10,6 @@ services:
       x-bake:
         output: type=docker,dest=./${COMPOSE_PROJECT_NAME}-app.tar.gz
     image: ${COMPOSE_PROJECT_NAME}-app:latest
-    volumes:
-      - ./public:/app/public
     networks:
       - traefik
     restart: unless-stopped

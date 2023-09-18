@@ -3,8 +3,7 @@ import { I18nextProvider } from 'react-i18next';
 import { Await, defer, LoaderFunction, Outlet, useAsyncValue, useLoaderData } from 'react-router-dom';
 import { Resource } from 'i18next';
 
-import { ErrorBoundary } from '@/components/fallback/ErrorBoundary';
-import { Loading } from '@/components/fallback/Loading';
+import { ErrorBoundary, Loading } from '@/containers/Fallback';
 import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/helpers/createI18n';
 import { useHead } from '@/utils/react/head';
 

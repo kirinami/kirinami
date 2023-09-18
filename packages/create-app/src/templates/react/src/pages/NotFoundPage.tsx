@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { Button } from '@/components/common/Button';
-import { Layout } from '@/components/layout/Layout';
+import { Button } from '@/components/Button';
+import { Layout } from '@/containers/Layout';
 import { useHead } from '@/utils/react/head';
 
 export function NotFoundPage() {

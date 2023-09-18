@@ -4,7 +4,6 @@
     "lib": ["es2020", "dom", "dom.iterable"],
     "module": "esnext",
 
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": false,
     "allowSyntheticDefaultImports": true,
@@ -15,19 +14,15 @@
     "allowJs": false,
     "jsx": "react-jsx",
 
-    /* Linting */
     "strict": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Paths */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
 
-    /* Output */
     "noEmit": true
   },
-  "include": ["src", "index.ts"],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }

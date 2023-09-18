@@ -8,10 +8,10 @@
     "dev": "vite",
     "build:spa": "vite build",
     "build:ssr": "vite build --ssr",
-    "build": "yarn build:spa && yarn build:ssr",
-    "start": "NODE_ENV=production node .build/ssr/index.js",
-    "format": "prettier --write src index.ts",
-    "lint": "tsc && eslint --fix src index.ts",
+    "build": "node -e \"fs.promises.rm('dist', { recursive: true, force: true })\" && yarn build:spa && yarn build:ssr",
+    "start": "NODE_ENV=production node dist/server/main.js",
+    "format": "prettier --write src",
+    "lint": "tsc && eslint --fix src",
     "test": "vitest run"
   },
   "dependencies": {

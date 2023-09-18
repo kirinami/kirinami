@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { Layout } from '@/components/layout/Layout';
+import { Layout } from '@/containers/Layout';
 import { useHead } from '@/utils/react/head';
 
 export function HomePage() {
