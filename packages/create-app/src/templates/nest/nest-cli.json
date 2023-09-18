@@ -4,6 +4,11 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "builder": "swc",
-    "deleteOutDir": true
+    "assets": [
+      {
+        "outDir": "dist/client",
+        "include": "../public"
+      }
+    ]
   }
 }

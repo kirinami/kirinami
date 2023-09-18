@@ -17,7 +17,7 @@ yarn-error.log*
 package-lock.json*
 
 # project
-.build
+dist
 .env*
 !.env.example
 

@@ -1,3 +1,4 @@
+import dns from 'node:dns';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -7,7 +8,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 
 import { AppModule } from './app.module';
 
-async function start() {
+export async function create() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   app.enableShutdownHooks();
@@ -28,7 +29,7 @@ async function start() {
     });
 
   app.useStaticAssets({
-    root: path.resolve('./public'),
+    root: path.resolve(process.env.NODE_ENV === 'production' ? 'dist/client' : 'public'),
     index: false,
   });
 
@@ -48,9 +49,15 @@ async function start() {
   return app;
 }
 
-start()
-  .then((app) => app.listen(3000, '0.0.0.0'))
-  .catch((err) => {
-    process.stderr.write(err.stack);
-    process.exit(1);
-  });
+export async function main() {
+  dns.setDefaultResultOrder('ipv4first');
+
+  const app = await create();
+
+  await app.listen(3000, '0.0.0.0');
+}
+
+main().catch((err) => {
+  process.stderr.write(err.stack);
+  process.exit(1);
+});

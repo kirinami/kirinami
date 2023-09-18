@@ -27,7 +27,7 @@
 
     /* Output */
     "incremental": true,
-    "outDir": "./.build",
+    "outDir": "dist/server",
     "removeComments": true,
     "declaration": true,
     "sourceMap": true

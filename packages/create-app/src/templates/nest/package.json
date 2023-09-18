@@ -6,8 +6,8 @@
   "scripts": {
     "postinstall": "husky install || true",
     "dev": "prisma migrate dev && nest start --watch",
-    "build": "prisma generate && nest build",
-    "start": "prisma migrate deploy && node .build/main.js",
+    "build": "node -e \"fs.promises.rm('dist', { recursive: true, force: true })\" && prisma generate && nest build",
+    "start": "prisma migrate deploy && NODE_ENV=production node dist/server/main.js",
     "format": "prisma generate && prettier --write src test",
     "lint": "prisma generate && tsc --noEmit && eslint --fix src test",
     "test:e2e": "prisma generate && vitest run --config ./vitest.config.e2e.js",
