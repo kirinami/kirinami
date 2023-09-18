@@ -4,7 +4,6 @@
     "lib": ["es2020"],
     "module": "commonjs",
 
-    /* Bundler mode */
     "allowImportingTsExtensions": false,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
@@ -15,23 +14,19 @@
     "skipLibCheck": true,
     "allowJs": false,
 
-    /* Linting */
     "strict": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Paths */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
 
-    /* Output */
     "incremental": true,
-    "outDir": "dist/server",
+    "outDir": "./dist/server",
     "removeComments": true,
     "declaration": true,
     "sourceMap": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "include": ["src", "test"],
   "exclude": ["node_modules"]
 }

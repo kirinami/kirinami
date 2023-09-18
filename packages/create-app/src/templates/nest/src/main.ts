@@ -29,7 +29,7 @@ export async function create() {
     });
 
   app.useStaticAssets({
-    root: path.resolve(process.env.NODE_ENV === 'production' ? 'dist/client' : 'public'),
+    root: path.resolve(process.env.NODE_ENV === 'production' ? 'dist/public' : 'public'),
     index: false,
   });
 
