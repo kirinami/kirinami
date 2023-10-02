@@ -15,6 +15,18 @@ const FRAMEWORKS = [
     name: 'nest',
     display: 'Nest.js',
     color: lightRed,
+    variants: [
+      {
+        name: 'nest-graphql',
+        display: 'Nest.js + GraphQL',
+        color: magenta,
+      },
+      {
+        name: 'nest-restapi',
+        display: 'Nest.js + RestAPI',
+        color: green,
+      }
+    ],
   },
   {
     name: 'react',
