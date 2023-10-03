@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, it } from 'vitest';
 
 import { AppModule } from '@/app.module';
 
-describe('AppController (e2e)', () => {
+describe('AppResolver (e2e)', () => {
   let app: NestFastifyApplication;
 
   beforeEach(async () => {
@@ -23,7 +23,23 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
+  it('getHello', () => {
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .set('Content-type', 'application/json')
+      .send({
+        query: `
+          query {
+            getHello
+          }
+        `,
+        variables: {},
+      })
+      .expect(200)
+      .expect({
+        data: {
+          getHello: 'Hello World!',
+        },
+      });
   });
 });

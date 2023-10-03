@@ -1,9 +1,10 @@
-import { Expose } from 'class-transformer';
+import { Field, ObjectType } from '@nestjs/graphql';
 
+@ObjectType()
 export class AuthEntity {
-  @Expose()
+  @Field(() => String)
   accessToken!: string;
 
-  @Expose()
+  @Field(() => String)
   refreshToken!: string;
 }

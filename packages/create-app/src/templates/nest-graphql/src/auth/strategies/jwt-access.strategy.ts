@@ -19,7 +19,9 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt-access') 
   async validate(req: FastifyRequest, payload: { id: number }) {
     const accessToken = ExtractJwt.fromAuthHeaderAsBearerToken()(req as never);
 
-    if (!accessToken) throw new UnauthorizedException();
+    if (!accessToken) {
+      throw new UnauthorizedException();
+    }
 
     return this.authService.loginByJwt(payload, accessToken);
   }

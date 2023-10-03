@@ -9,6 +9,7 @@
         "outDir": "dist/public",
         "include": "../public"
       }
-    ]
+    ],
+    "plugins": ["@nestjs/graphql"]
   }
 }

@@ -1,5 +1,13 @@
 #!/usr/bin/env sh
+
 . "$(dirname -- "$0")/_/husky.sh"
+
+set -e
 
 yarn lint
 yarn test
+
+if ! git diff --exit-code; then
+  echo "ESLint or Prettier made changes. Please commit again after running lint and format."
+  exit 1
+fi

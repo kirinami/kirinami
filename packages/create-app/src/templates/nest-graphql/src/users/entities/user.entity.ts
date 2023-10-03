@@ -1,20 +1,21 @@
-import { Expose } from 'class-transformer';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 import { User } from '@prisma/client';
 
+@ObjectType()
 export class UserEntity implements Omit<User, 'password' | 'accessToken' | 'refreshToken'> {
-  @Expose()
+  @Field(() => Int)
   id!: number;
 
-  @Expose()
+  @Field(() => String)
   email!: string;
 
-  @Expose()
+  @Field(() => [String])
   roles!: string[];
 
-  @Expose()
+  @Field(() => Date)
   createdAt!: Date;
 
-  @Expose()
+  @Field(() => Date)
   updatedAt!: Date;
 }

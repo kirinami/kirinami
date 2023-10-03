@@ -2,13 +2,12 @@ import { Module } from '@nestjs/common';
 
 import { CommonModule } from '@/common/common.module';
 
-import { TranslationsController } from './translations.controller';
+import { TranslationResolver } from './translations.resolver';
 import { TranslationsService } from './translations.service';
 
 @Module({
   imports: [CommonModule],
-  providers: [TranslationsService],
-  controllers: [TranslationsController],
+  providers: [TranslationsService, TranslationResolver],
   exports: [TranslationsService],
 })
 export class TranslationsModule {}

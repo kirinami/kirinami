@@ -1,23 +1,24 @@
-import { Expose } from 'class-transformer';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 import { Translation } from '@prisma/client';
 
+@ObjectType()
 export class TranslationEntity implements Translation {
-  @Expose()
+  @Field(() => Int)
   id!: number;
 
-  @Expose()
+  @Field(() => String)
   language!: string;
 
-  @Expose()
+  @Field(() => String)
   key!: string;
 
-  @Expose()
+  @Field(() => String)
   value!: string;
 
-  @Expose()
+  @Field(() => Date)
   createdAt!: Date;
 
-  @Expose()
+  @Field(() => Date)
   updatedAt!: Date;
 }

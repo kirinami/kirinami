@@ -3,9 +3,15 @@ import { Reflector } from '@nestjs/core';
 
 import { User } from '@prisma/client';
 
+import getRequestFromContext from '@/common/helpers/get-request-from-context';
+
 @Injectable()
 export class RolesAccessGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
+
+  getRequest(context: ExecutionContext) {
+    return getRequestFromContext(context);
+  }
 
   canActivate(context: ExecutionContext): boolean {
     const roles = this.reflector.getAllAndOverride<string[] | undefined>('roles', [
@@ -17,11 +23,7 @@ export class RolesAccessGuard implements CanActivate {
       return true;
     }
 
-    let user: User | undefined;
-
-    if (context.getType() === 'http') {
-      user = context.switchToHttp().getRequest().user;
-    }
+    const user: User | undefined = this.getRequest(context).user;
 
     if (!user) {
       return false;

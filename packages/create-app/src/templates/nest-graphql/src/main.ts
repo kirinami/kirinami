@@ -2,8 +2,8 @@ import dns from 'node:dns';
 import path from 'node:path';
 import process from 'node:process';
 
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
 import { AppModule } from './app.module';
@@ -35,14 +35,7 @@ export async function create() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
       transform: true,
-    }),
-  );
-
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector), {
-      strategy: 'excludeAll',
     }),
   );
 

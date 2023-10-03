@@ -2,13 +2,13 @@ import { Body, Controller, Get, Post, SerializeOptions } from '@nestjs/common';
 
 import { User } from '@prisma/client';
 
-import { RefreshTokenDto } from '@/auth/dto/refresh-token.dto';
-import { RegisterDto } from '@/auth/dto/register.dto';
 import { UserEntity } from '@/users/entities/user.entity';
 
 import { CurrentUser } from './decorators/current-user';
 import { JwtAccess } from './decorators/jwt-access';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RegisterDto } from './dto/register.dto';
 import { AuthEntity } from './entities/auth.entity';
 import { AuthService } from './auth.service';
 
