@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer';
 
 import { User } from '@prisma/client';
 
-export class UserEntity implements Omit<User, 'password' | 'accessToken' | 'refreshToken'> {
+export class UserModel implements Omit<User, 'password' | 'accessToken' | 'refreshToken'> {
   @Expose()
   id!: number;
 

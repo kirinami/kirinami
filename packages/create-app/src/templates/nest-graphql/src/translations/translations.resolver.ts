@@ -5,7 +5,7 @@ import { JwtAccess, Role } from '@/auth/decorators/jwt-access';
 import { CreateTranslationInput } from './dto/create-translation.input';
 import { UpdateTranslationInput } from './dto/update-translation.input';
 import { UpsertTranslationInput } from './dto/upsert-translation.input';
-import { TranslationEntity } from './entities/translation.entity';
+import { TranslationModel } from './models/translation.model';
 import { TranslationsService } from './translations.service';
 
 @Resolver()
@@ -17,8 +17,8 @@ export class TranslationResolver {
     return this.translationsService.getAvailableLanguages();
   }
 
-  @Query(() => [TranslationEntity])
-  async getTranslationsByLanguage(@Args('language') language: string): Promise<TranslationEntity[]> {
+  @Query(() => [TranslationModel])
+  async getTranslationsByLanguage(@Args('language') language: string): Promise<TranslationModel[]> {
     return this.translationsService.findManyByLanguage(language);
   }
 
@@ -31,25 +31,25 @@ export class TranslationResolver {
   }
 
   @JwtAccess([Role.Admin])
-  @Mutation(() => TranslationEntity)
+  @Mutation(() => TranslationModel)
   async createTranslation(
     @Args('body', { type: () => CreateTranslationInput }) body: CreateTranslationInput,
-  ): Promise<TranslationEntity> {
+  ): Promise<TranslationModel> {
     return this.translationsService.createTranslation(body);
   }
 
   @JwtAccess([Role.Admin])
-  @Mutation(() => TranslationEntity)
+  @Mutation(() => TranslationModel)
   async updateTranslation(
     @Args('id', { type: () => Int }) id: number,
     @Args('body', { type: () => UpdateTranslationInput }) body: UpdateTranslationInput,
-  ): Promise<TranslationEntity> {
+  ): Promise<TranslationModel> {
     return this.translationsService.updateTranslation(id, body);
   }
 
   @JwtAccess([Role.Admin])
-  @Mutation(() => TranslationEntity)
-  async deleteTranslation(@Args('id', { type: () => Int }) id: number): Promise<TranslationEntity> {
+  @Mutation(() => TranslationModel)
+  async deleteTranslation(@Args('id', { type: () => Int }) id: number): Promise<TranslationModel> {
     return this.translationsService.deleteTranslation(id);
   }
 }

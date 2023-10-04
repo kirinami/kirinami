@@ -1,17 +1,20 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
-import { User } from '@prisma/client';
+import { Translation } from '@prisma/client';
 
 @ObjectType()
-export class UserEntity implements Omit<User, 'password' | 'accessToken' | 'refreshToken'> {
+export class TranslationModel implements Translation {
   @Field(() => Int)
   id!: number;
 
   @Field(() => String)
-  email!: string;
+  language!: string;
 
-  @Field(() => [String])
-  roles!: string[];
+  @Field(() => String)
+  key!: string;
+
+  @Field(() => String)
+  value!: string;
 
   @Field(() => Date)
   createdAt!: Date;

@@ -2,7 +2,7 @@ import { Expose } from 'class-transformer';
 
 import { Translation } from '@prisma/client';
 
-export class TranslationEntity implements Translation {
+export class TranslationModel implements Translation {
   @Expose()
   id!: number;
 
