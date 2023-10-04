@@ -4,11 +4,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 
-import { AppResolver } from '@/app.resolver';
-
 import { AuthModule } from './auth/auth.module';
 import { TranslationsModule } from './translations/translations.module';
 import { UsersModule } from './users/users.module';
+import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
 
 @Module({
