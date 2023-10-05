@@ -1,4 +1,4 @@
-# React.js
+# React.js + SSR
 
 ## Getting Started
 
