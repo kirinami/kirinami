@@ -9,7 +9,7 @@ import { TranslationModel } from './models/translation.model';
 import { TranslationsService } from './translations.service';
 
 @Resolver()
-export class TranslationResolver {
+export class TranslationsResolver {
   constructor(private readonly translationsService: TranslationsService) {}
 
   @Query(() => [String])
