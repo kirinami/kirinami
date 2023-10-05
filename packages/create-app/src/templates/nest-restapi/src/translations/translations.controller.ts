@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, SerializeOptions } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { JwtAccess, Role } from '@/auth/decorators/jwt-access';
 
@@ -8,6 +9,7 @@ import { UpsertTranslationDto } from './dto/upsert-translation.dto';
 import { TranslationModel } from './models/translation.model';
 import { TranslationsService } from './translations.service';
 
+@ApiTags('translations')
 @Controller('translations')
 export class TranslationsController {
   constructor(private readonly translationsService: TranslationsService) {}

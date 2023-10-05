@@ -5,8 +5,10 @@ import process from 'node:process';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
+import metadata from './metadata';
 
 export async function create() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
@@ -45,6 +47,16 @@ export async function create() {
       strategy: 'excludeAll',
     }),
   );
+
+  if (process.env.NODE_ENV !== 'production') {
+    await SwaggerModule.loadPluginMetadata(metadata);
+
+    SwaggerModule.setup(
+      'docs',
+      app,
+      SwaggerModule.createDocument(app, new DocumentBuilder().setTitle('API').setVersion('1.0').build()),
+    );
+  }
 
   return app;
 }

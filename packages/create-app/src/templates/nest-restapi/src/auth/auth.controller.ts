@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, SerializeOptions } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { User } from '@prisma/client';
 
@@ -12,6 +13,7 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthModel } from './models/auth.model';
 import { AuthService } from './auth.service';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

@@ -1,6 +1,6 @@
 {
   "name": "@kirinami/create-app",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "license": "MIT",
   "author": "Vitalii Bondarenko",
   "bin": "src/main.js",
