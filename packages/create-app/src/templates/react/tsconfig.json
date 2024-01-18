@@ -5,25 +5,23 @@
     "module": "esnext",
 
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": false,
     "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": false,
+    "allowJs": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "esModuleInterop": false,
-    "skipLibCheck": true,
-    "allowJs": false,
     "jsx": "react-jsx",
+    "noEmit": true,
 
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
 
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"]
-    },
-
-    "noEmit": true
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["src"],
+  "include": ["src", "index.ts"],
   "exclude": ["node_modules"]
 }

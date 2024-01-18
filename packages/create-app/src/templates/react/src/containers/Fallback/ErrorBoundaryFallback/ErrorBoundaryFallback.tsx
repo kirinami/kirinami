@@ -1,6 +1,8 @@
 import { isRouteErrorResponse, useAsyncError, useRouteError } from 'react-router-dom';
 
-export function ErrorBoundary() {
+import styles from './ErrorBoundaryFallback.module.scss';
+
+export function ErrorBoundaryFallback() {
   const routeError = useRouteError();
   const asyncError = useAsyncError();
 
@@ -19,12 +21,10 @@ export function ErrorBoundary() {
   }
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center bg-white dark:bg-gray-900">
-      <div className="flex w-full max-w-2xl flex-col items-center gap-8 p-4 lg:p-6">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <h1 className="text-7xl font-extrabold text-blue-600 dark:text-blue-500">{status}</h1>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">{message}</p>
-        </div>
+    <div className={styles.layout}>
+      <div className={styles.content}>
+        <h1 className={styles.title}>{status}</h1>
+        <p className={styles.description}>{message}</p>
       </div>
     </div>
   );

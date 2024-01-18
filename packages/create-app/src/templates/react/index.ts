@@ -9,9 +9,9 @@ import fastify, { FastifyBaseLogger, FastifyInstance, RawServerDefault } from 'f
 import mime from 'mime';
 import type { ViteDevServer } from 'vite';
 
+import { api } from '@/api';
+import { render } from '@/entry-server';
 import { ejectStyles } from '@/utils/vite';
-
-import { render } from './entry-server';
 
 let appMemo:
   | FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse, FastifyBaseLogger, JsonSchemaToTsProvider>
@@ -19,6 +19,8 @@ let appMemo:
 
 export async function create(vite?: ViteDevServer) {
   if (appMemo) {
+    await appMemo.ready();
+
     return appMemo;
   }
 
@@ -36,6 +38,10 @@ export async function create(vite?: ViteDevServer) {
     disableRequestLogging: true,
   }).withTypeProvider<JsonSchemaToTsProvider>();
 
+  await app.register(api, {
+    prefix: '/api',
+  });
+
   app.route({
     method: 'GET',
     url: '*',
@@ -49,11 +55,11 @@ export async function create(vite?: ViteDevServer) {
       },
     } as const,
     handler: async (request, reply) => {
-      const slug = request.params['*'];
+      const pathname = request.params['*'];
 
-      if (slug.includes('.')) {
+      if (pathname.includes('.')) {
         try {
-          const file = path.join(import.meta.env.PROD ? 'dist/public' : 'public', slug);
+          const file = path.join(import.meta.env.PROD ? 'dist/public' : 'public', pathname);
           const type = mime.getType(file) || 'application/octet-stream';
 
           const stat = await fs.stat(file);
@@ -86,7 +92,7 @@ export async function create(vite?: ViteDevServer) {
 
         const markup = import.meta.env.PROD ? template : await vite!.transformIndexHtml(request.url, template);
 
-        const styles = import.meta.env.PROD ? '' : await ejectStyles(vite!, '/src/entry-app.tsx');
+        const styles = import.meta.env.PROD ? '' : await ejectStyles(vite!, '/src/main.tsx');
 
         return await reply
           .status(router.status)
@@ -113,9 +119,9 @@ export async function create(vite?: ViteDevServer) {
     },
   });
 
-  await app.ready();
-
   appMemo = app;
+
+  await app.ready();
 
   return app;
 }
@@ -133,7 +139,7 @@ export async function main() {
 
 if (import.meta.env.PROD) {
   main().catch((err) => {
-    process.stderr.write(err.stack);
+    process.stderr.write(err instanceof Error ? err.stack || err : err);
     process.exit(1);
   });
 }

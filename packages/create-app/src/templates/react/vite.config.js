@@ -1,4 +1,3 @@
-import dns from 'node:dns';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -7,11 +6,9 @@ import { defineConfig, loadEnv } from 'vite';
 
 import tsConfig from './tsconfig.json';
 
-export default defineConfig(({ mode, command, ssrBuild }) => {
-  dns.setDefaultResultOrder('ipv4first');
-
+export default defineConfig(({ mode, command, isSsrBuild }) => {
   const isDev = command === 'serve';
-  const isSsr = isDev || ssrBuild;
+  const isSsr = isDev || isSsrBuild;
 
   return {
     appType: isSsr ? 'custom' : 'spa',
@@ -28,26 +25,18 @@ export default defineConfig(({ mode, command, ssrBuild }) => {
     },
     css: {
       modules: {
-        localsConvention: 'camelCaseOnly',
+        localsConvention: 'dashesOnly',
       },
     },
     build: {
       outDir: path.resolve('dist', isSsr ? 'server' : 'public'),
       copyPublicDir: !isSsr,
       rollupOptions: {
-        input: ssrBuild && path.resolve('src/main.ts'),
+        input: isSsr && path.resolve('index.ts'),
       },
-    },
-    server: {
-      host: true,
-    },
-    test: {
-      environment: 'happy-dom',
-      passWithNoTests: true,
     },
     plugins: [
       react(),
-
       {
         name: 'fastify',
         apply: 'serve',
@@ -60,7 +49,7 @@ export default defineConfig(({ mode, command, ssrBuild }) => {
                 return;
               }
 
-              const module = await vite.ssrLoadModule('/src/main.ts');
+              const module = await vite.ssrLoadModule('/index.ts');
               const app = await module.create(vite);
 
               app.routing(req, res);
@@ -71,5 +60,12 @@ export default defineConfig(({ mode, command, ssrBuild }) => {
         },
       },
     ],
+    server: {
+      host: true,
+    },
+    test: {
+      environment: 'happy-dom',
+      passWithNoTests: true,
+    },
   };
 });
