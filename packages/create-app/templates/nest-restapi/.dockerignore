@@ -1,0 +1,29 @@
+# Git
+.git
+
+# Editor
+.idea
+.vscode
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json*
+
+# Project
+.build
+src/metadata.ts
+
+# Misc
+.DS_Store

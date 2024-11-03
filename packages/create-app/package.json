@@ -3,12 +3,7 @@
   "version": "0.0.38",
   "license": "MIT",
   "author": "Vitalii Bondarenko",
-  "bin": "src/main.js",
-  "main": "src/main.js",
-  "type": "module",
-  "engines": {
-    "node": ">=14.6.0"
-  },
+  "homepage": "https://github.com/kirinami/kirinami/tree/main/packages/create-app#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kirinami/kirinami.git",
@@ -17,7 +12,14 @@
   "bugs": {
     "url": "https://github.com/kirinami/kirinami/issues"
   },
-  "homepage": "https://github.com/kirinami/kirinami/tree/main/packages/create-app#readme",
+  "type": "module",
+  "engines": {
+    "node": ">=20.16"
+  },
+  "bin": {
+    "kirinami-create-app": "main.js"
+  },
+  "main": "main.js",
   "dependencies": {
     "kolorist": "^1.8.0",
     "minimist": "^1.2.8",

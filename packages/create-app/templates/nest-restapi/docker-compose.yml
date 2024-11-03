@@ -1,0 +1,35 @@
+networks:
+  database:
+
+volumes:
+  postgres:
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - database
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER
+      start_period: 5s
+      interval: 5s
+      retries: 5
+
+  app:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build: .
+    volumes:
+      - ./public:/app/public
+    networks:
+      - database
+    ports:
+      - 3000:3000
