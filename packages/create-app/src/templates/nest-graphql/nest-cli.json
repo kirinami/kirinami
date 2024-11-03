@@ -6,10 +6,12 @@
     "builder": "swc",
     "assets": [
       {
-        "outDir": "dist/public",
+        "outDir": "./.build/public",
         "include": "../public"
       }
     ],
-    "plugins": ["@nestjs/graphql"]
+    "plugins": [
+      "@nestjs/graphql"
+    ]
   }
 }

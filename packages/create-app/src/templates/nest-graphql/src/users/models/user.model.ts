@@ -7,15 +7,15 @@ export class UserModel implements Omit<User, 'password' | 'accessToken' | 'refre
   @Field(() => Int)
   id!: number;
 
-  @Field(() => String)
+  @Field()
   email!: string;
 
   @Field(() => [String])
   roles!: string[];
 
-  @Field(() => Date)
+  @Field()
   createdAt!: Date;
 
-  @Field(() => Date)
+  @Field()
   updatedAt!: Date;
 }

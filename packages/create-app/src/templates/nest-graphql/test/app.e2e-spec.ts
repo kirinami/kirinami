@@ -23,14 +23,14 @@ describe('AppResolver (e2e)', () => {
     await app.close();
   });
 
-  it('getHello', () => {
-    return request(app.getHttpServer())
+  it('getHello', () =>
+    request(app.getHttpServer())
       .post('/graphql')
       .set('Content-type', 'application/json')
       .send({
         query: `
           query {
-            getHello
+            health
           }
         `,
         variables: {},
@@ -38,8 +38,7 @@ describe('AppResolver (e2e)', () => {
       .expect(200)
       .expect({
         data: {
-          getHello: 'Hello World!',
+          health: 'OK',
         },
-      });
-  });
+      }));
 });

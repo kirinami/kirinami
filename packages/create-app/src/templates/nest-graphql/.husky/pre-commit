@@ -1,13 +1,30 @@
 #!/usr/bin/env sh
 
-. "$(dirname -- "$0")/_/husky.sh"
-
 set -e
 
-yarn lint
-yarn test
+changes=$(git diff --staged --name-only)
 
-if ! git diff --exit-code; then
-  echo "ESLint or Prettier made changes. Please commit again after running lint and format."
+echo '------------------------------------------'
+echo 'Git staged changes:'
+echo '------------------------------------------'
+echo "$changes"
+
+echo '------------------------------------------'
+echo "Linting and formatting:"
+echo '------------------------------------------'
+yarn run lint
+
+echo '------------------------------------------'
+echo "Testing:"
+echo '------------------------------------------'
+yarn run test
+
+echo '------------------------------------------'
+echo 'Git diff between files and staged changes:'
+echo '------------------------------------------'
+if ! git diff --name-only --exit-code -- $changes; then
+  echo 'Linting or formatting tools have made changes. Please recommit after running the necessary linting and formatting processes.'
   exit 1
+else
+  echo 'No changes introduced by linting or formatting.'
 fi

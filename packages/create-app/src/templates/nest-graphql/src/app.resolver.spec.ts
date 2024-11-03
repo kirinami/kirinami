@@ -15,9 +15,9 @@ describe('AppResolver', () => {
     appResolver = testingModule.get<AppResolver>(AppResolver);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appResolver.getHello()).toBe('Hello World!');
+  describe('getHealth', () => {
+    it('should return "OK"', () => {
+      expect(appResolver.health()).toBe('OK');
     });
   });
 });

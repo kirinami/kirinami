@@ -1,7 +1,9 @@
-# ide
-/.idea
-/.vscode
+# Git
+**/.git/**
 
-# misc
-.DS_Store
-*.pem
+# Editor
+**/.idea/**
+**/.vscode/**
+
+# Misc
+**/.DS_Store

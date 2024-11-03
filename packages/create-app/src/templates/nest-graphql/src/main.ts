@@ -8,28 +8,32 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 
 import { AppModule } from './app.module';
 
-export async function create() {
+export async function main() {
+  dns.setDefaultResultOrder('ipv4first');
+
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
   app.enableShutdownHooks();
 
-  app
-    .getHttpAdapter()
-    .getInstance()
-    .addHook('onRequest', async (req, _res) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      req.socket.encrypted = process.env.NODE_ENV === 'production';
-    })
-    .decorateReply('setHeader', function setHeader(name: string, value: unknown) {
-      this.header(name, value);
-    })
-    .decorateReply('end', function end() {
-      this.send('');
-    });
+  // app
+  //   .getHttpAdapter()
+  //   .getInstance()
+  //   .addHook('onRequest', (req) => {
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     req.socket.encrypted = process.env.NODE_ENV === 'production';
+  //
+  //     console.log(req.socket.encrypted);
+  //   })
+  //   .decorateReply('setHeader', function setHeader(name: string, value: unknown) {
+  //     this.header(name, value);
+  //   })
+  //   .decorateReply('end', function end() {
+  //     this.send('');
+  //   });
 
   app.useStaticAssets({
-    root: path.resolve(process.env.NODE_ENV === 'production' ? 'dist/public' : 'public'),
+    root: path.resolve(process.env.NODE_ENV === 'production' ? '.build/public' : 'public'),
     index: false,
   });
 
@@ -39,18 +43,13 @@ export async function create() {
     }),
   );
 
-  return app;
+  await app.listen({
+    host: '0.0.0.0',
+    port: 3000,
+  });
 }
 
-export async function main() {
-  dns.setDefaultResultOrder('ipv4first');
-
-  const app = await create();
-
-  await app.listen(3000, '0.0.0.0');
-}
-
-main().catch((err) => {
-  process.stderr.write(err.stack);
+main().catch((error) => {
+  process.stderr.write((error instanceof Error && (error.stack ?? error.message)) || String(error));
   process.exit(1);
 });

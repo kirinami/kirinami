@@ -6,12 +6,12 @@ import { Prisma } from '@prisma/client';
 @InputType()
 export class CreateTranslationInput implements Omit<Prisma.TranslationCreateInput, 'createdAt' | 'updatedAt'> {
   @Length(2, 2)
-  @Field(() => String)
+  @Field()
   language!: string;
 
-  @Field(() => String)
+  @Field()
   key!: string;
 
-  @Field(() => String)
+  @Field()
   value!: string;
 }

@@ -7,18 +7,18 @@ export class TranslationModel implements Translation {
   @Field(() => Int)
   id!: number;
 
-  @Field(() => String)
+  @Field()
   language!: string;
 
-  @Field(() => String)
+  @Field()
   key!: string;
 
-  @Field(() => String)
+  @Field()
   value!: string;
 
-  @Field(() => Date)
+  @Field()
   createdAt!: Date;
 
-  @Field(() => Date)
+  @Field()
   updatedAt!: Date;
 }

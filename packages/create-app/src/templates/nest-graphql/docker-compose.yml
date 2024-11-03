@@ -1,8 +1,4 @@
-version: "3.9"
-
 networks:
-  traefik:
-    name: traefik
   database:
 
 volumes:
@@ -10,7 +6,7 @@ volumes:
 
 services:
   postgres:
-    image: postgres:15.3-alpine
+    image: postgres:16.4-alpine
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -18,26 +14,22 @@ services:
       - postgres:/var/lib/postgresql/data
     networks:
       - database
-    restart: unless-stopped
+    ports:
+      - 5432:5432
     healthcheck:
-      test: pg_isready -q
+      test: pg_isready -U $$POSTGRES_USER
       start_period: 5s
       interval: 5s
+      retries: 5
 
   app:
     depends_on:
       postgres:
         condition: service_healthy
-    build:
-      x-bake:
-        output: type=docker,dest=./${COMPOSE_PROJECT_NAME}-app.tar.gz
-    image: ${COMPOSE_PROJECT_NAME}-app:latest
+    build: .
+    volumes:
+      - ./public:/app/public
     networks:
       - database
-      - traefik
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.rule=Host(`${DOMAIN:-${COMPOSE_PROJECT_NAME}.localhost}`)
-      - traefik.http.routers.${COMPOSE_PROJECT_NAME}-app.entrypoints=web
-      - traefik.http.services.${COMPOSE_PROJECT_NAME}-app.loadbalancer.server.port=3000
+    ports:
+      - 3000:3000

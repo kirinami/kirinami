@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 
-import { CommonModule } from '@/common/common.module';
-
+import { TranslationResolver } from './resolvers/translation.resolver';
+import { TranslationsService } from './services/translations.service';
 import { TranslationsResolver } from './translations.resolver';
-import { TranslationsService } from './translations.service';
 
 @Module({
-  imports: [CommonModule],
-  providers: [TranslationsService, TranslationsResolver],
+  imports: [],
+  providers: [TranslationResolver, TranslationsResolver, TranslationsService],
   exports: [TranslationsService],
 })
 export class TranslationsModule {}

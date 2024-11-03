@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
 
 import { Prisma } from '@prisma/client';
 
@@ -6,6 +7,8 @@ import { PrismaService } from '@/common/services/prisma.service';
 
 @Injectable()
 export class TranslationsService {
+  readonly pubSub = new PubSub();
+
   constructor(private readonly prismaService: PrismaService) {}
 
   async getAvailableLanguages() {
@@ -70,13 +73,13 @@ export class TranslationsService {
 
         return true;
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') throw new BadRequestException();
-        if (err.code === 'P2025') throw new NotFoundException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') throw new BadRequestException();
+        if (error.code === 'P2025') throw new NotFoundException();
       }
 
-      throw err;
+      throw error;
     }
   }
 
@@ -85,12 +88,12 @@ export class TranslationsService {
       return await this.prismaService.translation.create({
         data,
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') throw new BadRequestException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') throw new BadRequestException();
       }
 
-      throw err;
+      throw error;
     }
   }
 
@@ -102,13 +105,13 @@ export class TranslationsService {
         },
         data,
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') throw new BadRequestException();
-        if (err.code === 'P2025') throw new NotFoundException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') throw new BadRequestException();
+        if (error.code === 'P2025') throw new NotFoundException();
       }
 
-      throw err;
+      throw error;
     }
   }
 
@@ -119,12 +122,12 @@ export class TranslationsService {
           id,
         },
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') throw new NotFoundException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') throw new NotFoundException();
       }
 
-      throw err;
+      throw error;
     }
   }
 }

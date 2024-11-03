@@ -1,29 +1,28 @@
-# git
-.git
+# Git
+**/.git/**
 
-# ide
-.idea
-.vscode
+# Editor
+**/.idea/**
+**/.vscode/**
 
-# dependencies
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json*
+# Yarn
+**/.yarn/**
+!**/.yarn/patches/**
+!**/.yarn/plugins/**
+!**/.yarn/releases/**
+!**/.yarn/sdks/**
+!**/.yarn/versions/**
+**/.pnp.*
 
-# project
-dist
+# Dependencies
+**/node_modules/**
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/package-lock.json*
 
-# misc
-.DS_Store
+# Project
 
-# typescript
-*.tsbuildinfo
+
+# Misc
+**/.DS_Store

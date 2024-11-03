@@ -32,12 +32,12 @@ export class UsersService {
           id,
         },
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') throw new NotFoundException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') throw new NotFoundException();
       }
 
-      throw err;
+      throw error;
     }
   }
 
@@ -51,15 +51,17 @@ export class UsersService {
 
       const match = this.cryptoService.compare(password, user.password);
 
-      if (!match) throw new UnauthorizedException();
-
-      return user;
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') throw new NotFoundException();
+      if (!match) {
+        throw new UnauthorizedException();
       }
 
-      throw err;
+      return user;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') throw new NotFoundException();
+      }
+
+      throw error;
     }
   }
 
@@ -68,30 +70,32 @@ export class UsersService {
       return await this.prismaService.user.create({
         data: { ...input, password: this.cryptoService.hash(password) },
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') throw new BadRequestException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') throw new BadRequestException();
       }
 
-      throw err;
+      throw error;
     }
   }
 
-  async updateUser(id: number, { password, ...input }: Prisma.UserUpdateInput) {
+  async updateUser(id: number, input: Prisma.UserUpdateInput) {
+    const password = typeof input.password === 'string' ? input.password : input.password?.set;
+
     try {
       return await this.prismaService.user.update({
         where: {
           id,
         },
-        data: { ...input, password: password ? this.cryptoService.hash(password.toString()) : undefined },
+        data: { ...input, password: password ? this.cryptoService.hash(password) : undefined },
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') throw new BadRequestException();
-        if (err.code === 'P2025') throw new NotFoundException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') throw new BadRequestException();
+        if (error.code === 'P2025') throw new NotFoundException();
       }
 
-      throw err;
+      throw error;
     }
   }
 
@@ -102,12 +106,12 @@ export class UsersService {
           id,
         },
       });
-    } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2025') throw new NotFoundException();
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') throw new NotFoundException();
       }
 
-      throw err;
+      throw error;
     }
   }
 }

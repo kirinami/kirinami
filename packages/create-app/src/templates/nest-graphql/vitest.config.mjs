@@ -1,9 +1,9 @@
-const path = require('node:path');
+import path from 'node:path';
 
-const { defineConfig } = require('vitest/config');
-const { default: swc } = require('unplugin-swc');
+import swc from 'unplugin-swc';
+import { defineConfig } from 'vitest/config';
 
-module.exports = defineConfig({
+export default defineConfig({
   resolve: {
     alias: {
       '@/': `${path.resolve('src')}/`,

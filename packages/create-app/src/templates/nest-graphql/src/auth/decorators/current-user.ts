@@ -1,7 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-import getRequestFromContext from '@/common/helpers/get-request-from-context';
+import { UserModel } from '@/users/models/user.model';
 
-export const CurrentUser = createParamDecorator(
-  (data, context: ExecutionContext) => getRequestFromContext(context).user,
+import { getUserFromExecutionContext } from '../utils/execution-context';
+
+export const CurrentUser = createParamDecorator((data, context: ExecutionContext) =>
+  getUserFromExecutionContext<UserModel>(context),
 );

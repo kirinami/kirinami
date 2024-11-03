@@ -1,17 +1,23 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
 
 import { CommonModule } from '@/common/common.module';
 import { UsersModule } from '@/users/users.module';
 
-import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
+import { TokenResolver } from './resolvers/token.resolver';
+import { AuthService } from './services/auth.service';
 import { AuthResolver } from './auth.resolver';
-import { AuthService } from './auth.service';
 
+@Global()
 @Module({
-  imports: [JwtModule.register({}), PassportModule, CommonModule, UsersModule],
-  providers: [JwtAccessStrategy, AuthService, AuthResolver],
+  imports: [
+    JwtModule.register({
+      global: true,
+    }),
+    CommonModule,
+    UsersModule,
+  ],
+  providers: [TokenResolver, AuthService, AuthResolver],
   exports: [AuthService],
 })
 export class AuthModule {}

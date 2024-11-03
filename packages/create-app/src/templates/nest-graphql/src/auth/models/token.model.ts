@@ -1,10 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class AuthModel {
-  @Field(() => String)
+export class TokenModel {
+  @Field()
   accessToken!: string;
 
-  @Field(() => String)
+  @Field()
   refreshToken!: string;
 }
