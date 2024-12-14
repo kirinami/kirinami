@@ -7,7 +7,7 @@ import process from 'node:process';
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import fastify, { FastifyBaseLogger, FastifyInstance, RawServerDefault } from 'fastify';
 import mime from 'mime';
-import type { ViteDevServer } from 'vite';
+import type { Manifest, ViteDevServer } from 'vite';
 
 import { api } from '@/api';
 import { render } from '@/entry.server';
@@ -27,9 +27,14 @@ export async function create(vite?: ViteDevServer) {
     return appMemo;
   }
 
-  const template = await fs.readFile(path.resolve(import.meta.env.PROD ? publicDir : '.', 'index.html'), {
-    encoding: 'utf-8',
-  });
+  // const template = await fs.readFile(path.resolve(import.meta.env.PROD ? publicDir : '.', 'index.html'), 'utf-8');
+
+  const manifest: Manifest = import.meta.env.PROD ? JSON.parse(await fs.readFile(path.resolve(publicDir, '.vite/manifest.json'), 'utf-8')) : {
+    'src/entry.client.tsx': {
+      isEntry: true,
+      file: 'src/entry.client.tsx',
+    },
+  };
 
   const app = fastify({
     logger: {
@@ -86,27 +91,29 @@ export async function create(vite?: ViteDevServer) {
       }
 
       try {
-        const { router, head, root } = await render(
+        const { router, root } = await render(
+          manifest,
           new Request(new URL(request.url, import.meta.env.VITE_BASE_URL), {
             method: request.method,
             headers: request.headers as HeadersInit,
           }),
         );
 
-        const markup = import.meta.env.PROD ? template : await vite!.transformIndexHtml(request.url, template);
-
-        const styles = import.meta.env.PROD ? '' : await ejectStyles(vite!, '/src/main.tsx');
+        // const markup = import.meta.env.PROD ? template : await vite!.transformIndexHtml(request.url, template);
+        //
+        // const styles = import.meta.env.PROD ? '' : await ejectStyles(vite!, '/src/main.tsx');
 
         return await reply
           .status(router.status)
           .type('text/html')
           .send(
-            markup
-              .replace(/<html.*>/g, head.html)
-              .replace(`<!-- inject-meta -->`, head.meta.join(''))
-              .replace(/<title.*>.*<\/title>/g, head.title)
-              .replace(`<!-- inject-styles -->`, styles)
-              .replace(`<!-- inject-root -->`, root),
+            root,
+            // markup
+            //   // .replace(/<html.*>/g, head.html)
+            //   // .replace(`<!-- inject-meta -->`, head.meta.join(''))
+            //   // .replace(/<title.*>.*<\/title>/g, head.title)
+            //   .replace(`<!-- inject-styles -->`, styles)
+            //   .replace(`<!-- inject-root -->`, root),
           );
       } catch (err) {
         if (err instanceof Response && err.status >= 300 && err.status <= 399) {

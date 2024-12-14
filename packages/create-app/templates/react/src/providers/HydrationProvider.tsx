@@ -8,7 +8,6 @@ import { ErrorBoundaryFallback } from '@/containers/Fallback/ErrorBoundaryFallba
 import { LoadingFallback } from '@/containers/Fallback/LoadingFallback';
 import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/helpers/createI18n';
 import { useAppStore } from '@/stores/useAppStore';
-import { useHead } from '@/utils/react/head';
 import { day } from '@/utils/day';
 
 export type HydrationLoaderState = {

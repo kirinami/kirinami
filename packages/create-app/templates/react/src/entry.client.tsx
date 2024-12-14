@@ -1,18 +1,20 @@
-/* eslint-disable no-underscore-dangle */
-
 import { startTransition } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
-import { HeadProvider } from '@/utils/react/head';
 import { requestBrowserIdle } from '@/utils/react/ssr/client';
 
+import { Document } from './Document';
 import { routes } from './main';
 
 async function hydrate() {
   const router = createBrowserRouter(routes);
+  const language = router.state.loaderData.HydrationProvider?.state.i18n.language || DEFAULT_LANGUAGE;
+
+  console.log(language);
 
   const queryState = window.__staticQueryClientHydrationData;
 
@@ -29,8 +31,8 @@ async function hydrate() {
 
   startTransition(() => {
     hydrateRoot(
-      document.getElementById('root')!,
-      <HeadProvider>
+      document,
+      <Document language={language}>
         <QueryClientProvider client={queryClient}>
           <HydrationBoundary state={queryState}>
             <AppStoreProvider store={appStore}>
@@ -38,7 +40,7 @@ async function hydrate() {
             </AppStoreProvider>
           </HydrationBoundary>
         </QueryClientProvider>
-      </HeadProvider>,
+      </Document>,
     );
   });
 }

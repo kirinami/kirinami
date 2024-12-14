@@ -3,7 +3,11 @@ import { Writable } from 'node:stream';
 import { ReactNode } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
 
-export async function renderHtml(children: ReactNode) {
+export type RenderHtmlOptions = {
+  bootstrapModules?: string[];
+};
+
+export async function renderHtml(children: ReactNode, { bootstrapModules }: RenderHtmlOptions) {
   return new Promise<string>((resolve, reject) => {
     let html = '';
 
@@ -22,6 +26,7 @@ export async function renderHtml(children: ReactNode) {
     });
 
     const pipeableStream = renderToPipeableStream(children, {
+      bootstrapModules,
       onAllReady: () => {
         pipeableStream.pipe(writable);
       },

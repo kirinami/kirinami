@@ -37,8 +37,9 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
     build: {
       outDir: path.resolve('.build', isSsr ? 'server' : 'public'),
       copyPublicDir: !isSsr,
+      manifest: true,
       rollupOptions: {
-        input: isSsr && path.resolve('index.ts'),
+        input: isSsr ? path.resolve('index.ts') : path.resolve('src/entry.client.tsx'),
       },
     },
     plugins: [

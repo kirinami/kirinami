@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Spinner } from '@/components/Spinner';
 import { Layout } from '@/containers/Layout';
 import { useGetTodosQuery, useUpdateTodoMutation } from '@/queries/todos';
-import { useHead } from '@/utils/react/head';
 import { day } from '@/utils/day';
 
 export function HomePage() {
@@ -12,12 +11,6 @@ export function HomePage() {
   const { isLoading, data: todos = [] } = useGetTodosQuery({});
 
   const { mutate: updateTodo } = useUpdateTodoMutation();
-
-  useHead({
-    title: t('home'),
-    description: `${t('home')} - description`,
-    keywords: [t('home'), 'keyword'].join(','),
-  });
 
   return (
     <Layout>

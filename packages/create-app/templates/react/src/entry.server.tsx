@@ -9,19 +9,21 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import type { Manifest } from 'vite';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
-import { Head, HeadProvider, headToJson } from '@/utils/react/head';
 import { escapeJson, getMarkupFromTree } from '@/utils/react/ssr/server';
 
+import { Document } from './Document';
 import { routes } from './main';
 
 const handler = createStaticHandler(routes);
 
-export async function render(request: Request) {
+export async function render(manifest: Manifest, request: Request) {
+  const entry = manifest['src/entry.client.tsx'];
+
   const context = {
-    head: {} as Head,
     router: await handler.query(request),
   };
 
@@ -30,6 +32,7 @@ export async function render(request: Request) {
   }
 
   const router = createStaticRouter(handler.dataRoutes, context.router);
+  const language = router.state.loaderData.HydrationProvider?.state.i18n.language || DEFAULT_LANGUAGE;
 
   const queryCache = new QueryCache();
 
@@ -43,18 +46,19 @@ export async function render(request: Request) {
   });
 
   const appStore = createAppStore({
-    language: router.state.loaderData.HydrationProvider.state.i18n.language,
+    language,
   });
 
   const root = await getMarkupFromTree(
-    <HeadProvider context={context.head}>
+    <Document language={language}>
       <QueryClientProvider client={queryClient}>
         <AppStoreProvider store={appStore}>
           <StaticRouterProvider context={context.router} router={router} />
         </AppStoreProvider>
       </QueryClientProvider>
-    </HeadProvider>,
+    </Document>,
     {
+      bootstrapModules: [`/${entry.file}`],
       onAfterRender: (renderPromises) => {
         renderPromises.addQueryPromise('queryClient', async () => {
           const predicate = (query: Query) =>
@@ -80,16 +84,22 @@ export async function render(request: Request) {
 
   const appState = appStore.getState();
 
-  const hydration = `
-    <script>window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});</script>
-    <script>window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});</script>
-  `;
+  const scripts = [] satisfies string[];
+
+  const styles = entry.css?.map((file) => `<link rel="stylesheet" crossorigin href="/${file}">`) || [];
+
+  const hydration = [
+    `<script>window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});</script>`,
+    `<script>window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});</script>`,
+  ];
 
   return {
     router: {
       status: context.router.statusCode,
     },
-    head: headToJson(context.head),
-    root: root + hydration,
+    root: root
+      .replace('<script id="inject-styles"></script>', styles.join(''))
+      .replace('<script id="inject-scripts"></script>', scripts.join(''))
+      .replace('<script id="inject-hydration"></script>', hydration.join('')),
   };
 }
