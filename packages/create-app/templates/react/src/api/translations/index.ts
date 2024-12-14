@@ -29,9 +29,11 @@ export const translationsStorage: Record<string, typeof en> = {
 export async function translations(fastify: FastifyInstance) {
   const app = fastify.withTypeProvider<JsonSchemaToTsProvider>();
 
-  app.get('/:language', { schema: getTranslationSchema }, ({ params }) => {
+  app.get('/:language', { schema: getTranslationSchema }, async ({ params }) => {
     const hasLanguage = params.language in translationsStorage;
     const translationsData = hasLanguage ? translationsStorage[params.language] : translationsStorage[DEFAULT_LANGUAGE];
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     return Object.entries(translationsData).map(([key, value], i) => ({
       id: i + 1,

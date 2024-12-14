@@ -23,14 +23,12 @@ export type HydrationLoaderData = {
 
 export const hydrationLoader: LoaderFunction = async ({ params: { language = DEFAULT_LANGUAGE } }): Promise<HydrationLoaderData> => {
   const state = new Promise<HydrationLoaderState>(async (resolve) => {
-    setTimeout(async () => {
-      resolve({
-        i18n: {
-          language,
-          resources: await getResources(language),
-        },
-      });
-    }, 1000);
+    resolve({
+      i18n: {
+        language,
+        resources: await getResources(language),
+      },
+    });
   });
 
   return {

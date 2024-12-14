@@ -29,7 +29,10 @@ export async function create(vite?: ViteDevServer) {
 
   // const template = await fs.readFile(path.resolve(import.meta.env.PROD ? publicDir : '.', 'index.html'), 'utf-8');
 
-  const manifest: Manifest = import.meta.env.PROD ? JSON.parse(await fs.readFile(path.resolve(publicDir, '.vite/manifest.json'), 'utf-8')) : {
+  const manifest: Manifest = import.meta.env.PROD ? JSON.parse(await fs.readFile(path.resolve(
+    publicDir,
+    '.vite/manifest.json',
+  ), 'utf-8')) : {
     'src/entry.client.tsx': {
       isEntry: true,
       file: 'src/entry.client.tsx',
@@ -85,8 +88,8 @@ export async function create(vite?: ViteDevServer) {
               'Last-Modified': stat.mtime.toUTCString(),
             })
             .send(content);
-        } catch (err) {
-          // skip
+        } catch {
+          return reply.callNotFound();
         }
       }
 
