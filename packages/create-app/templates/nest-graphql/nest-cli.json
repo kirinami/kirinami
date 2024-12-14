@@ -4,6 +4,7 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "builder": "swc",
+    "typeCheck": true,
     "assets": [
       {
         "outDir": "./.build/public",
@@ -11,7 +12,18 @@
       }
     ],
     "plugins": [
-      "@nestjs/graphql"
+      {
+        "name": "@nestjs/graphql",
+        "options": {
+          "typeFileNameSuffix": [
+            ".input.ts",
+            ".args.ts",
+            ".entity.ts",
+            ".model.ts"
+          ],
+          "introspectComments": true
+        }
+      }
     ]
   }
 }

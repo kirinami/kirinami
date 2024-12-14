@@ -10,8 +10,11 @@ import mime from 'mime';
 import type { ViteDevServer } from 'vite';
 
 import { api } from '@/api';
-import { render } from '@/entry-server';
+import { render } from '@/entry.server';
 import { ejectStyles } from '@/utils/vite';
+
+const buildDir = path.resolve('.build');
+const publicDir = path.resolve(import.meta.env.PROD ? buildDir : '.', 'public');
 
 let appMemo:
   | FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse, FastifyBaseLogger, JsonSchemaToTsProvider>
@@ -24,13 +27,13 @@ export async function create(vite?: ViteDevServer) {
     return appMemo;
   }
 
-  const template = await fs.readFile(path.join(import.meta.env.PROD ? 'dist/public' : '.', 'index.html'), {
+  const template = await fs.readFile(path.resolve(import.meta.env.PROD ? publicDir : '.', 'index.html'), {
     encoding: 'utf-8',
   });
 
   const app = fastify({
     logger: {
-      level: 'info',
+      level: import.meta.env.PROD ? 'info' : 'warn',
       formatters: {
         level: (label) => ({ label }),
       },
@@ -59,7 +62,7 @@ export async function create(vite?: ViteDevServer) {
 
       if (pathname.includes('.')) {
         try {
-          const file = path.join(import.meta.env.PROD ? 'dist/public' : 'public', pathname);
+          const file = path.join(publicDir, pathname);
           const type = mime.getType(file) || 'application/octet-stream';
 
           const stat = await fs.stat(file);

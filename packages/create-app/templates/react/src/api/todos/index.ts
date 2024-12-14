@@ -4,10 +4,10 @@ import { FastifyInstance } from 'fastify';
 import { createTodoSchema, deleteTodoSchema, getTodosSchema, TodoSchema, updateTodoSchema } from './schema';
 
 const todosStorage: TodoSchema[] = [
-  { id: 1, title: 'Todo 1', completed: true, createdAt: 1705705200000 },
-  { id: 2, title: 'Todo 2', completed: true, createdAt: 1705878000000 },
-  { id: 3, title: 'Todo 3', completed: true, createdAt: 1705964400000 },
-  { id: 4, title: 'Todo 4', completed: true, createdAt: 1706050800000 },
+  { id: 1, title: 'Todo 1', completed: true, createdAt: 1702705200000 },
+  { id: 2, title: 'Todo 2', completed: true, createdAt: 1704878000000 },
+  { id: 3, title: 'Todo 3', completed: true, createdAt: 1708964400000 },
+  { id: 4, title: 'Todo 4', completed: true, createdAt: 1710050800000 },
 ];
 
 export async function todos(fastify: FastifyInstance) {

@@ -12,6 +12,7 @@ import { UsersModule } from '@/users/users.module';
 
 import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
+import metadata from './metadata';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AppService } from './app.service';
             },
           }),
       ].filter((plugin): plugin is ApolloServerPlugin => !!plugin),
+      metadata,
     }),
 
     AuthModule,

@@ -28,7 +28,7 @@
     "incremental": true,
     "outDir": "./.build/server",
     "removeComments": true,
-    "declaration": true,
+    "declaration": false,
     "sourceMap": true
   },
   "include": ["src", "test"],

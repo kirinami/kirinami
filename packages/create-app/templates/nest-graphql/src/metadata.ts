@@ -1,0 +1,5 @@
+/* eslint-disable */
+export default async () => {
+    const t = {};
+    return { "@nestjs/graphql": { "models": [[import("./users/models/user.model"), { "UserModel": { id: {}, email: {}, roles: {}, createdAt: {}, updatedAt: {} } }], [import("./auth/models/token.model"), { "TokenModel": { accessToken: {}, refreshToken: {} } }], [import("./auth/dto/login.input"), { "LoginInput": { email: {}, password: {} } }], [import("./auth/dto/refresh-token.input"), { "RefreshTokenInput": { refreshToken: {} } }], [import("./auth/dto/register.input"), { "RegisterInput": { email: {}, password: {} } }], [import("./translations/models/translation.model"), { "TranslationModel": { id: {}, language: {}, key: {}, value: {}, createdAt: {}, updatedAt: {} } }], [import("./translations/dto/create-translation.input"), { "CreateTranslationInput": { language: {}, key: {}, value: {} } }], [import("./translations/dto/update-translation.input"), { "UpdateTranslationInput": {} }], [import("./translations/dto/upsert-translation.input"), { "UpsertTranslationInput": { id: { nullable: true } } }]] } };
+};

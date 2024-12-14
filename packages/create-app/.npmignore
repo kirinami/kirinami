@@ -23,7 +23,6 @@
 
 # Project
 **/.build/**
-**/src/metadata.ts
 **/.env*
 !**/.env.example
 **/.gitignore*

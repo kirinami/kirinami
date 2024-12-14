@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "lib": ["es2020", "dom", "dom.iterable"],
+    "target": "es2021",
+    "lib": ["es2021", "dom", "dom.iterable"],
     "module": "esnext",
 
     "moduleResolution": "bundler",
@@ -22,6 +22,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "index.ts"],
+  "include": ["src", "test", "index.ts"],
   "exclude": ["node_modules"]
 }

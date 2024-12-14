@@ -23,7 +23,6 @@ package-lock.json*
 
 # Project
 .build
-src/metadata.ts
 
 # Misc
 .DS_Store

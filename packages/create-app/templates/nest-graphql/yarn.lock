@@ -8283,8 +8283,6 @@ __metadata:
     "@types/eslint__js": "npm:8.42.3"
     "@types/node": "npm:22.8.7"
     "@types/supertest": "npm:6.0.2"
-    "@typescript-eslint/eslint-plugin": "npm:8.12.2"
-    "@typescript-eslint/parser": "npm:8.12.2"
     better-typescript-lib: "npm:2.9.0"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"

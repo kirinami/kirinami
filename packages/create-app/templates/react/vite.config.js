@@ -14,8 +14,8 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
     appType: isSsr ? 'custom' : 'spa',
     define: isSsr
       ? Object.entries(loadEnv(mode, process.cwd(), ''))
-          .filter(([key]) => !(key in process.env))
-          .reduce((env, [key, value]) => ({ ...env, [`import.meta.env.${key}`]: JSON.stringify(value) }), {})
+        .filter(([key]) => !(key in process.env))
+        .reduce((env, [key, value]) => ({ ...env, [`import.meta.env.${key}`]: JSON.stringify(value) }), {})
       : {},
     resolve: {
       alias: Object.entries(tsConfig.compilerOptions.paths).map(([key, [value]]) => ({
@@ -25,11 +25,17 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
     },
     css: {
       modules: {
-        localsConvention: 'dashesOnly',
+        localsConvention: 'camelCaseOnly',
+        generateScopedName: isDev ? '[name]__[local]__[hash:base64:6]' : '[local]__[hash:base64:6]',
+      },
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
       },
     },
     build: {
-      outDir: path.resolve('dist', isSsr ? 'server' : 'public'),
+      outDir: path.resolve('.build', isSsr ? 'server' : 'public'),
       copyPublicDir: !isSsr,
       rollupOptions: {
         input: isSsr && path.resolve('index.ts'),

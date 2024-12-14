@@ -24,7 +24,7 @@ export function Layout({ children }: LayoutProps) {
           <Link
             key={language}
             to={`/${language}`}
-            className={clsx(styles.languages__item, i18n.language === language && styles.languages__itemActive)}
+            className={clsx(styles.item, i18n.language === language && styles.active)}
           >
             {label}
           </Link>

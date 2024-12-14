@@ -2,6 +2,9 @@
   "name": "template",
   "version": "0.0.1",
   "private": true,
+  "engines": {
+    "node": ">=20.16"
+  },
   "type": "commonjs",
   "scripts": {
     "postinstall": "husky || true",
@@ -49,8 +52,6 @@
     "@types/eslint__js": "8.42.3",
     "@types/node": "22.8.7",
     "@types/supertest": "6.0.2",
-    "@typescript-eslint/eslint-plugin": "8.12.2",
-    "@typescript-eslint/parser": "8.12.2",
     "better-typescript-lib": "2.9.0",
     "drizzle-prisma-generator": "0.1.7",
     "eslint": "9.14.0",

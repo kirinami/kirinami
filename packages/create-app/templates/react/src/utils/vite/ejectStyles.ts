@@ -4,13 +4,13 @@ import type { ModuleNode, ViteDevServer } from 'vite';
 function filterCssModules(
   moduleNode: ModuleNode | undefined,
   cssModules = new Set<ModuleNode>(),
-  visitedModules = new Set<string>(),
+  visitedModules = new Set<ModuleNode>(),
 ) {
-  if (!moduleNode || !moduleNode.url || visitedModules.has(moduleNode.url)) {
+  if (!moduleNode || visitedModules.has(moduleNode)) {
     return cssModules;
   }
 
-  visitedModules.add(moduleNode.url);
+  visitedModules.add(moduleNode);
 
   if (moduleNode.url.endsWith('.css') || moduleNode.url.endsWith('.scss')) {
     cssModules.add(moduleNode);

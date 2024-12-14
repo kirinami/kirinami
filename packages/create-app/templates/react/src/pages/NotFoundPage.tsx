@@ -6,9 +6,15 @@ import { useHead } from '@/utils/react/head';
 export function NotFoundPage() {
   const { t } = useTranslation();
 
-  useHead({
-    title: t('not_found'),
-  });
+  // useHead({
+  //   title: t('not_found'),
+  // });
 
-  return <NotFoundFallback />;
+  return (
+    <>
+      <title>{t('not_found')}</title>
+
+      <NotFoundFallback />
+    </>
+  );
 }

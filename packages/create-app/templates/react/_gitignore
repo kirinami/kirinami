@@ -1,28 +1,30 @@
-# ide
+# Git
+.git
+
+# Editor
 .idea
 .vscode
 
-# dependencies
-.pnp.*
+# Yarn
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.pnp.*
+
+# Dependencies
 node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 package-lock.json*
 
-# project
-dist
+# Project
+.build
 .env*
 !.env.example
 
-# misc
+# Misc
 .DS_Store
-
-# typescript
-*.tsbuildinfo

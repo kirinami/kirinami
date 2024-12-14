@@ -2,16 +2,13 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  gap: 48px;
+  padding: 48px;
   background-color: #ffffff;
 }
 
 .languages {
-  position: absolute;
-  top: 48px;
   display: flex;
   flex-direction: row;
   border-radius: 4px;
@@ -21,7 +18,7 @@
     0 4px 6px -1px rgb(0 0 0 / 0.1),
     0 2px 4px -2px rgb(0 0 0 / 0.1);
 
-  &__item {
+  .item {
     padding: 8px 16px;
     border-left: 1px solid #e5e7eb;
     background-color: #ffffff;
@@ -37,7 +34,7 @@
       color: #1d4ed8;
     }
 
-    &--active {
+    &.active {
       background-color: #2563eb;
       color: #ffffff;
 

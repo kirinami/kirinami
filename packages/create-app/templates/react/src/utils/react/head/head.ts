@@ -1,11 +1,21 @@
+export const resetTag = Symbol.for('Head/resetTag');
+
+export type ResetTag = typeof resetTag;
+
 export type Head = {
-  language?: {
-    locale: string;
-    dir: 'ltr' | 'rtl';
-  };
-  title?: string;
-  description?: string;
-  keywords?: string;
+  language?:
+    | {
+        locale: string;
+        dir: 'ltr' | 'rtl';
+      }
+    | ResetTag;
+  name?: string | ResetTag;
+  title?: string | ResetTag;
+  description?: string | ResetTag;
+  keywords?: string | ResetTag;
+  url?: string | ResetTag;
+  image?: string | ResetTag;
+  robots?: string | ResetTag;
 };
 
 export type Tag = {
@@ -44,6 +54,16 @@ const schema: Schema = {
   },
 
   meta: [
+    {
+      group: 'name',
+      name: 'meta',
+      key: 'property',
+      attributes: {
+        property: 'og:site_name',
+        content: '$',
+      },
+    },
+
     {
       group: 'title',
       name: 'meta',
@@ -109,10 +129,66 @@ const schema: Schema = {
         content: '$',
       },
     },
+
+    {
+      group: 'url',
+      name: 'meta',
+      key: 'name',
+      attributes: {
+        name: 'twitter:url',
+        content: '$',
+      },
+    },
+    {
+      group: 'url',
+      name: 'meta',
+      key: 'property',
+      attributes: {
+        property: 'og:url',
+        content: '$',
+      },
+    },
+
+    {
+      group: 'image',
+      name: 'meta',
+      key: 'name',
+      attributes: {
+        name: 'twitter:image',
+        content: '$',
+      },
+    },
+    {
+      group: 'image',
+      name: 'meta',
+      key: 'property',
+      attributes: {
+        property: 'og:image',
+        content: '$',
+      },
+    },
+
+    {
+      group: 'robots',
+      name: 'meta',
+      key: 'name',
+      attributes: {
+        name: 'robots',
+        content: '$',
+      },
+    },
   ],
 };
 
-function resolveValue(group: Head[keyof Head], ref?: string): string {
+const groups = Array.from(
+  new Set(
+    Object.values(schema)
+      .flat()
+      .map((tag) => tag.group),
+  ),
+);
+
+function resolveValue(group: Head[keyof Head], ref?: string) {
   if (!group || !ref) {
     return '';
   }
@@ -198,11 +274,9 @@ export function headToJson(head: Head) {
   };
 }
 
-export function resolveHead(curr: Head, next: Head): Head {
-  return {
-    language: next.language || curr.language,
-    title: next.title || undefined,
-    description: next.description || undefined,
-    keywords: next.keywords || undefined,
-  };
+export function resolveHead(curr: Head, next: Head) {
+  return groups.reduce<Head>(
+    (result, group) => ({ ...result, [group]: next[group] === resetTag ? undefined : next[group] || curr[group] }),
+    {},
+  );
 }
