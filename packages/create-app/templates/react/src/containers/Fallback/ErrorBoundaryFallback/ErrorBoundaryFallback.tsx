@@ -1,4 +1,4 @@
-import { isRouteErrorResponse, useAsyncError, useRouteError } from 'react-router-dom';
+import { isRouteErrorResponse, useAsyncError, useRouteError } from 'react-router';
 
 import styles from './ErrorBoundaryFallback.module.scss';
 

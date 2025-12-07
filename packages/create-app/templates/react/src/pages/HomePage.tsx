@@ -4,9 +4,13 @@ import { Spinner } from '@/components/Spinner';
 import { Layout } from '@/containers/Layout';
 import { useGetTodosQuery, useUpdateTodoMutation } from '@/queries/todos';
 import { day } from '@/utils/day';
+import { Link } from 'react-router';
+import { useLinkTo } from '@/hooks/useLinkTo';
 
 export function HomePage() {
   const { t } = useTranslation();
+
+  const linkTo = useLinkTo();
 
   const { isLoading, data: todos = [] } = useGetTodosQuery({});
 
@@ -52,6 +56,13 @@ export function HomePage() {
               ))}
             </ul>
           )}
+
+          <Link
+            to={linkTo('/create/')}
+            className="text-blue-600 font-semibold text-lg hover:text-blue-800 transition-colors"
+          >
+            {t('todo.create')}
+          </Link>
         </div>
       </div>
     </Layout>

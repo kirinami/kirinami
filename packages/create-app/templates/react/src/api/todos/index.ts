@@ -24,7 +24,12 @@ export async function todos(fastify: FastifyInstance) {
         .sort((a, b) => (query.sort === 'asc' ? a.createdAt - b.createdAt : b.createdAt - a.createdAt));
     }
 
-    return todosStorage;
+    console.log(headers['accept-language']);
+
+    return todosStorage.map((todo) => ({
+      ...todo,
+      title: `${todo.title} (${headers['accept-language']})`,
+    }));
   });
 
   app.post('/', { schema: createTodoSchema }, ({ body }) => {

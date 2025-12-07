@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
 
-import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
+import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router';
 import {
   dehydrate,
   FetchQueryOptions,
@@ -9,19 +9,17 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import type { Manifest } from 'vite';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
 import { escapeJson, getMarkupFromTree } from '@/utils/react/ssr/server';
 
 import { Document } from './Document';
-import { routes } from './main';
+import { createRoutes } from './routes';
 
-const handler = createStaticHandler(routes);
-
-export async function render(manifest: Manifest, request: Request) {
-  const entry = manifest['src/entry.client.tsx'];
+export async function render(request: Request) {
+  const routes = createRoutes();
+  const handler = createStaticHandler(routes);
 
   const context = {
     router: await handler.query(request),
@@ -49,57 +47,53 @@ export async function render(manifest: Manifest, request: Request) {
     language,
   });
 
-  const root = await getMarkupFromTree(
+  const tree = (
     <Document language={language}>
       <QueryClientProvider client={queryClient}>
         <AppStoreProvider store={appStore}>
           <StaticRouterProvider context={context.router} router={router} />
         </AppStoreProvider>
       </QueryClientProvider>
-    </Document>,
-    {
-      bootstrapModules: [`/${entry.file}`],
-      onAfterRender: (renderPromises) => {
-        renderPromises.addQueryPromise('queryClient', async () => {
-          const predicate = (query: Query) =>
-            !(
-              query.meta?.ssr === false ||
-              query.options.queryFn == null ||
-              ('enabled' in query.options && query.options.enabled === false) ||
-              ('suspense' in query.options && query.options.suspense === true) ||
-              query.state.status !== 'pending'
-            );
-
-          const queries = queryCache.findAll({
-            predicate,
-          });
-
-          return Promise.all(queries.map((query) => queryClient.prefetchQuery(query.options as FetchQueryOptions)));
-        });
-      },
-    },
+    </Document>
   );
+
+  const { error, html } = await getMarkupFromTree(tree, {
+    onAfterRender: (renderPromises) => {
+      const predicate = (query: Query) =>
+        !(
+          query.meta?.ssr === false ||
+          query.options.queryFn == null ||
+          ('enabled' in query.options && query.options.enabled === false) ||
+          ('suspense' in query.options && query.options.suspense === true) ||
+          query.state.status !== 'pending'
+        );
+
+      queryCache
+        .findAll({
+          predicate,
+        })
+        .forEach((query) =>
+          renderPromises.addQueryPromise(query.queryHash, () =>
+            queryClient.prefetchQuery(query.options as FetchQueryOptions),
+          ),
+        );
+    },
+  });
 
   const queryState = dehydrate(queryClient);
 
   const appState = appStore.getState();
 
-  const scripts = [] satisfies string[];
-
-  const styles = entry.css?.map((file) => `<link rel="stylesheet" crossorigin href="/${file}">`) || [];
-
   const hydration = [
     `<script>window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});</script>`,
     `<script>window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});</script>`,
-  ];
+  ]
+    .flat()
+    .filter((value) => value != null)
+    .join('');
 
   return {
-    router: {
-      status: context.router.statusCode,
-    },
-    root: root
-      .replace('<script id="inject-styles"></script>', styles.join(''))
-      .replace('<script id="inject-scripts"></script>', scripts.join(''))
-      .replace('<script id="inject-hydration"></script>', hydration.join('')),
+    statusCode: error ? 500 : context.router.statusCode,
+    html: html.replace('</body>', `${hydration}</body>`),
   };
 }

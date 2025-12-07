@@ -1,5 +1,5 @@
 import { initReactI18next } from 'react-i18next';
-import { createInstance, i18n as I18N, Resource } from 'i18next';
+import { createInstance, Resource } from 'i18next';
 
 import type { TranslationSchema } from '@/api/translations/schema';
 
@@ -39,7 +39,7 @@ export function createI18n(language: string, resources?: Resource) {
     returnNull: false,
   });
 
-  return i18n as I18N;
+  return i18n;
 }
 
 declare module 'i18next' {

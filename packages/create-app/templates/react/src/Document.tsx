@@ -1,25 +1,19 @@
 import { ReactNode } from 'react';
+import { dir } from 'i18next';
 
 export type DocumentProps = {
   language: string;
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 export function Document({ language, children }: DocumentProps) {
   return (
-    <html lang={language}>
+    <html lang={language} dir={dir(language)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        {import.meta.env.SSR && <script id="inject-styles" />}
-        {import.meta.env.SSR && <script id="inject-scripts" />}
       </head>
-      <body>
-        {children}
-
-        {import.meta.env.SSR && <script id="inject-hydration" />}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

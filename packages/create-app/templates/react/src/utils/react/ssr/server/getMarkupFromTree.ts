@@ -1,33 +1,29 @@
 import { createContext, createElement, ReactNode } from 'react';
 
-import { renderHtml } from './renderHtml';
 import { RenderPromises } from './RenderPromises';
+import { renderToString, RenderToStringResult } from './renderToString';
 
 const RenderPromisesContext = createContext(new RenderPromises());
 
 export type GetMarkupFromTreeOptions = {
-  bootstrapModules?: string[],
   onAfterRender?: (renderPromise: RenderPromises) => Promise<unknown> | unknown;
 };
 
-export async function getMarkupFromTree(tree: ReactNode, {
-  bootstrapModules,
-  onAfterRender,
-}: GetMarkupFromTreeOptions = {}) {
+export async function getMarkupFromTree(tree: ReactNode, { onAfterRender }: GetMarkupFromTreeOptions = {}) {
   const renderPromises = new RenderPromises();
 
-  const process = (): Promise<string> =>
-    new Promise<string>((resolve) => {
-      resolve(renderHtml(createElement(RenderPromisesContext.Provider, { value: renderPromises }, tree), {
-        bootstrapModules,
-      }));
+  const process = (): Promise<RenderToStringResult> =>
+    new Promise<RenderToStringResult>((resolve) => {
+      resolve(renderToString(createElement(RenderPromisesContext.Provider, { value: renderPromises }, tree)));
     })
-      .then(async (html) => {
+      .then(async (result) => {
         await onAfterRender?.(renderPromises);
 
-        return html;
+        return result;
       })
-      .then((html) => (renderPromises.hasPromises() ? renderPromises.consumeAndAwaitPromises().then(process) : html))
+      .then((result) =>
+        renderPromises.hasPromises() ? renderPromises.consumeAndAwaitPromises().then(process) : result,
+      )
       .finally(() => renderPromises.stop());
 
   return process();

@@ -1,13 +1,12 @@
-import { DefaultError, useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
+import { mutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { UpdateTodoData, UpdateTodoParams } from '@/api/todos/schema';
+import { UpdateTodoParams } from '@/api/todos/schema';
 import { AppStoreState, useAppStore } from '@/stores/useAppStore';
+import { useShallow } from 'zustand/react/shallow';
 
-export function updateTodoMutationOptions({
-  fetch,
-}: AppStoreState): UseMutationOptions<UpdateTodoData, DefaultError, UpdateTodoParams> {
-  return {
-    mutationFn: ({ id, ...body }) =>
+export function updateTodoMutationOptions({ fetch }: Pick<AppStoreState, 'fetch'>) {
+  return mutationOptions({
+    mutationFn: ({ id, ...body }: UpdateTodoParams) =>
       fetch(`/api/todos/${id}`, {
         method: 'PATCH',
         headers: {
@@ -15,7 +14,7 @@ export function updateTodoMutationOptions({
         },
         body: JSON.stringify(body),
       }).then((response) => response.json()),
-  };
+  });
 }
 
 export type UseUpdateTodoMutationOptions = Partial<
@@ -25,17 +24,17 @@ export type UseUpdateTodoMutationOptions = Partial<
 export function useUpdateTodoMutation(options?: UseUpdateTodoMutationOptions) {
   const queryClient = useQueryClient();
 
-  const appState = useAppStore();
+  const appState = useAppStore(useShallow(({ fetch }) => ({ fetch })));
 
   return useMutation({
     ...updateTodoMutationOptions(appState),
     ...options,
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({
+    onSuccess: (data, variables, onMutateResult, context) => {
+      options?.onSuccess?.(data, variables, onMutateResult, context);
+
+      void queryClient.invalidateQueries({
         queryKey: ['todos'],
       });
-
-      options?.onSuccess?.(data, variables, context);
     },
   });
 }

@@ -2,9 +2,9 @@ import path from 'node:path';
 import process from 'node:process';
 
 import react from '@vitejs/plugin-react-swc';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, loadEnv } from 'vite';
-
-import tsConfig from './tsconfig.json';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode, command, isSsrBuild }) => {
   const isDev = command === 'serve';
@@ -17,51 +17,44 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
         .filter(([key]) => !(key in process.env))
         .reduce((env, [key, value]) => ({ ...env, [`import.meta.env.${key}`]: JSON.stringify(value) }), {})
       : {},
-    resolve: {
-      alias: Object.entries(tsConfig.compilerOptions.paths).map(([key, [value]]) => ({
-        find: key.replace('*', ''),
-        replacement: path.resolve(value.replace('*', '')) + '/',
-      })),
-    },
     css: {
       modules: {
         localsConvention: 'camelCaseOnly',
         generateScopedName: isDev ? '[name]__[local]__[hash:base64:6]' : '[local]__[hash:base64:6]',
       },
-      preprocessorOptions: {
-        scss: {
-          api: 'modern-compiler',
-        },
-      },
     },
     build: {
       outDir: path.resolve('.build', isSsr ? 'server' : 'public'),
+      emptyOutDir: true,
       copyPublicDir: !isSsr,
+      cssCodeSplit: false,
       manifest: true,
       rollupOptions: {
-        input: isSsr ? path.resolve('index.ts') : path.resolve('src/entry.client.tsx'),
+        input: isSsr ? path.resolve('src/main.ts') : path.resolve('src/entry.client.tsx'),
       },
     },
     plugins: [
+      tsconfigPaths(),
+      tailwindcss(),
       react(),
       {
-        name: 'fastify',
+        name: 'fastify-plugin',
         apply: 'serve',
         configureServer: async (vite) => {
-          vite.middlewares.use(async (req, res, next) => {
+          vite.middlewares.use(async (request, response, next) => {
             try {
-              if (/^(?:\/@|\/node_modules|\/src)/.test(req.url)) {
+              if (/^\/(?:@|node_modules|src)/.test(request.originalUrl)) {
                 next();
 
                 return;
               }
 
-              const module = await vite.ssrLoadModule('/index.ts');
-              const app = await module.create(vite);
+              const module = await vite.ssrLoadModule('/src/main.ts');
+              const app = await module.init(vite);
 
-              app.routing(req, res);
-            } catch (err) {
-              next(err);
+              app.routing(request, response);
+            } catch (error) {
+              next(error);
             }
           });
         },

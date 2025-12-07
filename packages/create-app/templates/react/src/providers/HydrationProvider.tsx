@@ -1,6 +1,6 @@
-import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { I18nextProvider } from 'react-i18next';
-import { Await, LoaderFunction, Outlet, useAsyncValue, useLoaderData } from 'react-router-dom';
+import { Await, LoaderFunction, Outlet, useAsyncValue, useLoaderData } from 'react-router';
 import { Resource } from 'i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -9,6 +9,7 @@ import { LoadingFallback } from '@/containers/Fallback/LoadingFallback';
 import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/helpers/createI18n';
 import { useAppStore } from '@/stores/useAppStore';
 import { day } from '@/utils/day';
+import { useShallow } from 'zustand/react/shallow';
 
 export type HydrationLoaderState = {
   i18n: {
@@ -18,10 +19,14 @@ export type HydrationLoaderState = {
 };
 
 export type HydrationLoaderData = {
+  key: string;
   state: HydrationLoaderState | Promise<HydrationLoaderState>;
 };
 
-export const hydrationLoader: LoaderFunction = async ({ params: { language = DEFAULT_LANGUAGE } }): Promise<HydrationLoaderData> => {
+export const hydrationLoader: LoaderFunction = async ({
+  request,
+  params: { language = DEFAULT_LANGUAGE },
+}): Promise<HydrationLoaderData> => {
   const state = new Promise<HydrationLoaderState>(async (resolve) => {
     resolve({
       i18n: {
@@ -32,6 +37,7 @@ export const hydrationLoader: LoaderFunction = async ({ params: { language = DEF
   });
 
   return {
+    key: btoa(request.url),
     state: import.meta.env.SSR ? await state : state,
   };
 };
@@ -39,35 +45,26 @@ export const hydrationLoader: LoaderFunction = async ({ params: { language = DEF
 export function HydrationOutlet() {
   const state = useAsyncValue() as HydrationLoaderState;
 
-  const i18n = useMemo(() => createI18n(state.i18n.language, state.i18n.resources), [state.i18n.language]);
-
-  const isFirstMountRef = useRef(true);
-
   const queryClient = useQueryClient();
 
-  const changeLanguage = useAppStore((state) => state.changeLanguage);
+  const i18n = useMemo(() => createI18n(state.i18n.language, state.i18n.resources), [state.i18n]);
 
-  day.locale(i18n.language);
-
-  // useHead({
-  //   language: {
-  //     locale: i18n.language,
-  //     dir: i18n.dir(i18n.language),
-  //   },
-  //   title: i18n.t('loading'),
-  // });
+  const appState = useAppStore(useShallow(({ changeLanguage }) => ({ changeLanguage })));
 
   useEffect(() => {
-    if (isFirstMountRef.current) {
-      isFirstMountRef.current = false;
-
+    if (document.documentElement.lang === i18n.language) {
       return;
     }
 
-    changeLanguage(i18n.language);
+    document.documentElement.lang = i18n.language;
+    document.documentElement.dir = i18n.dir(i18n.language);
 
-    queryClient.resetQueries();
-  }, [i18n.language, changeLanguage]);
+    appState.changeLanguage(i18n.language);
+
+    void queryClient.resetQueries();
+  }, [queryClient, i18n.language, appState]);
+
+  day.locale(i18n.language);
 
   return (
     <I18nextProvider i18n={i18n}>
@@ -77,10 +74,16 @@ export function HydrationOutlet() {
 }
 
 export function HydrationProvider() {
-  const { state } = useLoaderData() as HydrationLoaderData;
+  const { key, state } = useLoaderData() as HydrationLoaderData;
+
+  useEffect(() => {
+    if (!document.title) {
+      document.title = '...';
+    }
+  }, [key]);
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense key={key} fallback={<LoadingFallback />}>
       <Await resolve={state} errorElement={<ErrorBoundaryFallback />}>
         <HydrationOutlet />
       </Await>

@@ -131,7 +131,6 @@ export default typescriptEslint.config(
             ['^\\u0000'],
             [`^(${builtinModules.join('|')})(/|$)`, '^node:'],
             ['^react', '^@?\\w', '^'],
-            ['^@makeup/\\w'],
             ['^@prisma/\\w'],
             ['^@/\\w'],
             ['^\\.\\.(?!/?$)', '^\\.\\./?$'],

@@ -13,6 +13,8 @@ function filterCssModules(
   visitedModules.add(moduleNode);
 
   if (moduleNode.url.endsWith('.css') || moduleNode.url.endsWith('.scss')) {
+    moduleNode.importedModules.forEach((moduleNode) => visitedModules.add(moduleNode));
+
     cssModules.add(moduleNode);
   }
 
@@ -31,37 +33,40 @@ export async function ejectStyles(vite: ViteDevServer, entryModuleUrl: string) {
 
   const entryModule = await vite.moduleGraph.getModuleByUrl(entryModuleUrl);
 
-  return Array.from(filterCssModules(entryModule)).reduce(async (promise, cssModule) => {
-    const styles = await promise;
+  return Array.from(filterCssModules(entryModule)).reduce(
+    async (promise, cssModule) => {
+      const styles = await promise;
 
-    const transformResult = await vite.transformRequest(cssModule.url);
+      const transformResult = await vite.transformRequest(cssModule.url);
 
-    if (!transformResult) {
-      return styles;
-    }
+      if (!transformResult) {
+        return styles;
+      }
 
-    const ast = parse(transformResult.code, {
-      sourceType: 'module',
-      ecmaVersion: 'latest',
-      locations: true,
-      allowHashBang: true,
-    });
+      const ast = parse(transformResult.code, {
+        sourceType: 'module',
+        ecmaVersion: 'latest',
+        locations: true,
+        allowHashBang: true,
+      });
 
-    let id = '';
-    let css = '';
+      let id = '';
+      let css = '';
 
-    walk(ast as Node, {
-      enter(node) {
-        if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init?.type === 'Literal') {
-          if (node.id.name === '__vite__id') {
-            id = String(node.init.value);
-          } else if (node.id.name === '__vite__css') {
-            css = String(node.init.value);
+      walk(ast as Node, {
+        enter(node) {
+          if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init?.type === 'Literal') {
+            if (node.id.name === '__vite__id') {
+              id = String(node.init.value);
+            } else if (node.id.name === '__vite__css') {
+              css = String(node.init.value);
+            }
           }
-        }
-      },
-    });
+        },
+      });
 
-    return `${styles}<style type="text/css" data-vite-dev-id="${id}">${css}</style>`;
-  }, Promise.resolve(''));
+      return [...styles, { id, css }];
+    },
+    Promise.resolve([] as { id: string; css: string }[]),
+  );
 }

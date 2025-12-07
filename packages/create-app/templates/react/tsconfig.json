@@ -1,20 +1,27 @@
 {
   "compilerOptions": {
-    "target": "es2021",
-    "lib": ["es2021", "dom", "dom.iterable"],
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
     "module": "esnext",
 
     "moduleResolution": "bundler",
+    "moduleDetection": "force",
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": false,
     "allowJs": false,
     "resolveJsonModule": true,
+    // "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "noEmit": true,
 
     "strict": true,
     "useDefineForClassFields": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
     "skipLibCheck": true,
 
     "baseUrl": "./",
