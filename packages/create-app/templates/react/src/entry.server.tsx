@@ -92,7 +92,7 @@ export async function render(request: Request) {
     `<script>window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});</script>`,
   ]
     .flat()
-    .filter((value) => value != null)
+    .filter((value) => !!value)
     .join('');
 
   return {
