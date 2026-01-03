@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { href, Link } from 'react-router';
 
 import { clsx } from '@/utils/lib/clsx';
 
@@ -24,7 +24,7 @@ export function Layout({ children }: LayoutProps) {
         {Object.entries(languages).map(([language, label]) => (
           <Link
             key={language}
-            to={`/${language}`}
+            to={href('/:language', { language })}
             className={clsx(styles.item, i18n.language === language && styles.active)}
           >
             {label}

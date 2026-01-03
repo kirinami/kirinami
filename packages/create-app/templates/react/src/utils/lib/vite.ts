@@ -25,48 +25,51 @@ function filterCssModules(
   return cssModules;
 }
 
-export async function ejectStyles(vite: ViteDevServer, entryModuleUrl: string) {
+export async function ejectStyles(vite: ViteDevServer, url: string) {
   /* eslint-disable import/no-extraneous-dependencies */
   const { parse } = await import('acorn');
   const { walk } = await import('estree-walker');
   /* eslint-enable import/no-extraneous-dependencies */
 
-  const entryModule = await vite.moduleGraph.getModuleByUrl(entryModuleUrl);
+  await vite.transformRequest(url);
 
-  return Array.from(filterCssModules(entryModule)).reduce(
-    async (promise, cssModule) => {
-      const styles = await promise;
+  const entryModule = await vite.moduleGraph.getModuleByUrl(url);
 
-      const transformResult = await vite.transformRequest(cssModule.url);
+  return Array.from(filterCssModules(entryModule)).reduce(async (promise, cssModule) => {
+    const styles = await promise;
 
-      if (!transformResult) {
-        return styles;
-      }
+    const transformResult = await vite.transformRequest(cssModule.url);
 
-      const ast = parse(transformResult.code, {
-        sourceType: 'module',
-        ecmaVersion: 'latest',
-        locations: true,
-        allowHashBang: true,
-      });
+    if (!transformResult) {
+      return styles;
+    }
 
-      let id = '';
-      let css = '';
+    const ast = parse(transformResult.code, {
+      sourceType: 'module',
+      ecmaVersion: 'latest',
+      locations: true,
+      allowHashBang: true,
+    });
 
-      walk(ast as Node, {
-        enter(node) {
-          if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init?.type === 'Literal') {
-            if (node.id.name === '__vite__id') {
-              id = String(node.init.value);
-            } else if (node.id.name === '__vite__css') {
-              css = String(node.init.value);
-            }
+    let id = '';
+    let css = '';
+
+    walk(ast as Node, {
+      enter(node) {
+        if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.init?.type === 'Literal') {
+          if (node.id.name === '__vite__id') {
+            id = String(node.init.value);
+          } else if (node.id.name === '__vite__css') {
+            css = String(node.init.value);
           }
-        },
-      });
+        }
+      },
+    });
 
-      return [...styles, { id, css }];
-    },
-    Promise.resolve([] as { id: string; css: string }[]),
-  );
+    return styles + `<style type="text/css" data-vite-dev-id="${id}">${css}</style>`;
+  }, Promise.resolve(''));
+}
+
+export async function ejectScripts(vite: ViteDevServer, url: string) {
+  return vite.transformIndexHtml(url, '');
 }

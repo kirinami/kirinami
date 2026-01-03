@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { href, Link } from 'react-router';
 
 import { Layout } from '@/components/Layout';
 import { Spinner } from '@/components/Spinner';
@@ -7,7 +7,7 @@ import { useGetTodosQuery, useUpdateTodoMutation } from '@/queries/todos';
 import { dayjs } from '@/utils/lib/dayjs';
 
 export function HomePage() {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   const { isLoading, data: todos = [] } = useGetTodosQuery({});
 
@@ -57,7 +57,10 @@ export function HomePage() {
             </ul>
           )}
 
-          <Link className="text-blue-600 font-semibold text-lg hover:text-blue-800 transition-colors" to="/create">
+          <Link
+            className="text-blue-600 font-semibold text-lg hover:text-blue-800 transition-colors"
+            to={href('/:language/create', { language: i18n.language })}
+          >
             {t('todo.create')}
           </Link>
         </div>

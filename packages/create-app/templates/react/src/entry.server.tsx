@@ -11,7 +11,7 @@ import {
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
 import { LanguageLoaderData } from '@/providers/LanguageProvider';
 import { useAppStore } from '@/stores/useAppStore';
-import { escapeJson, getMarkupFromTree } from '@/utils/lib/react/ssr/server';
+import { escapeJson, getMarkupFromTree } from '@/utils/lib/react/server';
 
 import { Document } from './Document';
 import { createRoutes } from './routes';

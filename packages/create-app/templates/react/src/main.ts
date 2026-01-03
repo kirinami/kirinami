@@ -10,7 +10,7 @@ import type { ManifestChunk, ViteDevServer } from 'vite';
 import { apiPlugin } from '@/api';
 import { render } from '@/entry.server';
 import { serializeError, statusCodeFromError } from '@/utils/errors';
-import { ejectStyles } from '@/utils/lib/vite';
+import { ejectScripts, ejectStyles } from '@/utils/lib/vite';
 
 const BUILD_DIR = path.resolve('.build');
 const PUBLIC_DIR = path.resolve(import.meta.env.PROD ? BUILD_DIR : '.', 'public');
@@ -104,15 +104,11 @@ export async function init(vite?: ViteDevServer) {
       const { html, statusCode } = response;
 
       const head = [
-        vite && [
-          await vite.transformIndexHtml('/', ''),
-          await ejectStyles(vite, `/${entryClient.file}`).then((styles) =>
-            styles.map((style) => `<style type="text/css" data-vite-dev-id="${style.id}">${style.css}</style>`),
-          ),
-        ],
+        vite && (await ejectScripts(vite, '/')),
+        vite && (await ejectStyles(vite, `/${entryClient.file}`)),
         manifest['style.css'] && `<link rel="stylesheet" href="/${manifest['style.css'].file}" />`,
       ]
-        .flat(2)
+        .flat()
         .filter((value) => !!value)
         .join('');
 

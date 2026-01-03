@@ -4,7 +4,7 @@ import { redirect, RouteObject } from 'react-router';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
 import { languageLoader, LanguageProvider } from '@/providers/LanguageProvider';
-import { dynamic } from '@/utils/lib/react/lazy';
+import { dynamic } from '@/utils/lib/react';
 
 const HomePage = dynamic(() => import('@/pages/HomePage').then((m) => m.HomePage));
 const NotFoundPage = dynamic(() => import('@/pages/NotFoundPage').then((m) => m.NotFoundPage));

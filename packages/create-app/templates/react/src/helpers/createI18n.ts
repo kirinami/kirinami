@@ -7,7 +7,7 @@ import { delay } from '@/utils/delay';
 export const DEFAULT_LANGUAGE = 'en';
 
 export async function getResources(language: string) {
-  await delay(1000);
+  await delay(500);
 
   return {
     [language]: {

@@ -1,6 +1,6 @@
 import { Attributes, ComponentType, createElement, lazy, ReactElement } from 'react';
 
-import { useIsHydrated } from '@/utils/lib/react/ssr';
+import { useIsHydrated } from '@/utils/lib/react';
 
 export type DynamicLoad<T> = () => Promise<T>;
 
