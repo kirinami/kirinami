@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
-import { NotFoundFallback } from '@/containers/Fallback/NotFoundFallback';
+import { NotFoundFallback } from '@/components/Fallback/NotFoundFallback';
 
 export function NotFoundPage() {
   const { t } = useTranslation();
 
   return (
     <>
-      <title>{t('not_found')}</title>
+      <title>{t('errors.notFound')}</title>
 
       <NotFoundFallback />
     </>

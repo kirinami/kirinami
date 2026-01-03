@@ -1,7 +1,13 @@
-import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
+import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
-import { createTodoSchema, deleteTodoSchema, getTodosSchema, TodoSchema, updateTodoSchema } from './schema';
+import {
+  createTodoSchema,
+  deleteTodoSchema,
+  getTodosSchema,
+  TodoSchema,
+  updateTodoSchema,
+} from '@/schemas/todoSchemas';
 
 const todosStorage: TodoSchema[] = [
   { id: 1, title: 'Todo 1', completed: true, createdAt: 1702705200000 },
@@ -10,12 +16,14 @@ const todosStorage: TodoSchema[] = [
   { id: 4, title: 'Todo 4', completed: true, createdAt: 1710050800000 },
 ];
 
-export async function todos(fastify: FastifyInstance) {
-  const app = fastify.withTypeProvider<JsonSchemaToTsProvider>();
+export async function todosPlugin(fastify: FastifyInstance) {
+  const app = fastify.withTypeProvider<ZodTypeProvider>();
 
   app.get('/', { schema: getTodosSchema }, ({ headers, query }) => {
     if (query.search) {
-      return todosStorage.filter((todo) => todo.title.toLowerCase().includes(query.search!.toLowerCase()));
+      const search = query.search.toLowerCase();
+
+      return todosStorage.filter((todo) => todo.title.toLowerCase().includes(search));
     }
 
     if (query.sort) {
@@ -24,16 +32,16 @@ export async function todos(fastify: FastifyInstance) {
         .sort((a, b) => (query.sort === 'asc' ? a.createdAt - b.createdAt : b.createdAt - a.createdAt));
     }
 
-    console.log(headers['accept-language']);
+    const language = headers['accept-language'] ?? 'unknown';
 
     return todosStorage.map((todo) => ({
       ...todo,
-      title: `${todo.title} (${headers['accept-language']})`,
+      title: `${todo.title} (${language})`,
     }));
   });
 
   app.post('/', { schema: createTodoSchema }, ({ body }) => {
-    const todo = { ...body, id: Date.now(), createdAt: Date.now() } as TodoSchema;
+    const todo = { ...body, id: Date.now(), createdAt: Date.now() } satisfies TodoSchema;
 
     todosStorage.push(todo);
 
@@ -41,7 +49,7 @@ export async function todos(fastify: FastifyInstance) {
   });
 
   app.patch('/:id', { schema: updateTodoSchema }, ({ params, body }) => {
-    const todoIndex = todosStorage.findIndex((todo) => todo.id === +params.id);
+    const todoIndex = todosStorage.findIndex((todo) => todo.id === params.id);
 
     if (todoIndex === -1) {
       throw new Error('Todo Not Found');
@@ -53,7 +61,7 @@ export async function todos(fastify: FastifyInstance) {
   });
 
   app.delete('/:id', { schema: deleteTodoSchema }, ({ params }) => {
-    const todoIndex = todosStorage.findIndex((todo) => todo.id === +params.id);
+    const todoIndex = todosStorage.findIndex((todo) => todo.id === params.id);
 
     if (todoIndex === -1) {
       throw new Error('Todo Not Found');

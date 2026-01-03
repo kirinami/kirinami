@@ -5,36 +5,38 @@ export class RenderPromises {
 
   private stopped = false;
 
-  public stop() {
-    if (!this.stopped) {
-      this.queryPromises.clear();
-      this.queryInfo.clear();
-      this.stopped = true;
-    }
-  }
-
-  public addQueryPromise(key: string, exec: () => Promise<unknown>, finish?: () => void) {
-    if (!this.stopped) {
-      const info = this.queryInfo.get(key);
-
-      if (!info?.seen) {
-        this.queryPromises.set(key, exec);
-        this.queryInfo.set(key, {
-          seen: false,
-        });
-
-        return null;
-      }
+  stop() {
+    if (this.stopped) {
+      return;
     }
 
-    return finish ? finish() : null;
+    this.queryPromises.clear();
+    this.queryInfo.clear();
+    this.stopped = true;
   }
 
-  public hasPromises() {
+  addQueryPromise(key: string, exec: () => Promise<unknown>) {
+    if (this.stopped) {
+      return;
+    }
+
+    const info = this.queryInfo.get(key);
+
+    if (info?.seen) {
+      return;
+    }
+
+    this.queryPromises.set(key, exec);
+    this.queryInfo.set(key, {
+      seen: false,
+    });
+  }
+
+  hasPromises() {
     return this.queryPromises.size > 0;
   }
 
-  public consumeAndAwaitPromises() {
+  consumeAndAwaitPromises() {
     const promises: Promise<unknown>[] = [];
 
     this.queryPromises.forEach((exec, key) => {

@@ -13,7 +13,7 @@ export function ErrorBoundaryFallback() {
     message = routeError.message;
   } else if (isRouteErrorResponse(routeError)) {
     status = String(routeError.status);
-    message = routeError.data || routeError.statusText;
+    message = String(routeError.data ?? routeError.statusText);
   }
 
   if (asyncError instanceof Error) {

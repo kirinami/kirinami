@@ -3,21 +3,22 @@ import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 
-import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
-import fastify, { FastifyBaseLogger, FastifyInstance, RawServerDefault } from 'fastify';
-import type { Manifest, ViteDevServer } from 'vite';
-
-import { api } from '@/api';
-import { render } from '@/entry.server';
-import { ejectStyles } from '@/utils/vite';
 import { send } from '@fastify/send';
+import fastify, { FastifyBaseLogger, FastifyInstance, RawServerDefault } from 'fastify';
+import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
+import type { ManifestChunk, ViteDevServer } from 'vite';
+import { z } from 'zod';
+
+import { apiPlugin } from '@/api';
+import { render } from '@/entry.server';
+import { ejectStyles } from '@/utils/ejectStyles';
 
 const BUILD_DIR = path.resolve('.build');
 const PUBLIC_DIR = path.resolve(import.meta.env.PROD ? BUILD_DIR : '.', 'public');
 const MANIFEST_FILE = path.resolve(PUBLIC_DIR, '.vite/manifest.json');
 
 let appMemo:
-  | FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse, FastifyBaseLogger, JsonSchemaToTsProvider>
+  | FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse, FastifyBaseLogger, ZodTypeProvider>
   | undefined;
 
 export async function init(vite?: ViteDevServer) {
@@ -27,9 +28,15 @@ export async function init(vite?: ViteDevServer) {
     return appMemo;
   }
 
-  const manifest: Manifest = import.meta.env.DEV
-    ? {}
-    : await fs.readFile(MANIFEST_FILE, 'utf8').then((content) => JSON.parse(content));
+  const manifest: Record<string, ManifestChunk | undefined> = vite
+    ? {
+        'src/entry.client.tsx': {
+          file: 'src/entry.client.tsx',
+        },
+      }
+    : await fs
+        .readFile(MANIFEST_FILE, 'utf8')
+        .then((content) => JSON.parse(content) as Record<string, ManifestChunk | undefined>);
 
   const app = fastify({
     logger: {
@@ -39,7 +46,10 @@ export async function init(vite?: ViteDevServer) {
       },
     },
     disableRequestLogging: true,
-  }).withTypeProvider<JsonSchemaToTsProvider>();
+  }).withTypeProvider<ZodTypeProvider>();
+
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
 
   app.setNotFoundHandler((_request, reply) => {
     reply.status(404).send({
@@ -50,19 +60,22 @@ export async function init(vite?: ViteDevServer) {
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);
 
-    reply.status(500).send(
-      error instanceof Error
-        ? {
-            message: import.meta.env.DEV ? error.message : 'Unknown Error',
-            stack: import.meta.env.DEV ? error.stack : undefined,
-          }
-        : {
-            message: import.meta.env.DEV ? String(error) : 'Unknown Error',
-          },
-    );
+    if (error && typeof error === 'object') {
+      return reply
+        .status(('statusCode' in error && typeof error.statusCode === 'number' && error.statusCode) || 500)
+        .send({
+          message: ('message' in error && typeof error.message === 'string' && error.message) || 'Unknown Error',
+          stack:
+            (import.meta.env.DEV && 'stack' in error && typeof error.stack === 'string' && error.stack) || undefined,
+        });
+    }
+
+    reply.status(500).send({
+      message: 'Internal Server Error',
+    });
   });
 
-  await app.register(api, {
+  await app.register(apiPlugin, {
     prefix: '/api',
   });
 
@@ -70,14 +83,10 @@ export async function init(vite?: ViteDevServer) {
     method: 'GET',
     url: '*',
     schema: {
-      params: {
-        type: 'object',
-        required: ['*'],
-        properties: {
-          '*': { type: 'string' },
-        },
-      },
-    } as const,
+      params: z.object({
+        '*': z.string(),
+      }),
+    },
     handler: async (request, reply) => {
       const pathname = request.params['*'];
 
@@ -98,32 +107,6 @@ export async function init(vite?: ViteDevServer) {
       }
 
       try {
-        const injections = {
-          head: {
-            end: [
-              vite && (await vite.transformIndexHtml('/', '')),
-              vite &&
-                (await ejectStyles(vite, `/src/entry.client.tsx`).then((styles) =>
-                  styles.map((style) => `<style type="text/css" data-vite-dev-id="${style.id}">${style.css}</style>`),
-                )),
-              manifest['style.css'] && `<link rel="stylesheet" href="/${manifest['style.css'].file}" />`,
-            ]
-              .flat()
-              .filter((value) => value != null)
-              .join(''),
-          },
-          body: {
-            end: [
-              manifest['src/entry.client.tsx']
-                ? `<script type="module" src="/${manifest['entry.client.tsx'].file}"></script>`
-                : `<script type="module" src="/src/entry.client.tsx"></script>`,
-            ]
-              .flat()
-              .filter((value) => value != null)
-              .join(''),
-          },
-        };
-
         const { statusCode, html } = await render(
           new Request(new URL(request.url, import.meta.env.VITE_BASE_URL), {
             method: request.method,
@@ -131,14 +114,31 @@ export async function init(vite?: ViteDevServer) {
           }),
         );
 
-        return reply
+        const entryClient = manifest['src/entry.client.tsx'];
+
+        if (!entryClient) {
+          throw new Error('Entry client not found in manifest');
+        }
+
+        const head = [
+          vite && [
+            await vite.transformIndexHtml('/', ''),
+            await ejectStyles(vite, `/${entryClient.file}`).then((styles) =>
+              styles.map((style) => `<style type="text/css" data-vite-dev-id="${style.id}">${style.css}</style>`),
+            ),
+          ],
+          manifest['style.css'] && `<link rel="stylesheet" href="/${manifest['style.css'].file}" />`,
+        ]
+          .flat(2)
+          .filter((value) => !!value)
+          .join('');
+
+        const body = `<script type="module" src="/${entryClient.file}"></script>`;
+
+        return await reply
           .status(statusCode)
           .type('text/html; charset=utf-8')
-          .send(
-            html
-              .replace('</head>', `${injections.head.end}</head>`)
-              .replace('</body>', `${injections.body.end}</body>`),
-          );
+          .send(html.replace('</head>', `${head}</head>`).replace('</body>', `${body}</body>`));
       } catch (error) {
         if (error instanceof Response) {
           return reply.send(error);
@@ -170,7 +170,7 @@ export async function main() {
 }
 
 if (import.meta.env.PROD) {
-  main().catch((error) => {
+  main().catch((error: unknown) => {
     process.stderr.write(String(error));
     process.exit(1);
   });

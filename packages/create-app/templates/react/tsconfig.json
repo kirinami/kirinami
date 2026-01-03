@@ -1,34 +1,35 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-    "lib": ["es2022", "dom", "dom.iterable"],
-    "module": "esnext",
-
-    "moduleResolution": "bundler",
-    "moduleDetection": "force",
-    "allowSyntheticDefaultImports": true,
-    "allowImportingTsExtensions": false,
-    "allowJs": false,
-    "resolveJsonModule": true,
-    // "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "noEmit": true,
-
-    "strict": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
     "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false, // true
+    "verbatimModuleSyntax": false, // true
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "skipLibCheck": true,
 
+    /* Paths */
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "test", "index.ts"],
+  "include": ["src", "test"],
   "exclude": ["node_modules"]
 }

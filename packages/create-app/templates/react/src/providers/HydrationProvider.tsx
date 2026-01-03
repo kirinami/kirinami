@@ -1,15 +1,16 @@
 import { Suspense, useEffect, useMemo } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { Await, LoaderFunction, Outlet, useAsyncValue, useLoaderData } from 'react-router';
-import { Resource } from 'i18next';
 import { useQueryClient } from '@tanstack/react-query';
+import { Resource } from 'i18next';
+import { useShallow } from 'zustand/react/shallow';
 
-import { ErrorBoundaryFallback } from '@/containers/Fallback/ErrorBoundaryFallback';
-import { LoadingFallback } from '@/containers/Fallback/LoadingFallback';
+import { ErrorBoundaryFallback } from '@/components/Fallback/ErrorBoundaryFallback';
+import { LoadingFallback } from '@/components/Fallback/LoadingFallback';
 import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/helpers/createI18n';
 import { useAppStore } from '@/stores/useAppStore';
-import { day } from '@/utils/day';
-import { useShallow } from 'zustand/react/shallow';
+import { setLocale as setDayjsLocale } from '@/utils/dayjs';
+import { setLocale as setZodLocale } from '@/utils/zod';
 
 export type HydrationLoaderState = {
   i18n: {
@@ -27,6 +28,8 @@ export const hydrationLoader: LoaderFunction = async ({
   request,
   params: { language = DEFAULT_LANGUAGE },
 }): Promise<HydrationLoaderData> => {
+  // Wrap in Promise to avoid blocking on SSR
+  // eslint-disable-next-line no-async-promise-executor,@typescript-eslint/no-misused-promises
   const state = new Promise<HydrationLoaderState>(async (resolve) => {
     resolve({
       i18n: {
@@ -62,9 +65,10 @@ export function HydrationOutlet() {
     appState.changeLanguage(i18n.language);
 
     void queryClient.resetQueries();
-  }, [queryClient, i18n.language, appState]);
+  }, [queryClient, i18n, appState]);
 
-  day.locale(i18n.language);
+  setDayjsLocale(i18n.language);
+  setZodLocale(i18n.language);
 
   return (
     <I18nextProvider i18n={i18n}>
@@ -74,19 +78,16 @@ export function HydrationOutlet() {
 }
 
 export function HydrationProvider() {
-  const { key, state } = useLoaderData() as HydrationLoaderData;
-
-  useEffect(() => {
-    if (!document.title) {
-      document.title = '...';
-    }
-  }, [key]);
+  const { key, state } = useLoaderData<HydrationLoaderData>();
 
   return (
-    <Suspense key={key} fallback={<LoadingFallback />}>
-      <Await resolve={state} errorElement={<ErrorBoundaryFallback />}>
-        <HydrationOutlet />
-      </Await>
-    </Suspense>
+    <>
+      <title>...</title>
+      <Suspense key={key} fallback={<LoadingFallback />}>
+        <Await resolve={state} errorElement={<ErrorBoundaryFallback />}>
+          <HydrationOutlet />
+        </Await>
+      </Suspense>
+    </>
   );
 }

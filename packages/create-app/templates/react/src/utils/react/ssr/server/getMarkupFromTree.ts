@@ -6,7 +6,7 @@ import { renderToString, RenderToStringResult } from './renderToString';
 const RenderPromisesContext = createContext(new RenderPromises());
 
 export type GetMarkupFromTreeOptions = {
-  onAfterRender?: (renderPromise: RenderPromises) => Promise<unknown> | unknown;
+  onAfterRender?: (renderPromise: RenderPromises) => Promise<unknown>;
 };
 
 export async function getMarkupFromTree(tree: ReactNode, { onAfterRender }: GetMarkupFromTreeOptions = {}) {

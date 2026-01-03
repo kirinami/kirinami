@@ -1,6 +1,6 @@
 const DEFAULT_FRAME_TIME = 16;
 
-export function requestBrowserIdle(handler: () => void) {
+export function requestBrowserIdle(handler: () => unknown) {
   if (!window.requestIdleCallback) {
     window.setTimeout(handler, DEFAULT_FRAME_TIME);
 

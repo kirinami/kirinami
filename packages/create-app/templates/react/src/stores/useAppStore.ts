@@ -4,7 +4,7 @@ import { createStore, useStore } from 'zustand';
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
 
 export type InitialState<T extends object> = {
-  [K in keyof T as T[K] extends Function ? never : K]?: T[K];
+  [K in keyof T as T[K] extends () => void ? never : K]?: T[K];
 };
 
 export type AppStoreState = {
@@ -25,7 +25,7 @@ export const createAppStore = (initialState?: InitialState<AppStoreState>) =>
 
       const headers = new Headers(init.headers);
 
-      headers.set('Accept-Language', headers.get('Accept-Language') || language);
+      headers.set('Accept-Language', headers.get('Accept-Language') ?? language);
 
       return fetch(import.meta.env.VITE_API_URL + input, { ...init, headers });
     },

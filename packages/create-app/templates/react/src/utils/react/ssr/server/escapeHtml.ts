@@ -1,4 +1,4 @@
-const ESCAPE_LOOKUP: { [match: string]: string } = {
+const ESCAPE_LOOKUP: Record<string, string> = {
   '&': '\\u0026',
   '>': '\\u003e',
   '<': '\\u003c',

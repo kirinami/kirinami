@@ -1,9 +1,10 @@
 import path from 'node:path';
 import process from 'node:process';
 
-import react from '@vitejs/plugin-react-swc';
 import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react-swc';
 import { defineConfig, loadEnv } from 'vite';
+import analyzer from 'vite-bundle-analyzer';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode, command, isSsrBuild }) => {
@@ -14,8 +15,8 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
     appType: isSsr ? 'custom' : 'spa',
     define: isSsr
       ? Object.entries(loadEnv(mode, process.cwd(), ''))
-        .filter(([key]) => !(key in process.env))
-        .reduce((env, [key, value]) => ({ ...env, [`import.meta.env.${key}`]: JSON.stringify(value) }), {})
+          .filter(([key]) => !(key in process.env))
+          .reduce((env, [key, value]) => ({ ...env, [`import.meta.env.${key}`]: JSON.stringify(value) }), {})
       : {},
     css: {
       modules: {
@@ -34,6 +35,9 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
       },
     },
     plugins: [
+      analyzer({
+        analyzerMode: 'static',
+      }),
       tsconfigPaths(),
       tailwindcss(),
       react(),

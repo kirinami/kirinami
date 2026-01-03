@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-throw-literal */
-
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router';
 import {
   dehydrate,
@@ -11,6 +9,7 @@ import {
 } from '@tanstack/react-query';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
+import { HydrationLoaderData } from '@/providers/HydrationProvider';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
 import { escapeJson, getMarkupFromTree } from '@/utils/react/ssr/server';
 
@@ -26,11 +25,15 @@ export async function render(request: Request) {
   };
 
   if (context.router instanceof Response) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw context.router;
   }
 
   const router = createStaticRouter(handler.dataRoutes, context.router);
-  const language = router.state.loaderData.HydrationProvider?.state.i18n.language || DEFAULT_LANGUAGE;
+  // TODO: Fix type assertion
+  const language =
+    (await (router.state.loaderData as { HydrationProvider: HydrationLoaderData }).HydrationProvider.state).i18n
+      .language || DEFAULT_LANGUAGE;
 
   const queryCache = new QueryCache();
 
@@ -58,7 +61,7 @@ export async function render(request: Request) {
   );
 
   const { error, html } = await getMarkupFromTree(tree, {
-    onAfterRender: (renderPromises) => {
+    onAfterRender: async (renderPromises) => {
       const predicate = (query: Query) =>
         !(
           query.meta?.ssr === false ||

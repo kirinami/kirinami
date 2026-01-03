@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
 
 export type RenderToStringOptions = {
-  timeout?: number
+  timeout?: number;
 };
 
 export type RenderToStringResult = {
@@ -12,7 +12,10 @@ export type RenderToStringResult = {
   html: string;
 };
 
-export async function renderToString(children: ReactNode, { timeout = 10000 }: RenderToStringOptions = {}): Promise<RenderToStringResult> {
+export async function renderToString(
+  children: ReactNode,
+  { timeout = 10000 }: RenderToStringOptions = {},
+): Promise<RenderToStringResult> {
   let error: unknown;
 
   const html = await new Promise<string>((resolve, reject) => {
@@ -21,7 +24,7 @@ export async function renderToString(children: ReactNode, { timeout = 10000 }: R
     const chunks: Buffer[] = [];
 
     const stream = new Writable({
-      write(chunk, _encoding, next) {
+      write(chunk: string | Buffer, _encoding, next) {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
 
         next();
@@ -44,7 +47,7 @@ export async function renderToString(children: ReactNode, { timeout = 10000 }: R
         clearTimeout(timeoutId);
         timeoutId = undefined;
 
-        reject(error);
+        reject(error instanceof Error ? error : new Error(String(error)));
       },
       onError(e) {
         error = e;

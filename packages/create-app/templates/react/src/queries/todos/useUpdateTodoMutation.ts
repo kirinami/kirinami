@@ -1,8 +1,8 @@
 import { mutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
-
-import { UpdateTodoParams } from '@/api/todos/schema';
-import { AppStoreState, useAppStore } from '@/stores/useAppStore';
 import { useShallow } from 'zustand/react/shallow';
+
+import { UpdateTodoParams } from '@/schemas/todoSchemas';
+import { AppStoreState, useAppStore } from '@/stores/useAppStore';
 
 export function updateTodoMutationOptions({ fetch }: Pick<AppStoreState, 'fetch'>) {
   return mutationOptions({

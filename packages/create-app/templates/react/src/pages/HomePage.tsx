@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
-
-import { Spinner } from '@/components/Spinner';
-import { Layout } from '@/containers/Layout';
-import { useGetTodosQuery, useUpdateTodoMutation } from '@/queries/todos';
-import { day } from '@/utils/day';
 import { Link } from 'react-router';
+
+import { Layout } from '@/components/Layout';
+import { Spinner } from '@/components/Spinner';
 import { useLinkTo } from '@/hooks/useLinkTo';
+import { useGetTodosQuery, useUpdateTodoMutation } from '@/queries/todos';
+import { dayjs } from '@/utils/dayjs';
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -40,8 +40,8 @@ export function HomePage() {
                       <span className="text-white">{todo.title.at(0)?.toUpperCase() ?? '-'}</span>
                     </div>
                     <div className="min-w-0 flex-auto">
-                      <p className="text-sm/6 font-semibold text-gray-900">{todo.title}</p>
-                      <p className="truncate text-xs/5 text-gray-500">{day(todo.createdAt).format('LL')}</p>
+                      <p className="text-sm font-semibold text-gray-900">{todo.title}</p>
+                      <p className="truncate text-xs text-gray-500">{dayjs(todo.createdAt).format('LL')}</p>
                     </div>
                   </div>
                   <div className="flex flex-row items-center gap-6">
@@ -61,7 +61,7 @@ export function HomePage() {
           )}
 
           <Link
-            to={linkTo('/create/')}
+            to={linkTo('/create')}
             className="text-blue-600 font-semibold text-lg hover:text-blue-800 transition-colors"
           >
             {t('todo.create')}

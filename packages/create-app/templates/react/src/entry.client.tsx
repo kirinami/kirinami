@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
+import { HydrationLoaderData } from '@/providers/HydrationProvider';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
 import { requestBrowserIdle } from '@/utils/react/ssr/client';
 
@@ -13,7 +14,10 @@ import { createRoutes } from './routes';
 async function hydrate() {
   const routes = createRoutes();
   const router = createBrowserRouter(routes);
-  const language = router.state.loaderData.HydrationProvider?.state.i18n.language || DEFAULT_LANGUAGE;
+  // TODO: Fix type assertion
+  const language =
+    (await (router.state.loaderData as { HydrationProvider: HydrationLoaderData }).HydrationProvider.state).i18n
+      .language || DEFAULT_LANGUAGE;
 
   const queryState = window.__staticQueryClientHydrationData;
 

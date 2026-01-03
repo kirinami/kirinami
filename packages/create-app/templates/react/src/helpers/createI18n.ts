@@ -1,22 +1,21 @@
 import { initReactI18next } from 'react-i18next';
 import { createInstance, Resource } from 'i18next';
 
-import type { TranslationSchema } from '@/api/translations/schema';
+import { translations } from '@/translations';
+import { delay } from '@/utils/delay';
 
 export const DEFAULT_LANGUAGE = 'en';
 
 const translationsMemo: Record<string, Resource> = {};
 
 export const getResources = async (language: string) => {
-  translationsMemo[language] =
-    translationsMemo[language] ||
-    fetch(`${import.meta.env.VITE_API_URL}/api/translations/${language}`)
-      .then((response) => response.json())
-      .then((translations: TranslationSchema[]) => ({
-        [language]: {
-          translation: Object.fromEntries(translations.map(({ key, value }) => [key, value])),
-        },
-      }));
+  await delay(translationsMemo[language] ? 100 : 1000);
+
+  translationsMemo[language] ||= {
+    [language]: {
+      translation: translations[language] || translations[DEFAULT_LANGUAGE],
+    },
+  };
 
   return translationsMemo[language];
 };
@@ -24,15 +23,14 @@ export const getResources = async (language: string) => {
 export function createI18n(language: string, resources?: Resource) {
   const i18n = createInstance();
 
-  i18n.use(initReactI18next);
-
-  i18n.init({
+  void i18n.use(initReactI18next).init({
     lng: language,
     fallbackLng: DEFAULT_LANGUAGE,
     resources,
     react: {
       useSuspense: true,
     },
+    keySeparator: '.',
     interpolation: {
       escapeValue: false,
     },
@@ -43,7 +41,16 @@ export function createI18n(language: string, resources?: Resource) {
 }
 
 declare module 'i18next' {
+  /* eslint-disable @typescript-eslint/consistent-type-definitions */
+
   interface CustomTypeOptions {
+    resources: {
+      translation: (typeof translations)[string];
+    };
+    keySeparator: '.';
+    interpolation: {
+      escapeValue: false;
+    };
     returnNull: false;
   }
 }

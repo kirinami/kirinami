@@ -1,4 +1,4 @@
-import './main.css';
+import './globals.css';
 
 import { redirect, RouteObject } from 'react-router';
 

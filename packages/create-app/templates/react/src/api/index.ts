@@ -1,12 +1,10 @@
-import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 import { FastifyInstance } from 'fastify';
+import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
-import { todos } from './todos';
-import { translations } from './translations';
+import { todosPlugin } from './todos';
 
-export async function api(fastify: FastifyInstance) {
-  const app = fastify.withTypeProvider<JsonSchemaToTsProvider>();
+export async function apiPlugin(fastify: FastifyInstance) {
+  const app = fastify.withTypeProvider<ZodTypeProvider>();
 
-  await app.register(translations, { prefix: '/translations' });
-  await app.register(todos, { prefix: '/todos' });
+  await app.register(todosPlugin, { prefix: '/todos' });
 }

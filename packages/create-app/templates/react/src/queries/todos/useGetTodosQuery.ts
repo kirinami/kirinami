@@ -1,8 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
-
-import { GetTodosData, GetTodosParams } from '@/api/todos/schema';
-import { AppStoreState, useAppStore } from '@/stores/useAppStore';
 import { useShallow } from 'zustand/react/shallow';
+
+import { GetTodosData, GetTodosParams } from '@/schemas/todoSchemas';
+import { AppStoreState, useAppStore } from '@/stores/useAppStore';
 
 export function getTodosQueryOptions({ fetch }: Pick<AppStoreState, 'fetch'>, params: GetTodosParams) {
   return queryOptions<GetTodosData>({

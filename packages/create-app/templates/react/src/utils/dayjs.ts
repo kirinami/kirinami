@@ -12,4 +12,10 @@ dayjs.extend(localizedFormat);
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
-export const day = dayjs;
+export function setLocale(language: string) {
+  dayjs.locale(language);
+}
+
+setLocale('en');
+
+export { dayjs };

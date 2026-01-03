@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { clsx } from 'clsx';
+
+import { clsx } from '@/utils/clsx';
 
 import styles from './Layout.module.scss';
 

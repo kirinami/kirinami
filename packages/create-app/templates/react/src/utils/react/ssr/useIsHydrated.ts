@@ -12,6 +12,8 @@ export function useIsHydrated() {
 
     isHydratedRef.current = true;
 
+    // Set state in effect to avoid hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsHydrated(true);
   }, []);
 
