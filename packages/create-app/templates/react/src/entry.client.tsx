@@ -4,48 +4,41 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { HydrationLoaderData } from '@/providers/HydrationProvider';
-import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
-import { requestBrowserIdle } from '@/utils/react/ssr/client';
+import { LanguageLoaderData } from '@/providers/LanguageProvider';
+import { useAppStore } from '@/stores/useAppStore';
 
 import { Document } from './Document';
 import { createRoutes } from './routes';
 
-async function hydrate() {
-  const routes = createRoutes();
-  const router = createBrowserRouter(routes);
-  // TODO: Fix type assertion
-  const language =
-    (await (router.state.loaderData as { HydrationProvider: HydrationLoaderData }).HydrationProvider.state).i18n
-      .language || DEFAULT_LANGUAGE;
+const routes = createRoutes();
+const router = createBrowserRouter(routes);
 
-  const queryState = window.__staticQueryClientHydrationData;
+const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language || DEFAULT_LANGUAGE;
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60,
-        refetchOnWindowFocus: false,
-      },
+const queryState = window.__staticQueryClientHydrationData;
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60,
+      refetchOnWindowFocus: false,
     },
-  });
+  },
+});
 
-  const appStore = createAppStore(window.__staticAppStoreHydrationData);
+useAppStore.setState({
+  ...window.__staticAppStoreHydrationData,
+});
 
-  startTransition(() => {
-    hydrateRoot(
-      document,
-      <Document language={language}>
-        <QueryClientProvider client={queryClient}>
-          <HydrationBoundary state={queryState}>
-            <AppStoreProvider store={appStore}>
-              <RouterProvider router={router} />
-            </AppStoreProvider>
-          </HydrationBoundary>
-        </QueryClientProvider>
-      </Document>,
-    );
-  });
-}
-
-requestBrowserIdle(hydrate);
+startTransition(() => {
+  hydrateRoot(
+    document,
+    <Document language={language}>
+      <QueryClientProvider client={queryClient}>
+        <HydrationBoundary state={queryState}>
+          <RouterProvider router={router} />
+        </HydrationBoundary>
+      </QueryClientProvider>
+    </Document>,
+  );
+});

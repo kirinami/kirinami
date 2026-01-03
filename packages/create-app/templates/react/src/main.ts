@@ -1,25 +1,22 @@
 import fs from 'node:fs/promises';
-import { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import process from 'node:process';
 
 import { send } from '@fastify/send';
-import fastify, { FastifyBaseLogger, FastifyInstance, RawServerDefault } from 'fastify';
-import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
+import fastify, { FastifyInstance } from 'fastify';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import type { ManifestChunk, ViteDevServer } from 'vite';
-import { z } from 'zod';
 
 import { apiPlugin } from '@/api';
 import { render } from '@/entry.server';
-import { ejectStyles } from '@/utils/ejectStyles';
+import { serializeError, statusCodeFromError } from '@/utils/errors';
+import { ejectStyles } from '@/utils/lib/vite';
 
 const BUILD_DIR = path.resolve('.build');
 const PUBLIC_DIR = path.resolve(import.meta.env.PROD ? BUILD_DIR : '.', 'public');
 const MANIFEST_FILE = path.resolve(PUBLIC_DIR, '.vite/manifest.json');
 
-let appMemo:
-  | FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse, FastifyBaseLogger, ZodTypeProvider>
-  | undefined;
+let appMemo: FastifyInstance | undefined;
 
 export async function init(vite?: ViteDevServer) {
   if (appMemo) {
@@ -38,6 +35,12 @@ export async function init(vite?: ViteDevServer) {
         .readFile(MANIFEST_FILE, 'utf8')
         .then((content) => JSON.parse(content) as Record<string, ManifestChunk | undefined>);
 
+  const entryClient = manifest['src/entry.client.tsx'];
+
+  if (!entryClient) {
+    throw new Error('Entry client not found in manifest');
+  }
+
   const app = fastify({
     logger: {
       level: import.meta.env.PROD ? 'info' : 'warn',
@@ -46,7 +49,7 @@ export async function init(vite?: ViteDevServer) {
       },
     },
     disableRequestLogging: true,
-  }).withTypeProvider<ZodTypeProvider>();
+  });
 
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
@@ -60,97 +63,72 @@ export async function init(vite?: ViteDevServer) {
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);
 
-    if (error && typeof error === 'object') {
-      return reply
-        .status(('statusCode' in error && typeof error.statusCode === 'number' && error.statusCode) || 500)
-        .send({
-          message: ('message' in error && typeof error.message === 'string' && error.message) || 'Unknown Error',
-          stack:
-            (import.meta.env.DEV && 'stack' in error && typeof error.stack === 'string' && error.stack) || undefined,
-        });
-    }
-
-    reply.status(500).send({
-      message: 'Internal Server Error',
-    });
+    reply.status(statusCodeFromError(error)).send(serializeError(error));
   });
 
   await app.register(apiPlugin, {
     prefix: '/api',
   });
 
-  app.route({
-    method: 'GET',
-    url: '*',
-    schema: {
-      params: z.object({
-        '*': z.string(),
-      }),
-    },
-    handler: async (request, reply) => {
-      const pathname = request.params['*'];
+  app.get('*', async (request, reply) => {
+    const url = new URL(request.originalUrl, import.meta.env.VITE_BASE_URL);
 
-      if (pathname.includes('.')) {
-        const { type, statusCode, headers, stream } = await send(request.raw, encodeURI(pathname), {
-          root: PUBLIC_DIR,
-          index: false,
-          maxAge: pathname.startsWith('/assets') ? 31536000 : 0,
-        });
+    if (url.pathname.includes('.')) {
+      const { type, statusCode, headers, stream } = await send(request.raw, url.pathname, {
+        root: PUBLIC_DIR,
+        index: false,
+        maxAge: url.pathname.startsWith('/assets') ? 31536000 : 0,
+      });
 
-        if (type === 'file') {
-          return reply.status(statusCode).headers(headers).send(stream);
-        }
-
-        reply.callNotFound();
-
-        return;
+      if (type === 'file') {
+        return reply.status(statusCode).headers(headers).send(stream);
       }
 
-      try {
-        const { statusCode, html } = await render(
-          new Request(new URL(request.url, import.meta.env.VITE_BASE_URL), {
-            method: request.method,
-            headers: request.headers as HeadersInit,
-          }),
-        );
+      reply.callNotFound();
 
-        const entryClient = manifest['src/entry.client.tsx'];
+      return;
+    }
 
-        if (!entryClient) {
-          throw new Error('Entry client not found in manifest');
-        }
+    try {
+      const response = await render(
+        new Request(url, {
+          method: request.method,
+          headers: request.headers as HeadersInit,
+        }),
+      );
 
-        const head = [
-          vite && [
-            await vite.transformIndexHtml('/', ''),
-            await ejectStyles(vite, `/${entryClient.file}`).then((styles) =>
-              styles.map((style) => `<style type="text/css" data-vite-dev-id="${style.id}">${style.css}</style>`),
-            ),
-          ],
-          manifest['style.css'] && `<link rel="stylesheet" href="/${manifest['style.css'].file}" />`,
-        ]
-          .flat(2)
-          .filter((value) => !!value)
-          .join('');
-
-        const body = `<script type="module" src="/${entryClient.file}"></script>`;
-
-        return await reply
-          .status(statusCode)
-          .type('text/html; charset=utf-8')
-          .send(html.replace('</head>', `${head}</head>`).replace('</body>', `${body}</body>`));
-      } catch (error) {
-        if (error instanceof Response) {
-          return reply.send(error);
-        }
-
-        if (error instanceof Error) {
-          vite?.ssrFixStacktrace(error);
-        }
-
-        throw error;
+      if (response instanceof Response) {
+        return await reply.send(response);
       }
-    },
+
+      const { html, statusCode } = response;
+
+      const head = [
+        vite && [
+          await vite.transformIndexHtml('/', ''),
+          await ejectStyles(vite, `/${entryClient.file}`).then((styles) =>
+            styles.map((style) => `<style type="text/css" data-vite-dev-id="${style.id}">${style.css}</style>`),
+          ),
+        ],
+        manifest['style.css'] && `<link rel="stylesheet" href="/${manifest['style.css'].file}" />`,
+      ]
+        .flat(2)
+        .filter((value) => !!value)
+        .join('');
+
+      const body = `<script type="module" src="/${entryClient.file}"></script>`;
+
+      return await reply
+        .status(statusCode)
+        .type('text/html; charset=utf-8')
+        .send(html.replace('</head>', `${head}</head>`).replace('</body>', `${body}</body>`));
+    } catch (error) {
+      if (error instanceof Error) {
+        vite?.ssrFixStacktrace(error);
+      }
+
+      throw error;
+    }
   });
 
   appMemo = app;

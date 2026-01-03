@@ -9,9 +9,9 @@ import {
 } from '@tanstack/react-query';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { HydrationLoaderData } from '@/providers/HydrationProvider';
-import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
-import { escapeJson, getMarkupFromTree } from '@/utils/react/ssr/server';
+import { LanguageLoaderData } from '@/providers/LanguageProvider';
+import { useAppStore } from '@/stores/useAppStore';
+import { escapeJson, getMarkupFromTree } from '@/utils/lib/react/ssr/server';
 
 import { Document } from './Document';
 import { createRoutes } from './routes';
@@ -20,20 +20,15 @@ export async function render(request: Request) {
   const routes = createRoutes();
   const handler = createStaticHandler(routes);
 
-  const context = {
-    router: await handler.query(request),
-  };
+  const context = await handler.query(request);
 
-  if (context.router instanceof Response) {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw context.router;
+  if (context instanceof Response) {
+    return context;
   }
 
-  const router = createStaticRouter(handler.dataRoutes, context.router);
-  // TODO: Fix type assertion
-  const language =
-    (await (router.state.loaderData as { HydrationProvider: HydrationLoaderData }).HydrationProvider.state).i18n
-      .language || DEFAULT_LANGUAGE;
+  const router = createStaticRouter(handler.dataRoutes, context);
+
+  const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language || DEFAULT_LANGUAGE;
 
   const queryCache = new QueryCache();
 
@@ -46,16 +41,14 @@ export async function render(request: Request) {
     },
   });
 
-  const appStore = createAppStore({
+  useAppStore.setState({
     language,
   });
 
   const tree = (
     <Document language={language}>
       <QueryClientProvider client={queryClient}>
-        <AppStoreProvider store={appStore}>
-          <StaticRouterProvider context={context.router} router={router} />
-        </AppStoreProvider>
+        <StaticRouterProvider context={context} router={router} />
       </QueryClientProvider>
     </Document>
   );
@@ -85,7 +78,7 @@ export async function render(request: Request) {
 
   const queryState = dehydrate(queryClient);
 
-  const appState = appStore.getState();
+  const appState = useAppStore.getState();
 
   const hydration = [
     `<script>window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});</script>`,
@@ -96,7 +89,7 @@ export async function render(request: Request) {
     .join('');
 
   return {
-    statusCode: error ? 500 : context.router.statusCode,
+    statusCode: error ? 500 : context.statusCode,
     html: html.replace('</body>', `${hydration}</body>`),
   };
 }

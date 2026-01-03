@@ -1,6 +1,6 @@
 import { Writable } from 'node:stream';
 
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
 
 export type RenderToStringOptions = {

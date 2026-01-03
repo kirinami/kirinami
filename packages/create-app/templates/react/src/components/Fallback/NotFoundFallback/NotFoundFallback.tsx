@@ -2,14 +2,11 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { Button } from '@/components/Button';
-import { useLinkTo } from '@/hooks/useLinkTo';
 
 import styles from './NotFoundFallback.module.scss';
 
 export function NotFoundFallback() {
   const { t } = useTranslation();
-
-  const linkTo = useLinkTo();
 
   return (
     <div className={styles.layout}>
@@ -19,7 +16,7 @@ export function NotFoundFallback() {
           <p className={styles.description}>{t('errors.notFound')}</p>
         </div>
 
-        <Link to={linkTo('/')}>
+        <Link to="/">
           <Button>{t('navigation.backToHome')}</Button>
         </Link>
       </div>

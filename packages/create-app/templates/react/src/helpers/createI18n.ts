@@ -6,19 +6,15 @@ import { delay } from '@/utils/delay';
 
 export const DEFAULT_LANGUAGE = 'en';
 
-const translationsMemo: Record<string, Resource> = {};
+export async function getResources(language: string) {
+  await delay(1000);
 
-export const getResources = async (language: string) => {
-  await delay(translationsMemo[language] ? 100 : 1000);
-
-  translationsMemo[language] ||= {
+  return {
     [language]: {
       translation: translations[language] || translations[DEFAULT_LANGUAGE],
     },
   };
-
-  return translationsMemo[language];
-};
+}
 
 export function createI18n(language: string, resources?: Resource) {
   const i18n = createInstance();

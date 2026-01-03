@@ -1,13 +1,14 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
-import { useShallow } from 'zustand/react/shallow';
 
 import { GetTodosData, GetTodosParams } from '@/schemas/todoSchemas';
-import { AppStoreState, useAppStore } from '@/stores/useAppStore';
+import { AppStore, useAppStore } from '@/stores/useAppStore';
+import { usePick } from '@/utils/lib/zustand';
 
-export function getTodosQueryOptions({ fetch }: Pick<AppStoreState, 'fetch'>, params: GetTodosParams) {
-  return queryOptions<GetTodosData>({
-    queryKey: ['todos'],
-    queryFn: () => fetch(`/api/todos?${new URLSearchParams(params)}`).then((response) => response.json()),
+export function getTodosQueryOptions({ fetcher }: Pick<AppStore, 'fetcher'>, params: GetTodosParams) {
+  return queryOptions({
+    queryKey: ['todos', params],
+    queryFn: (): Promise<GetTodosData> =>
+      fetcher(`/api/todos?${new URLSearchParams(params)}`).then((response) => response.json()),
   });
 }
 
@@ -16,10 +17,10 @@ export type UseGetTodosQueryOptions = Partial<
 >;
 
 export function useGetTodosQuery(params: GetTodosParams, options?: UseGetTodosQueryOptions) {
-  const appState = useAppStore(useShallow(({ fetch }) => ({ fetch })));
+  const appStore = useAppStore(usePick(['fetcher']));
 
   return useQuery({
-    ...getTodosQueryOptions(appState, params),
+    ...getTodosQueryOptions(appStore, params),
     ...options,
   });
 }

@@ -1,5 +1,3 @@
-/// <reference types="vite/client" />
-
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
 import { HydrationState } from 'react-router';

@@ -1,4 +1,4 @@
-import { clsx } from '@/utils/clsx';
+import { clsx } from '@/utils/lib/clsx';
 
 import styles from './Spinner.module.scss';
 

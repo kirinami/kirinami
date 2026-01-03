@@ -3,25 +3,25 @@ import './globals.css';
 import { redirect, RouteObject } from 'react-router';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { HomePage } from '@/pages/HomePage';
-import { NotFoundPage } from '@/pages/NotFoundPage';
-import { hydrationLoader, HydrationProvider } from '@/providers/HydrationProvider';
+import { languageLoader, LanguageProvider } from '@/providers/LanguageProvider';
+import { dynamic } from '@/utils/lib/react/lazy';
+
+const HomePage = dynamic(() => import('@/pages/HomePage').then((m) => m.HomePage));
+const NotFoundPage = dynamic(() => import('@/pages/NotFoundPage').then((m) => m.NotFoundPage));
 
 export function createRoutes(): RouteObject[] {
   return [
     {
-      id: 'HydrationProvider',
+      id: 'Language',
       path: ':language',
-      loader: hydrationLoader,
-      element: <HydrationProvider />,
+      loader: languageLoader(),
+      element: <LanguageProvider />,
       children: [
         {
-          id: 'HomePage',
           index: true,
           element: <HomePage />,
         },
         {
-          id: 'NotFoundPage',
           path: '*',
           loader: () =>
             new Response('Not Found', {
@@ -32,7 +32,6 @@ export function createRoutes(): RouteObject[] {
       ],
     },
     {
-      id: 'LanguageRedirect',
       path: '*',
       loader: () => redirect(DEFAULT_LANGUAGE),
     },
