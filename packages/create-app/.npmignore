@@ -20,11 +20,12 @@
 **/yarn-debug.log*
 **/yarn-error.log*
 **/package-lock.json*
+**/yarn.lock*
 
 # Project
 **/.build/**
 **/.env*
-!**/.env.example
+!**/.env.example*
 **/.gitignore*
 
 # Misc
