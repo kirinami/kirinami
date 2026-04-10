@@ -14,7 +14,7 @@
   },
   "type": "module",
   "engines": {
-    "node": ">=22.16"
+    "node": ">=22.22"
   },
   "bin": {
     "kirinami-create-app": "main.js"

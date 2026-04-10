@@ -3,9 +3,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import process from 'node:process';
 import minimist from 'minimist';
 import prompts from 'prompts';
-import { blue, green, lightRed, magenta, red, reset } from 'kolorist';
+import { lightBlue, green, lightRed, magenta, red, reset, cyan } from 'kolorist';
 
 const argv = minimist(process.argv.slice(2), { string: ['_'] });
 const cwd = process.cwd();
@@ -31,7 +32,19 @@ const FRAMEWORKS = [
   {
     name: 'react',
     display: 'React.js',
-    color: blue,
+    color: lightBlue,
+    variants: [
+      {
+        name: 'react',
+        display: 'React.js',
+        color: lightBlue,
+      },
+      {
+        name: 'react-ssr',
+        display: 'React.js + SSR',
+        color: cyan,
+      },
+    ],
   },
 ];
 

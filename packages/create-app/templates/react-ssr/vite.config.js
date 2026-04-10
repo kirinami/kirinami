@@ -5,7 +5,6 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
 import { defineConfig, loadEnv } from 'vite';
 import analyzer from 'vite-bundle-analyzer';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig(({ mode, command, isSsrBuild }) => {
   const isDev = command === 'serve';
@@ -24,13 +23,16 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
         generateScopedName: isDev ? '[name]__[local]__[hash:base64:6]' : '[local]__[hash:base64:6]',
       },
     },
+    resolve: {
+      tsconfigPaths: true,
+    },
     build: {
       outDir: path.resolve('.build', isSsr ? 'server' : 'public'),
       emptyOutDir: true,
       copyPublicDir: !isSsr,
       cssCodeSplit: false,
       manifest: true,
-      rollupOptions: {
+      rolldownOptions: {
         input: isSsr ? path.resolve('src/main.ts') : path.resolve('src/entry.client.tsx'),
       },
     },
@@ -38,11 +40,10 @@ export default defineConfig(({ mode, command, isSsrBuild }) => {
       analyzer({
         analyzerMode: 'static',
       }),
-      tsconfigPaths(),
       tailwindcss(),
       react(),
       {
-        name: 'fastify-plugin',
+        name: 'fastify',
         apply: 'serve',
         configureServer: async (vite) => {
           vite.middlewares.use(async (request, response, next) => {

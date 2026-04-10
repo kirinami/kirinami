@@ -28,7 +28,7 @@ export async function render(request: Request) {
 
   const router = createStaticRouter(handler.dataRoutes, context);
 
-  const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language || DEFAULT_LANGUAGE;
+  const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language ?? DEFAULT_LANGUAGE;
 
   const queryCache = new QueryCache();
 

@@ -13,7 +13,7 @@ import { createRoutes } from './routes';
 const routes = createRoutes();
 const router = createBrowserRouter(routes);
 
-const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language || DEFAULT_LANGUAGE;
+const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language ?? DEFAULT_LANGUAGE;
 
 const queryState = window.__staticQueryClientHydrationData;
 

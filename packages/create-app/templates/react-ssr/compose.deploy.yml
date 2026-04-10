@@ -1,0 +1,43 @@
+name: ${PROJECT_NAME:?}
+
+include:
+  - compose.yml
+
+networks:
+  traefik:
+    name: traefik
+    external: true
+
+services:
+  app:
+    build:
+      cache_from:
+        - type=registry,ref=registry.kirinami.com/${PROJECT_NAME}-app:cache
+      cache_to:
+        - type=registry,ref=registry.kirinami.com/${PROJECT_NAME}-app:cache,mode=max
+      tags:
+        - registry.kirinami.com/${PROJECT_NAME}-app:${PROJECT_BUILD_ID:-00000000}
+        - registry.kirinami.com/${PROJECT_NAME}-app:latest
+    image: registry.kirinami.com/${PROJECT_NAME}-app:${PROJECT_BUILD_ID:-latest}
+    networks:
+      - traefik
+    ports: !reset []
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.lbswarm=true
+        - traefik.http.services.${PROJECT_NAME}-app.loadbalancer.server.port=5173
+        - traefik.http.routers.${PROJECT_NAME}-app.rule=Host(`${DOMAIN:-${PROJECT_NAME}.localhost}`)
+        - traefik.http.routers.${PROJECT_NAME}-app.service=${PROJECT_NAME}-app
+      replicas: 1
+      update_config:
+        parallelism: 1
+        failure_action: rollback
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        failure_action: pause
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
