@@ -10,6 +10,8 @@ import { useAppStore } from '@/stores/useAppStore';
 import { Document } from './Document';
 import { createRoutes } from './routes';
 
+const assets = window.__staticAssetsHydrationData;
+
 const routes = createRoutes();
 const router = createBrowserRouter(routes);
 
@@ -33,7 +35,7 @@ useAppStore.setState({
 startTransition(() => {
   hydrateRoot(
     document,
-    <Document language={language}>
+    <Document assets={assets} language={language}>
       <QueryClientProvider client={queryClient}>
         <HydrationBoundary state={queryState}>
           <RouterProvider router={router} />

@@ -11,3 +11,7 @@ const ESCAPE_REGEX = /[&><\u2028\u2029]/g;
 export function escapeHtml(str: string): string {
   return str.replace(ESCAPE_REGEX, (match) => ESCAPE_LOOKUP[match]);
 }
+
+export function escapeJson(value: unknown): string {
+  return escapeHtml(JSON.stringify(JSON.stringify(value)));
+}

@@ -1,22 +1,17 @@
+import { renderToReadableStream } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router';
-import {
-  dehydrate,
-  FetchQueryOptions,
-  Query,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { dehydrate, FetchQueryOptions, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
 import { LanguageLoaderData } from '@/providers/LanguageProvider';
 import { useAppStore } from '@/stores/useAppStore';
-import { escapeJson, getMarkupFromTree } from '@/utils/lib/react/server';
+import { escapeJson } from '@/utils/lib/react/server';
+import { render } from '@/utils/lib/react/server/render';
 
 import { Document } from './Document';
 import { createRoutes } from './routes';
 
-export async function render(request: Request) {
+export async function handler(request: Request, assets: { style: string; entry: string }) {
   const routes = createRoutes();
   const handler = createStaticHandler(routes);
 
@@ -45,28 +40,47 @@ export async function render(request: Request) {
     language,
   });
 
-  const tree = (
-    <Document language={language}>
+  const children = (
+    <Document assets={assets} language={language}>
       <QueryClientProvider client={queryClient}>
         <StaticRouterProvider context={context} router={router} />
       </QueryClientProvider>
     </Document>
   );
 
-  const { error, html } = await getMarkupFromTree(tree, {
-    onAfterRender: async (renderPromises) => {
-      const predicate = (query: Query) =>
-        !(
-          query.meta?.ssr === false ||
-          query.options.queryFn == null ||
-          ('enabled' in query.options && query.options.enabled === false) ||
-          ('suspense' in query.options && query.options.suspense === true) ||
-          query.state.status !== 'pending'
-        );
+  const stream = await render(children, {
+    onRender: async (children) => {
+      const queryState = dehydrate(queryClient);
 
+      const appState = useAppStore.getState();
+
+      const stream = await renderToReadableStream(children, {
+        bootstrapScriptContent: `
+          window.__staticAssetsHydrationData = JSON.parse(${escapeJson(assets)});
+          window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});
+          window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});
+        `,
+        bootstrapModules: [assets.entry],
+        onError: (error) => {
+          console.error('onError:', error);
+        },
+      });
+
+      await stream.allReady;
+
+      return stream;
+    },
+    onCollect: (renderPromises) => {
       queryCache
         .findAll({
-          predicate,
+          predicate: (query) =>
+            !(
+              query.meta?.ssr === false ||
+              query.options.queryFn == null ||
+              ('enabled' in query.options && query.options.enabled === false) ||
+              ('suspense' in query.options && query.options.suspense === true) ||
+              query.state.status !== 'pending'
+            ),
         })
         .forEach((query) =>
           renderPromises.addQueryPromise(query.queryHash, () =>
@@ -76,20 +90,10 @@ export async function render(request: Request) {
     },
   });
 
-  const queryState = dehydrate(queryClient);
-
-  const appState = useAppStore.getState();
-
-  const hydration = [
-    `<script>window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});</script>`,
-    `<script>window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});</script>`,
-  ]
-    .flat()
-    .filter((value) => !!value)
-    .join('');
-
-  return {
-    statusCode: error ? 500 : context.statusCode,
-    html: html.replace('</body>', `${hydration}</body>`),
-  };
+  return new Response(stream, {
+    status: context.statusCode,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+    },
+  });
 }

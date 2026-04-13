@@ -7,9 +7,10 @@ import { AppStoreState } from '@/stores/useAppStore';
 
 declare global {
   interface Window {
-    __staticRouterHydrationData: HydrationState | undefined;
-    __staticQueryClientHydrationData: DehydratedState | undefined;
-    __staticAppStoreHydrationData: AppStoreState | undefined;
+    __staticAssetsHydrationData: { style: string; entry: string };
+    __staticRouterHydrationData: HydrationState;
+    __staticQueryClientHydrationData: DehydratedState;
+    __staticAppStoreHydrationData: AppStoreState;
   }
 
   interface ImportMetaEnv {

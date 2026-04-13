@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest';
 
-import { escapeHtml } from './escapeHtml';
+import { escapeHtml } from './escape';
 
-test('escapeHtml', () => {
+test('escape', () => {
   expect(escapeHtml('')).toStrictEqual('');
   expect(escapeHtml('foo&bar')).toEqual('foo\\u0026bar');
   expect(escapeHtml('foo>bar')).toEqual('foo\\u003ebar');

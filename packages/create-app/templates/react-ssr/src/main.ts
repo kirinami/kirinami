@@ -5,10 +5,10 @@ import process from 'node:process';
 import { send } from '@fastify/send';
 import fastify, { FastifyInstance } from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import type { ManifestChunk, ViteDevServer } from 'vite';
+import type { Manifest, ViteDevServer } from 'vite';
 
 import { apiPlugin } from '@/api';
-import { render } from '@/entry.server';
+import { handler } from '@/entry.server';
 import { serializeError, statusCodeFromError } from '@/utils/errors';
 import { ejectScripts, ejectStyles } from '@/utils/lib/vite';
 
@@ -25,21 +25,14 @@ export async function init(vite?: ViteDevServer) {
     return appMemo;
   }
 
-  const manifest: Record<string, ManifestChunk | undefined> = vite
-    ? {
-        'src/entry.client.tsx': {
-          file: 'src/entry.client.tsx',
-        },
-      }
-    : await fs
-        .readFile(MANIFEST_FILE, 'utf8')
-        .then((content) => JSON.parse(content) as Record<string, ManifestChunk | undefined>);
+  const manifest: Manifest = vite
+    ? { 'style.css': { file: '' }, 'src/entry.client.tsx': { file: 'src/entry.client.tsx' } }
+    : await fs.readFile(MANIFEST_FILE, 'utf8').then((content) => JSON.parse(content) as Manifest);
 
-  const entryClient = manifest['src/entry.client.tsx'];
-
-  if (!entryClient) {
-    throw new Error('Entry client not found in manifest');
-  }
+  const assets = {
+    style: `/${manifest['style.css'].file}`,
+    entry: `/${manifest['src/entry.client.tsx'].file}`,
+  };
 
   const app = fastify({
     logger: {
@@ -90,34 +83,42 @@ export async function init(vite?: ViteDevServer) {
     }
 
     try {
-      const response = await render(
+      const response = await handler(
         new Request(url, {
           method: request.method,
           headers: request.headers as HeadersInit,
         }),
+        assets,
       );
 
-      if (response instanceof Response) {
-        return await reply.send(response);
+      if (vite) {
+        const scripts = await ejectScripts(vite);
+        const styles = await ejectStyles(vite, '/src/entry.client.tsx');
+
+        const stream = response.clone().body?.pipeThrough(
+          new TransformStream({
+            transform(chunk, controller) {
+              const html = new TextDecoder().decode(chunk);
+
+              if (html.includes('</head>')) {
+                controller.enqueue(new TextEncoder().encode(html.replace('</head>', `${scripts}${styles}</head>`)));
+              } else {
+                controller.enqueue(chunk);
+              }
+            },
+          }),
+        );
+
+        return await reply.send(
+          new Response(stream, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers,
+          }),
+        );
       }
 
-      const { html, statusCode } = response;
-
-      const head = [
-        vite && (await ejectScripts(vite, '/')),
-        vite && (await ejectStyles(vite, `/${entryClient.file}`)),
-        manifest['style.css'] && `<link rel="stylesheet" href="/${manifest['style.css'].file}" />`,
-      ]
-        .flat()
-        .filter((value) => !!value)
-        .join('');
-
-      const body = `<script type="module" src="/${entryClient.file}"></script>`;
-
-      return await reply
-        .status(statusCode)
-        .type('text/html; charset=utf-8')
-        .send(html.replace('</head>', `${head}</head>`).replace('</body>', `${body}</body>`));
+      return await reply.send(response);
     } catch (error) {
       if (error instanceof Error) {
         vite?.ssrFixStacktrace(error);
