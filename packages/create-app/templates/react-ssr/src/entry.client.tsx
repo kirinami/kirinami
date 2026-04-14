@@ -1,11 +1,12 @@
 import { startTransition } from 'react';
 import { hydrateRoot } from 'react-dom/client';
+import { I18nextProvider } from 'react-i18next';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query';
 
-import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { LanguageLoaderData } from '@/providers/LanguageProvider';
-import { useAppStore } from '@/stores/useAppStore';
+import { createI18n, DEFAULT_LANGUAGE } from '@/helpers/createI18n';
+import { createQueryClient } from '@/helpers/createQueryClient';
+import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
 
 import { Document } from './Document';
 import { createRoutes } from './routes';
@@ -15,32 +16,29 @@ const assets = window.__staticAssetsHydrationData;
 const routes = createRoutes();
 const router = createBrowserRouter(routes);
 
-const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language ?? DEFAULT_LANGUAGE;
+const language = router.state.matches.at(-1)?.params.language || DEFAULT_LANGUAGE;
+
+const i18n = createI18n(language, window.__staticI18nHydrationData);
 
 const queryState = window.__staticQueryClientHydrationData;
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = createQueryClient();
 
-useAppStore.setState({
-  ...window.__staticAppStoreHydrationData,
-});
+const appStore = createAppStore(window.__staticAppStoreHydrationData);
 
 startTransition(() => {
   hydrateRoot(
     document,
-    <Document assets={assets} language={language}>
+    <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
         <HydrationBoundary state={queryState}>
-          <RouterProvider router={router} />
+          <AppStoreProvider store={appStore}>
+            <Document assets={assets}>
+              <RouterProvider router={router} />
+            </Document>
+          </AppStoreProvider>
         </HydrationBoundary>
       </QueryClientProvider>
-    </Document>,
+    </I18nextProvider>,
   );
 });

@@ -16,6 +16,9 @@ const BUILD_DIR = path.resolve('.build');
 const PUBLIC_DIR = path.resolve(import.meta.env.PROD ? BUILD_DIR : '.', 'public');
 const MANIFEST_FILE = path.resolve(PUBLIC_DIR, '.vite/manifest.json');
 
+const STYLE_FILE_KEY = 'style.css';
+const ENTRY_FILE_KEY = 'src/entry.client.tsx';
+
 let appMemo: FastifyInstance | undefined;
 
 export async function init(vite?: ViteDevServer) {
@@ -25,13 +28,20 @@ export async function init(vite?: ViteDevServer) {
     return appMemo;
   }
 
-  const manifest: Manifest = vite
-    ? { 'style.css': { file: '' }, 'src/entry.client.tsx': { file: 'src/entry.client.tsx' } }
+  const manifest = vite
+    ? undefined
     : await fs.readFile(MANIFEST_FILE, 'utf8').then((content) => JSON.parse(content) as Manifest);
 
+  const styleFile = manifest?.[STYLE_FILE_KEY]?.file;
+  const entryFile = manifest?.[ENTRY_FILE_KEY]?.file ?? ENTRY_FILE_KEY;
+
+  if (!entryFile) {
+    throw new Error('Entry file not found in manifest');
+  }
+
   const assets = {
-    style: `/${manifest['style.css'].file}`,
-    entry: `/${manifest['src/entry.client.tsx'].file}`,
+    style: styleFile ? `/${styleFile}` : undefined,
+    entry: `/${entryFile}`,
   };
 
   const app = fastify({

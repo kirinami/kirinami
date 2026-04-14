@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import en from 'zod/v4/locales/en.js';
-import uk from 'zod/v4/locales/uk.js';
 
 export function setLocale(language: string) {
-  if (language === 'en') z.config(en());
-  if (language === 'uk') z.config(uk());
+  if (language === 'en') z.config(z.locales.en());
+  if (language === 'uk') z.config(z.locales.uk());
+
+  return language;
 }
 
 setLocale('en');

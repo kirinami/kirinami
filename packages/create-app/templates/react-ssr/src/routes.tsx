@@ -1,21 +1,19 @@
 import './globals.css';
 
+import { lazy } from 'react';
 import { redirect, RouteObject } from 'react-router';
 
+import { Layout } from '@/components/Layout';
 import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { languageLoader, LanguageProvider } from '@/providers/LanguageProvider';
-import { dynamic } from '@/utils/lib/react';
 
-const HomePage = dynamic(() => import('@/pages/HomePage').then((m) => m.HomePage));
-const NotFoundPage = dynamic(() => import('@/pages/NotFoundPage').then((m) => m.NotFoundPage));
+const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 export function createRoutes(): RouteObject[] {
   return [
     {
-      id: 'Language',
       path: ':language',
-      loader: languageLoader(),
-      element: <LanguageProvider />,
+      element: <Layout />,
       children: [
         {
           index: true,
@@ -23,10 +21,6 @@ export function createRoutes(): RouteObject[] {
         },
         {
           path: '*',
-          loader: () =>
-            new Response('Not Found', {
-              status: 404,
-            }),
           element: <NotFoundPage />,
         },
       ],

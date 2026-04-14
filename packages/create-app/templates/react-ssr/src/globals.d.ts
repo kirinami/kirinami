@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 
-import { HydrationState } from 'react-router';
-import { DehydratedState } from '@tanstack/react-query';
+import type { HydrationState } from 'react-router';
+import type { DehydratedState } from '@tanstack/react-query';
+import type { Resource } from 'i18next';
 
-import { AppStoreState } from '@/stores/useAppStore';
+import type { AppState } from '@/stores/useAppStore';
 
 declare global {
   interface Window {
     __staticAssetsHydrationData: { style: string; entry: string };
     __staticRouterHydrationData: HydrationState;
+    __staticI18nHydrationData: Resource;
     __staticQueryClientHydrationData: DehydratedState;
-    __staticAppStoreHydrationData: AppStoreState;
+    __staticAppStoreHydrationData: AppState;
   }
 
   interface ImportMetaEnv {
@@ -18,5 +20,3 @@ declare global {
     readonly VITE_API_URL: string;
   }
 }
-
-export type {};

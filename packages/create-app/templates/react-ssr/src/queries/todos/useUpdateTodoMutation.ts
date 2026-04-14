@@ -1,16 +1,16 @@
+import { useTranslation } from 'react-i18next';
 import { mutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { UpdateTodoData, UpdateTodoParams } from '@/schemas/todoSchemas';
-import { AppStore, useAppStore } from '@/stores/useAppStore';
-import { usePick } from '@/utils/lib/zustand';
 
-export function updateTodoMutationOptions({ fetcher }: Pick<AppStore, 'fetcher'>) {
+export function updateTodoMutationOptions(language: string) {
   return mutationOptions({
     mutationFn: ({ id, ...body }: UpdateTodoParams): Promise<UpdateTodoData> =>
-      fetcher(`/api/todos/${id}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/todos/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Accept-Language': language,
         },
         body: JSON.stringify(body),
       }).then((response) => response.json()),
@@ -22,12 +22,12 @@ export type UseUpdateTodoMutationOptions = Partial<
 >;
 
 export function useUpdateTodoMutation(options?: UseUpdateTodoMutationOptions) {
+  const { i18n } = useTranslation();
+
   const queryClient = useQueryClient();
 
-  const appStore = useAppStore(usePick(['fetcher']));
-
   return useMutation({
-    ...updateTodoMutationOptions(appStore),
+    ...updateTodoMutationOptions(i18n.language),
     ...options,
     onSuccess: (data, variables, onMutateResult, context) => {
       options?.onSuccess?.(data, variables, onMutateResult, context);

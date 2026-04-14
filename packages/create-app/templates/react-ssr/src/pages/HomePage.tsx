@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { href, Link } from 'react-router';
 
-import { Layout } from '@/components/Layout';
 import { Spinner } from '@/components/Spinner';
 import { useGetTodosQuery, useUpdateTodoMutation } from '@/queries/todos';
 import { dayjs } from '@/utils/lib/dayjs';
@@ -14,13 +13,10 @@ export function HomePage() {
   const { mutate: updateTodo } = useUpdateTodoMutation();
 
   return (
-    <Layout>
+    <>
       <title>{t('home')}</title>
       <meta name="description" content={`${t('home')} - description`} />
       <meta name="keywords" content={`${t('home')},keyword`} />
-      <link rel="alternate" hrefLang="en" href={`${import.meta.env.VITE_BASE_URL}/en`} />
-      <link rel="alternate" hrefLang="uk" href={`${import.meta.env.VITE_BASE_URL}/uk`} />
-      <link rel="canonical" href={import.meta.env.VITE_BASE_URL} />
 
       <div className="flex w-full max-w-2xl flex-col gap-8 p-4 lg:p-6">
         <div className="flex flex-col justify-center items-center w-full gap-8">
@@ -65,6 +61,6 @@ export function HomePage() {
           </Link>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

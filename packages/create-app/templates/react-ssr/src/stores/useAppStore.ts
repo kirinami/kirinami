@@ -1,29 +1,44 @@
-import { create } from 'zustand/react';
+import { createContext, createElement, ReactNode, useContext } from 'react';
+import { createStore, useStore } from 'zustand';
 
-import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { Fetcher, fetcher } from '@/utils/fetcher';
-
-export type AppStoreState = {
-  language: string;
+export type AppProps = {
+  count: number;
 };
 
-export type AppStoreActions = {
-  fetcher: Fetcher;
+export type AppState = AppProps & {
+  changeCount: (count: number) => void;
 };
 
-export type AppStore = AppStoreState & AppStoreActions;
+export type AppStore = ReturnType<typeof createAppStore>;
 
-export const useAppStore = create<AppStore>()((set, get) => ({
-  language: DEFAULT_LANGUAGE,
+export const createAppStore = (initProps?: Partial<AppProps>) =>
+  createStore<AppState>((set, get) => ({
+    count: 0,
 
-  fetcher: (input, init) => {
-    const { language } = get();
+    ...initProps,
 
-    const headers = new Headers(init?.headers);
-    headers.set('Accept-Language', headers.get('Accept-Language') ?? language);
+    changeCount: (count) => set({ count }),
+  }));
 
-    const url = new URL(input, import.meta.env.VITE_API_URL);
+const AppStoreContext = createContext<AppStore | null>(null);
 
-    return fetcher(url, { ...init, headers });
-  },
-}));
+export type AppStoreProviderProps = {
+  store: AppStore;
+  children: ReactNode;
+};
+
+export function AppStoreProvider({ store, children }: AppStoreProviderProps) {
+  return createElement(AppStoreContext.Provider, { value: store }, children);
+}
+
+export function useAppStore(): AppState;
+export function useAppStore<T>(selector: (state: AppState) => T): T;
+export function useAppStore(selector = (state: AppState) => state) {
+  const store = useContext(AppStoreContext);
+
+  if (!store) {
+    throw new Error('useAppStore must be used within AppStoreProvider');
+  }
+
+  return useStore(store, selector);
+}

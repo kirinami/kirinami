@@ -15,7 +15,7 @@ export class RenderPromises {
     this.stopped = true;
   }
 
-  addQueryPromise(key: string, exec: () => Promise<unknown>) {
+  addPromise(key: string, exec: () => Promise<unknown>) {
     if (this.stopped) {
       return;
     }

@@ -1,14 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
 import { GetTodosData, GetTodosParams } from '@/schemas/todoSchemas';
-import { AppStore, useAppStore } from '@/stores/useAppStore';
-import { usePick } from '@/utils/lib/zustand';
 
-export function getTodosQueryOptions({ fetcher }: Pick<AppStore, 'fetcher'>, params: GetTodosParams) {
+export function getTodosQueryOptions(language: string, params: GetTodosParams) {
   return queryOptions({
     queryKey: ['todos', params],
     queryFn: (): Promise<GetTodosData> =>
-      fetcher(`/api/todos?${new URLSearchParams(params)}`).then((response) => response.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/todos?${new URLSearchParams(params)}`, {
+        method: 'GET',
+        headers: {
+          'Accept-Language': language,
+        },
+      }).then((response) => response.json()),
   });
 }
 
@@ -17,10 +21,10 @@ export type UseGetTodosQueryOptions = Partial<
 >;
 
 export function useGetTodosQuery(params: GetTodosParams, options?: UseGetTodosQueryOptions) {
-  const appStore = useAppStore(usePick(['fetcher']));
+  const { i18n } = useTranslation();
 
   return useQuery({
-    ...getTodosQueryOptions(appStore, params),
+    ...getTodosQueryOptions(i18n.language, params),
     ...options,
   });
 }

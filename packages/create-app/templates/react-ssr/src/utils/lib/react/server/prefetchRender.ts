@@ -4,20 +4,23 @@ import { RenderPromises } from './RenderPromises';
 
 const RenderPromisesContext = createContext(new RenderPromises());
 
-export type RenderOptions<T> = {
-  onRender: (children: ReactNode) => Promise<T>;
-  onCollect?: (renderPromises: RenderPromises) => void;
+export type PrefetchRenderOptions = {
+  onCollect?: (renderPromises: RenderPromises) => Promise<void>;
 };
 
-export function render<T>(children: ReactNode, { onRender, onCollect }: RenderOptions<T>) {
+export async function prefetchRender<T>(
+  children: ReactNode,
+  render: (children: ReactNode) => T | Promise<T>,
+  { onCollect }: PrefetchRenderOptions,
+) {
   const renderPromises = new RenderPromises();
 
   const element = createElement(RenderPromisesContext.Provider, { value: renderPromises }, children);
 
   const process = async () => {
-    const result = await onRender(element);
+    const result = await render(element);
 
-    onCollect?.(renderPromises);
+    await onCollect?.(renderPromises);
 
     if (renderPromises.hasPromises()) {
       await renderPromises.consumeAndAwaitPromises();
@@ -28,5 +31,5 @@ export function render<T>(children: ReactNode, { onRender, onCollect }: RenderOp
     return result;
   };
 
-  return process();
+  return process().finally(() => renderPromises.stop());
 }

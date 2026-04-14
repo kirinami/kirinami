@@ -1,17 +1,18 @@
+import { ReactNode } from 'react';
 import { renderToReadableStream } from 'react-dom/server';
+import { I18nextProvider } from 'react-i18next';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router';
-import { dehydrate, FetchQueryOptions, QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { dehydrate, FetchQueryOptions, QueryClientProvider } from '@tanstack/react-query';
 
-import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { LanguageLoaderData } from '@/providers/LanguageProvider';
-import { useAppStore } from '@/stores/useAppStore';
-import { escapeJson } from '@/utils/lib/react/server';
-import { render } from '@/utils/lib/react/server/render';
+import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/helpers/createI18n';
+import { createQueryClient } from '@/helpers/createQueryClient';
+import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
+import { escapeJson, prefetchRender } from '@/utils/lib/react/server';
 
 import { Document } from './Document';
 import { createRoutes } from './routes';
 
-export async function handler(request: Request, assets: { style: string; entry: string }) {
+export async function handler(request: Request, assets: { style?: string; entry: string }) {
   const routes = createRoutes();
   const handler = createStaticHandler(routes);
 
@@ -23,59 +24,58 @@ export async function handler(request: Request, assets: { style: string; entry: 
 
   const router = createStaticRouter(handler.dataRoutes, context);
 
-  const language = (router.state.loaderData.Language as LanguageLoaderData | undefined)?.language ?? DEFAULT_LANGUAGE;
+  const language = router.state.matches.at(-1)?.params.language || DEFAULT_LANGUAGE;
 
-  const queryCache = new QueryCache();
+  const i18n = createI18n(language, await getResources(language));
 
-  const queryClient = new QueryClient({
-    queryCache,
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60,
-      },
-    },
-  });
+  const queryClient = createQueryClient();
 
-  useAppStore.setState({
-    language,
-  });
+  const appStore = createAppStore();
 
   const children = (
-    <Document assets={assets} language={language}>
+    <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
-        <StaticRouterProvider context={context} router={router} />
+        <AppStoreProvider store={appStore}>
+          <Document assets={assets}>
+            <StaticRouterProvider context={context} router={router} />
+          </Document>
+        </AppStoreProvider>
       </QueryClientProvider>
-    </Document>
+    </I18nextProvider>
   );
 
-  const stream = await render(children, {
-    onRender: async (children) => {
-      const queryState = dehydrate(queryClient);
+  const render = async (children: ReactNode) => {
+    const i18nState = i18n.store.data;
 
-      const appState = useAppStore.getState();
+    const queryState = dehydrate(queryClient);
 
-      const stream = await renderToReadableStream(children, {
-        bootstrapScriptContent: `
+    const appState = appStore.getState();
+
+    const stream = await renderToReadableStream(children, {
+      bootstrapScriptContent: `
           window.__staticAssetsHydrationData = JSON.parse(${escapeJson(assets)});
+          window.__staticI18nHydrationData = JSON.parse(${escapeJson(i18nState)});
           window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});
           window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});
         `,
-        bootstrapModules: [assets.entry],
-        onError: (error) => {
-          console.error('onError:', error);
-        },
-      });
+      bootstrapModules: [assets.entry],
+      onError: (error) => console.error('onError:', error),
+    });
 
-      await stream.allReady;
+    await stream.allReady;
 
-      return stream;
-    },
-    onCollect: (renderPromises) => {
-      queryCache
+    return stream;
+  };
+
+  const stream = await prefetchRender(children, render, {
+    onCollect: async (renderPromises) => {
+      queryClient
+        .getQueryCache()
         .findAll({
           predicate: (query) =>
             !(
               query.meta?.ssr === false ||
+              query.options.queryKey == null ||
               query.options.queryFn == null ||
               ('enabled' in query.options && query.options.enabled === false) ||
               ('suspense' in query.options && query.options.suspense === true) ||
@@ -83,7 +83,7 @@ export async function handler(request: Request, assets: { style: string; entry: 
             ),
         })
         .forEach((query) =>
-          renderPromises.addQueryPromise(query.queryHash, () =>
+          renderPromises.addPromise(query.queryHash, () =>
             queryClient.prefetchQuery(query.options as FetchQueryOptions),
           ),
         );

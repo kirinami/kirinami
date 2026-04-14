@@ -6,17 +6,15 @@ export function ErrorBoundaryFallback() {
   const routeError = useRouteError();
   const asyncError = useAsyncError();
 
-  let status = '500';
+  let status = 500;
   let message = 'Internal Server Error';
 
   if (routeError instanceof Error) {
     message = routeError.message;
   } else if (isRouteErrorResponse(routeError)) {
-    status = String(routeError.status);
+    status = routeError.status;
     message = String(routeError.data ?? routeError.statusText);
-  }
-
-  if (asyncError instanceof Error) {
+  } else if (asyncError instanceof Error) {
     message = asyncError.message;
   }
 
