@@ -29,16 +29,16 @@ const appStore = createAppStore(window.__staticAppStoreHydrationData);
 startTransition(() => {
   hydrateRoot(
     document,
-    <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={queryClient}>
-        <HydrationBoundary state={queryState}>
-          <AppStoreProvider store={appStore}>
-            <Document assets={assets}>
+    <Document language={language} assets={assets}>
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={queryClient}>
+          <HydrationBoundary state={queryState}>
+            <AppStoreProvider store={appStore}>
               <RouterProvider router={router} />
-            </Document>
-          </AppStoreProvider>
-        </HydrationBoundary>
-      </QueryClientProvider>
-    </I18nextProvider>,
+            </AppStoreProvider>
+          </HydrationBoundary>
+        </QueryClientProvider>
+      </I18nextProvider>
+    </Document>,
   );
 });

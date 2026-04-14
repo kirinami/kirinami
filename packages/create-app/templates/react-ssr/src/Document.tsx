@@ -1,22 +1,21 @@
 import { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
+import { dir } from 'i18next';
 
 import { setLocale as setDayjsLocale } from '@/utils/lib/dayjs';
 import { setLocale as setZodLocale } from '@/utils/lib/zod';
 
 export type DocumentProps = {
+  language: string;
   assets: { style?: string };
   children: ReactNode;
 };
 
-export function Document({ assets, children }: DocumentProps) {
-  const { i18n } = useTranslation();
-
-  setDayjsLocale(i18n.language);
-  setZodLocale(i18n.language);
+export function Document({ language, assets, children }: DocumentProps) {
+  setDayjsLocale(language);
+  setZodLocale(language);
 
   return (
-    <html lang={i18n.language} dir={i18n.dir()}>
+    <html lang={language} dir={dir(language)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

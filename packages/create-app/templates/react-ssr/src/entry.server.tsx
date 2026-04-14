@@ -33,15 +33,15 @@ export async function handler(request: Request, assets: { style?: string; entry:
   const appStore = createAppStore();
 
   const children = (
-    <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={queryClient}>
-        <AppStoreProvider store={appStore}>
-          <Document assets={assets}>
+    <Document language={language} assets={assets}>
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={queryClient}>
+          <AppStoreProvider store={appStore}>
             <StaticRouterProvider context={context} router={router} />
-          </Document>
-        </AppStoreProvider>
-      </QueryClientProvider>
-    </I18nextProvider>
+          </AppStoreProvider>
+        </QueryClientProvider>
+      </I18nextProvider>
+    </Document>
   );
 
   const render = async (children: ReactNode) => {
