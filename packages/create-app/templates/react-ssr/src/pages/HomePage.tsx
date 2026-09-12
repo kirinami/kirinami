@@ -10,7 +10,7 @@ export function HomePage() {
 
   const { isLoading, data: todos = [] } = useGetTodosQuery({});
 
-  const { mutate: updateTodo } = useUpdateTodoMutation();
+  const { isPending, mutate: updateTodo } = useUpdateTodoMutation();
 
   return (
     <>
@@ -29,7 +29,7 @@ export function HomePage() {
               {todos.map((todo) => (
                 <li key={todo.id} className="flex justify-between gap-x-6 py-5">
                   <div className="flex min-w-0 gap-x-4">
-                    <div className="h-12 w-12 flex flex-shrink-0 justify-center items-center rounded-full bg-gray-400">
+                    <div className="h-12 w-12 flex shrink-0 justify-center items-center rounded-full bg-gray-400">
                       <span className="text-white">{todo.title.at(0)?.toUpperCase() ?? '-'}</span>
                     </div>
                     <div className="min-w-0 flex-auto">
@@ -45,7 +45,7 @@ export function HomePage() {
                         checked={todo.completed}
                         onChange={(event) => updateTodo({ id: todo.id, completed: event.target.checked })}
                       />
-                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
                 </li>

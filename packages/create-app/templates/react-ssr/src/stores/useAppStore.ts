@@ -12,7 +12,7 @@ export type AppState = AppProps & {
 export type AppStore = ReturnType<typeof createAppStore>;
 
 export const createAppStore = (initProps?: Partial<AppProps>) =>
-  createStore<AppState>((set, get) => ({
+  createStore<AppState>((set) => ({
     count: 0,
 
     ...initProps,

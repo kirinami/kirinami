@@ -2,10 +2,10 @@ import { ReactNode } from 'react';
 import { renderToReadableStream } from 'react-dom/server';
 import { I18nextProvider } from 'react-i18next';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router';
-import { dehydrate, FetchQueryOptions, QueryClientProvider } from '@tanstack/react-query';
+import { dehydrate, noop, QueryClientProvider, QueryExecuteOptions } from '@tanstack/react-query';
 
-import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/lib/createI18n';
-import { createQueryClient } from '@/lib/createQueryClient';
+import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/lib/i18n';
+import { createQueryClient } from '@/lib/query-client';
 import { escapeJson, prefetchRender } from '@/lib/react/server';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
 
@@ -84,7 +84,7 @@ export async function handler(assets: { fonts: string[]; styles?: string[]; modu
         })
         .forEach((query) =>
           renderPromises.addPromise(query.queryHash, () =>
-            queryClient.prefetchQuery(query.options as FetchQueryOptions),
+            queryClient.query(query.options as QueryExecuteOptions).catch(noop),
           ),
         );
     },

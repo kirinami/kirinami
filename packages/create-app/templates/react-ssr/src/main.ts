@@ -4,7 +4,7 @@ import process from 'node:process';
 
 import compress from '@fastify/compress';
 import { send } from '@fastify/send';
-import fastify, { FastifyInstance } from 'fastify';
+import fastify, { FastifyInstance, LogController } from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import type { Manifest, ViteDevServer } from 'vite';
 
@@ -48,7 +48,9 @@ export async function create(vite?: ViteDevServer) {
         level: (label) => ({ label }),
       },
     },
-    disableRequestLogging: true,
+    logController: new LogController({
+      disableRequestLogging: true,
+    }),
   });
 
   app.setValidatorCompiler(validatorCompiler);
