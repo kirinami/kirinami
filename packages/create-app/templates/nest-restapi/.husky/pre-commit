@@ -12,12 +12,12 @@ echo "$changes"
 echo '------------------------------------------'
 echo "Linting and formatting:"
 echo '------------------------------------------'
-yarn run lint
+npm run lint
 
 echo '------------------------------------------'
 echo "Testing:"
 echo '------------------------------------------'
-yarn run test
+npm run test
 
 echo '------------------------------------------'
 echo 'Git diff between files and staged changes:'
