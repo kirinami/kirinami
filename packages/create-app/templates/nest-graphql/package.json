@@ -67,6 +67,5 @@
     "typescript-eslint": "8.12.2",
     "unplugin-swc": "1.5.1",
     "vitest": "2.1.4"
-  },
-  "packageManager": "yarn@4.5.1"
+  }
 }
