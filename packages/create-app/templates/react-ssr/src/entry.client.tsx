@@ -4,8 +4,8 @@ import { I18nextProvider } from 'react-i18next';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query';
 
-import { createI18n, DEFAULT_LANGUAGE } from '@/helpers/createI18n';
-import { createQueryClient } from '@/helpers/createQueryClient';
+import { createI18n, DEFAULT_LANGUAGE } from '@/lib/createI18n';
+import { createQueryClient } from '@/lib/createQueryClient';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
 
 import { Document } from './Document';

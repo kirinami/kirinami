@@ -4,7 +4,7 @@ import { lazy } from 'react';
 import { redirect, RouteObject } from 'react-router';
 
 import { Layout } from '@/components/Layout';
-import { DEFAULT_LANGUAGE } from '@/helpers/createI18n';
+import { DEFAULT_LANGUAGE } from '@/lib/createI18n';
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));

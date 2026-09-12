@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { href, Link } from 'react-router';
 
 import { Spinner } from '@/components/Spinner';
-import { useGetTodosQuery, useUpdateTodoMutation } from '@/queries/todos';
-import { dayjs } from '@/utils/lib/dayjs';
+import { useGetTodosQuery, useUpdateTodoMutation } from '@/features/todos/queries';
+import { dayjs } from '@/lib/dayjs';
 
 export function HomePage() {
   const { i18n, t } = useTranslation();

@@ -35,7 +35,7 @@ const FRAMEWORKS = [
     color: lightBlue,
     variants: [
       {
-        name: 'react',
+        name: 'react-spa',
         display: 'React.js',
         color: lightBlue,
       },

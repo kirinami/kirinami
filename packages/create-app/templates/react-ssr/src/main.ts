@@ -2,15 +2,16 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
+import compress from '@fastify/compress';
 import { send } from '@fastify/send';
 import fastify, { FastifyInstance } from 'fastify';
 import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import type { Manifest, ViteDevServer } from 'vite';
 
-import { apiPlugin } from '@/api';
 import { handler } from '@/entry.server';
-import { serializeError, statusCodeFromError } from '@/utils/errors';
-import { ejectScripts, ejectStyles } from '@/utils/lib/vite';
+import { todosApi } from '@/features/todos/api';
+import { getStatusCodeFromError, serializeError } from '@/lib/errors';
+import { extractScripts, extractStyles } from '@/lib/vite';
 
 const BUILD_DIR = path.resolve('.build');
 const PUBLIC_DIR = path.resolve(import.meta.env.PROD ? BUILD_DIR : '.', 'public');
@@ -21,7 +22,7 @@ const ENTRY_FILE_KEY = 'src/entry.client.tsx';
 
 let appMemo: FastifyInstance | undefined;
 
-export async function init(vite?: ViteDevServer) {
+export async function create(vite?: ViteDevServer) {
   if (appMemo) {
     await appMemo.ready();
 
@@ -29,19 +30,15 @@ export async function init(vite?: ViteDevServer) {
   }
 
   const manifest = vite
-    ? undefined
-    : await fs.readFile(MANIFEST_FILE, 'utf8').then((content) => JSON.parse(content) as Manifest);
-
-  const styleFile = manifest?.[STYLE_FILE_KEY]?.file;
-  const entryFile = manifest?.[ENTRY_FILE_KEY]?.file ?? ENTRY_FILE_KEY;
-
-  if (!entryFile) {
-    throw new Error('Entry file not found in manifest');
-  }
+    ? { [ENTRY_FILE_KEY]: { file: ENTRY_FILE_KEY } }
+    : (JSON.parse(await fs.readFile(MANIFEST_FILE, 'utf-8')) as Manifest);
 
   const assets = {
-    style: styleFile ? `/${styleFile}` : undefined,
-    entry: `/${entryFile}`,
+    fonts: Object.entries(manifest)
+      .filter(([key]) => key.endsWith('.ttf'))
+      .map(([, value]) => `/${value.file}`),
+    styles: manifest[STYLE_FILE_KEY]?.file ? [`/${manifest[STYLE_FILE_KEY].file}`] : [],
+    modules: [`/${manifest[ENTRY_FILE_KEY].file}`],
   };
 
   const app = fastify({
@@ -66,15 +63,22 @@ export async function init(vite?: ViteDevServer) {
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);
 
-    reply.status(statusCodeFromError(error)).send(serializeError(error));
+    reply.status(getStatusCodeFromError(error)).send(serializeError(error));
   });
 
-  await app.register(apiPlugin, {
-    prefix: '/api',
+  await app.register(compress, {
+    global: true,
+    encodings: ['gzip', 'deflate', 'br'],
   });
+
+  await app.register(todosApi, { prefix: '/api/todos' });
+
+  app.get('/api/health', () => ({
+    message: 'OK',
+  }));
 
   app.get('*', async (request, reply) => {
-    const url = new URL(request.originalUrl, import.meta.env.VITE_BASE_URL);
+    const url = new URL(import.meta.env.VITE_BASE_URL + request.originalUrl);
 
     if (url.pathname.includes('.')) {
       const { type, statusCode, headers, stream } = await send(request.raw, url.pathname, {
@@ -94,16 +98,18 @@ export async function init(vite?: ViteDevServer) {
 
     try {
       const response = await handler(
+        assets,
         new Request(url, {
           method: request.method,
           headers: request.headers as HeadersInit,
         }),
-        assets,
       );
 
+      reply.status(response.status).headers(Object.fromEntries(response.headers));
+
       if (vite) {
-        const scripts = await ejectScripts(vite);
-        const styles = await ejectStyles(vite, '/src/entry.client.tsx');
+        const scripts = await extractScripts(vite);
+        const styles = await extractStyles(vite, assets.modules[0]);
 
         const stream = response.clone().body?.pipeThrough(
           new TransformStream({
@@ -119,16 +125,10 @@ export async function init(vite?: ViteDevServer) {
           }),
         );
 
-        return await reply.send(
-          new Response(stream, {
-            status: response.status,
-            statusText: response.statusText,
-            headers: response.headers,
-          }),
-        );
+        return await reply.send(stream);
       }
 
-      return await reply.send(response);
+      return await reply.send(response.body);
     } catch (error) {
       if (error instanceof Error) {
         vite?.ssrFixStacktrace(error);
@@ -146,7 +146,7 @@ export async function init(vite?: ViteDevServer) {
 }
 
 export async function main() {
-  const app = await init();
+  const app = await create();
 
   await app.listen({
     host: '0.0.0.0',

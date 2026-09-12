@@ -8,7 +8,11 @@ import type { AppState } from '@/stores/useAppStore';
 
 declare global {
   interface Window {
-    __staticAssetsHydrationData: { style: string; entry: string };
+    __staticAssetsHydrationData: {
+      fonts?: string[];
+      styles: string[];
+      modules: string[];
+    };
     __staticRouterHydrationData: HydrationState;
     __staticI18nHydrationData: Resource;
     __staticQueryClientHydrationData: DehydratedState;

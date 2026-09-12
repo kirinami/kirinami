@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
 
 import { LoadingFallback } from '@/components/Fallback/LoadingFallback';
-import { clsx } from '@/utils/lib/clsx';
+import { clsx } from '@/lib/clsx';
 
 import styles from './Layout.module.scss';
 

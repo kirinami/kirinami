@@ -4,15 +4,15 @@ import { I18nextProvider } from 'react-i18next';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router';
 import { dehydrate, FetchQueryOptions, QueryClientProvider } from '@tanstack/react-query';
 
-import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/helpers/createI18n';
-import { createQueryClient } from '@/helpers/createQueryClient';
+import { createI18n, DEFAULT_LANGUAGE, getResources } from '@/lib/createI18n';
+import { createQueryClient } from '@/lib/createQueryClient';
+import { escapeJson, prefetchRender } from '@/lib/react/server';
 import { AppStoreProvider, createAppStore } from '@/stores/useAppStore';
-import { escapeJson, prefetchRender } from '@/utils/lib/react/server';
 
 import { Document } from './Document';
 import { createRoutes } from './routes';
 
-export async function handler(request: Request, assets: { style?: string; entry: string }) {
+export async function handler(assets: { fonts: string[]; styles?: string[]; modules: string[] }, request: Request) {
   const routes = createRoutes();
   const handler = createStaticHandler(routes);
 
@@ -58,7 +58,7 @@ export async function handler(request: Request, assets: { style?: string; entry:
           window.__staticQueryClientHydrationData = JSON.parse(${escapeJson(queryState)});
           window.__staticAppStoreHydrationData = JSON.parse(${escapeJson(appState)});
         `,
-      bootstrapModules: [assets.entry],
+      bootstrapModules: assets.modules,
       onError: (error) => console.error('onError:', error),
     });
 
