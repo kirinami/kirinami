@@ -1,27 +1,25 @@
 import { initReactI18next } from 'react-i18next';
 import { createInstance, Resource } from 'i18next';
 
-import { delay } from '@/lib/delay';
 import { translations } from '@/translations';
 
 export const DEFAULT_LANGUAGE = 'en';
 
-export async function getResources(language: string) {
-  await delay(500);
+export async function getResources(language: string): Promise<Resource> {
+  const translation = translations[language] || translations[DEFAULT_LANGUAGE];
 
   return {
     [language]: {
-      translation: translations[language],
+      translation: await translation(),
     },
   };
 }
 
-export function createI18n(language: string, resources?: Resource) {
+export async function createI18n(language: string, resources: Resource) {
   const i18n = createInstance();
 
-  void i18n.use(initReactI18next).init({
+  await i18n.use(initReactI18next).init({
     lng: language,
-    fallbackLng: DEFAULT_LANGUAGE,
     resources,
     react: {
       useSuspense: true,
@@ -41,7 +39,7 @@ declare module 'i18next' {
 
   interface CustomTypeOptions {
     resources: {
-      translation: (typeof translations)[string];
+      translation: Awaited<ReturnType<(typeof translations)[string]>>;
     };
     keySeparator: '.';
     interpolation: {

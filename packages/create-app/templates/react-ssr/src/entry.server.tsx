@@ -26,7 +26,7 @@ export async function handler(assets: { fonts: string[]; styles?: string[]; modu
 
   const language = router.state.matches.at(-1)?.params.language || DEFAULT_LANGUAGE;
 
-  const i18n = createI18n(language, await getResources(language));
+  const i18n = await createI18n(language, await getResources(language));
 
   const queryClient = createQueryClient();
 
@@ -68,7 +68,7 @@ export async function handler(assets: { fonts: string[]; styles?: string[]; modu
   };
 
   const stream = await prefetchRender(children, render, {
-    onCollect: async (renderPromises) => {
+    onCollect: async (renderCollector) => {
       queryClient
         .getQueryCache()
         .findAll({
@@ -83,7 +83,7 @@ export async function handler(assets: { fonts: string[]; styles?: string[]; modu
             ),
         })
         .forEach((query) =>
-          renderPromises.addPromise(query.queryHash, () =>
+          renderCollector.add(query.queryHash, () =>
             queryClient.query(query.options as QueryExecuteOptions).catch(noop),
           ),
         );

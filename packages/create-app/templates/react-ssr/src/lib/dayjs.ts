@@ -11,11 +11,19 @@ dayjs.extend(localizedFormat);
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
-export function setLocale(language: string) {
-  if (language === 'en') dayjs.locale(en);
-  if (language === 'uk') dayjs.locale(uk);
+const LOCALES: Record<string, typeof en> = {
+  en,
+  uk,
+};
 
-  return language;
+export function setLocale(language: string) {
+  dayjs.locale(LOCALES[language] ?? en);
+}
+
+export function formatDate(value: dayjs.ConfigType, language: string, format: string) {
+  return dayjs(value)
+    .locale(LOCALES[language] ?? en)
+    .format(format);
 }
 
 setLocale('en');

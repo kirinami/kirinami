@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
-export function setLocale(language: string) {
-  if (language === 'en') z.config(z.locales.en());
-  if (language === 'uk') z.config(z.locales.uk());
+const LOCALES: Record<string, typeof z.locales.en> = {
+  en: z.locales.en,
+  uk: z.locales.uk,
+};
 
-  return language;
+export function setLocale(language: string) {
+  z.config((LOCALES[language] ?? z.locales.en)());
 }
 
 setLocale('en');

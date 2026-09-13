@@ -10,7 +10,7 @@ export function HomePage() {
 
   const { isLoading, data: todos = [] } = useGetTodosQuery({});
 
-  const { isPending, mutate: updateTodo } = useUpdateTodoMutation();
+  const { mutate: updateTodo } = useUpdateTodoMutation();
 
   return (
     <>

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
 
 import { LoadingFallback } from '@/components/Fallback/LoadingFallback';
-import { clsx } from '@/lib/clsx';
+import { cn } from '@/lib/cn';
 
 import styles from './Layout.module.scss';
 
@@ -23,7 +23,7 @@ export function Layout() {
         {Object.entries(languages).map(([language, label]) => (
           <a
             key={language}
-            className={clsx(styles.item, i18n.language === language && styles.active)}
+            className={cn(styles.item, i18n.language === language && styles.active)}
             href={location.pathname.replace(/^\/[a-z]{2}(\/.*|)$/, `/${language}$1`)}
           >
             {label}

@@ -10,7 +10,7 @@ import type { Manifest, ViteDevServer } from 'vite';
 
 import { handler } from '@/entry.server';
 import { todosApi } from '@/features/todos/api';
-import { getStatusCodeFromError, serializeError } from '@/lib/errors';
+import { getStatusFromError, serializeError } from '@/lib/errors';
 import { extractScripts, extractStyles } from '@/lib/vite';
 
 const BUILD_DIR = path.resolve('.build');
@@ -65,7 +65,7 @@ export async function create(vite?: ViteDevServer) {
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);
 
-    reply.status(getStatusCodeFromError(error)).send(serializeError(error));
+    reply.status(getStatusFromError(error)).send(serializeError(error));
   });
 
   await app.register(compress, {

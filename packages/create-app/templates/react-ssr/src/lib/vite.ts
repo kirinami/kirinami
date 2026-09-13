@@ -12,8 +12,9 @@ function collectCssModules(
   visitedModules.add(moduleNode);
 
   if (moduleNode.url.endsWith('.css') || moduleNode.url.endsWith('.scss')) {
-    moduleNode.importedModules.forEach((moduleNode) => {
-      visitedModules.add(moduleNode);
+    // What a stylesheet imports is Vite runtime plumbing, not more stylesheets
+    moduleNode.importedModules.forEach((importedModuleNode) => {
+      visitedModules.add(importedModuleNode);
     });
 
     cssModules.add(moduleNode);
@@ -27,11 +28,6 @@ function collectCssModules(
 }
 
 export async function extractStyles(vite: ViteDevServer, url: string) {
-  /* eslint-disable import/no-extraneous-dependencies */
-  const { parse } = await import('acorn');
-  const { simple } = await import('acorn-walk');
-  /* eslint-enable import/no-extraneous-dependencies */
-
   await vite.warmupRequest(url);
 
   const entryModule = await vite.moduleGraph.getModuleByUrl(url);
@@ -41,33 +37,16 @@ export async function extractStyles(vite: ViteDevServer, url: string) {
   let styles = '';
 
   for (const cssModule of cssModules) {
-    const result = await vite.transformRequest(cssModule.url);
+    // `?direct` yields the raw stylesheet instead of the JS module that injects it
+    const separator = cssModule.url.includes('?') ? '&' : '?';
+
+    const result = await vite.transformRequest(`${cssModule.url}${separator}direct`);
 
     if (!result) {
       continue;
     }
 
-    const ast = parse(result.code, {
-      sourceType: 'module',
-      ecmaVersion: 'latest',
-    });
-
-    let id = '';
-    let css = '';
-
-    simple(ast, {
-      VariableDeclarator: (node) => {
-        if (node.id.type === 'Identifier' && node.init?.type === 'Literal') {
-          if (node.id.name === '__vite__id') {
-            id = String(node.init.value);
-          } else if (node.id.name === '__vite__css') {
-            css = String(node.init.value);
-          }
-        }
-      },
-    });
-
-    styles += `<style type="text/css" data-vite-dev-id="${id}">${css}</style>`;
+    styles += `<style type="text/css" data-vite-dev-id="${cssModule.id ?? cssModule.url}">${result.code}</style>`;
   }
 
   return styles;

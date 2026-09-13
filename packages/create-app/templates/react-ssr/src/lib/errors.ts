@@ -1,6 +1,14 @@
-export function getStatusCodeFromError(error: unknown): number {
-  if (error && typeof error === 'object' && 'statusCode' in error && typeof error.statusCode === 'number') {
-    return error.statusCode;
+export function getStatusFromError(error: unknown): number {
+  if (error && typeof error === 'object') {
+    // Fastify errors carry `statusCode`, Response-shaped errors carry `status`
+    const statusCode = 'statusCode' in error && typeof error.statusCode === 'number' ? error.statusCode : undefined;
+    const status = 'status' in error && typeof error.status === 'number' ? error.status : undefined;
+
+    const code = statusCode || status;
+
+    if (code !== undefined && code >= 400 && code <= 599) {
+      return code;
+    }
   }
 
   return 500;

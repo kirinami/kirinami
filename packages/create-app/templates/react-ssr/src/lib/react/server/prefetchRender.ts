@@ -1,29 +1,25 @@
-import { createContext, createElement, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
-import { RenderPromises } from './RenderPromises';
-
-const RenderPromisesContext = createContext(new RenderPromises());
+import { RenderCollector } from './RenderCollector';
 
 export type PrefetchRenderOptions = {
-  onCollect?: (renderPromises: RenderPromises) => Promise<void>;
+  onCollect?: (renderCollector: RenderCollector) => Promise<void>;
 };
 
 export async function prefetchRender<T>(
   children: ReactNode,
   render: (children: ReactNode) => T | Promise<T>,
-  { onCollect }: PrefetchRenderOptions,
+  { onCollect }: PrefetchRenderOptions = {},
 ) {
-  const renderPromises = new RenderPromises();
-
-  const element = createElement(RenderPromisesContext.Provider, { value: renderPromises }, children);
+  const renderCollector = new RenderCollector();
 
   const process = async () => {
-    const result = await render(element);
+    const result = await render(children);
 
-    await onCollect?.(renderPromises);
+    await onCollect?.(renderCollector);
 
-    if (renderPromises.hasPromises()) {
-      await renderPromises.consumeAndAwaitPromises();
+    if (renderCollector.hasPending()) {
+      await renderCollector.runPending();
 
       return await process();
     }
@@ -31,5 +27,5 @@ export async function prefetchRender<T>(
     return result;
   };
 
-  return process().finally(() => renderPromises.stop());
+  return process().finally(() => renderCollector.stop());
 }

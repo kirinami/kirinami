@@ -1,21 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+
+const unsubscribe = () => undefined;
+
+const subscribe = () => unsubscribe;
 
 export function useIsHydrated() {
-  const isHydratedRef = useRef(false);
-
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    if (isHydratedRef.current) {
-      return;
-    }
-
-    isHydratedRef.current = true;
-
-    // Set state in effect to avoid hydration mismatch
-
-    setIsHydrated(true);
-  }, []);
-
-  return isHydrated;
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
 }
